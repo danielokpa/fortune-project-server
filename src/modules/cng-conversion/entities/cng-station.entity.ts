@@ -126,6 +126,15 @@ export class CngStation extends Model<CngStation> {
   })
   public latitude: number;
 
+  @Default('default.png')
+  @AllowNull(true)
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+    defaultValue: 'default.png',
+  })
+  public stationImage: string;
+
   @CreatedAt
   @Column({
     type: DataType.DATE,

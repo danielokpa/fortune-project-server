@@ -18,10 +18,14 @@ const cng_station_review_entity_1 = require("./entities/cng-station-review.entit
 const user_entity_1 = require("../users/entities/user.entity");
 const users_module_1 = require("../users/users.module");
 const cng_conversion_controller_1 = require("./controllers/cng-conversion.controller");
+const cng_stations_controller_1 = require("./controllers/cng-stations.controller");
 const cng_conversion_service_1 = require("./services/cng-conversion.service");
 const cng_station_service_1 = require("./services/cng-station.service");
+const cng_stations_service_1 = require("./services/cng-stations.service");
+const user_cng_station_service_1 = require("./services/user-cng-station.service");
 const cng_conversion_repository_1 = require("./repositories/cng-conversion.repository");
 const cng_station_repository_1 = require("./repositories/cng-station.repository");
+const user_cng_station_repository_1 = require("./repositories/user-cng-station.repository");
 let CngConversionModule = class CngConversionModule {
 };
 exports.CngConversionModule = CngConversionModule;
@@ -39,18 +43,24 @@ exports.CngConversionModule = CngConversionModule = __decorate([
             ]),
             users_module_1.UsersModule,
         ],
-        controllers: [cng_conversion_controller_1.CngConversionController],
+        controllers: [cng_conversion_controller_1.CngConversionController, cng_stations_controller_1.CngStationsController],
         providers: [
             cng_conversion_service_1.CngConversionService,
             cng_station_service_1.CngStationService,
+            cng_stations_service_1.CngStationsService,
+            user_cng_station_service_1.UserCngStationService,
             cng_conversion_repository_1.CngConversionRepository,
             cng_station_repository_1.CngStationRepository,
+            user_cng_station_repository_1.UserCngStationRepository,
         ],
         exports: [
             cng_conversion_service_1.CngConversionService,
             cng_station_service_1.CngStationService,
+            cng_stations_service_1.CngStationsService,
+            user_cng_station_service_1.UserCngStationService,
             cng_conversion_repository_1.CngConversionRepository,
             cng_station_repository_1.CngStationRepository,
+            user_cng_station_repository_1.UserCngStationRepository,
         ],
     })
 ], CngConversionModule);

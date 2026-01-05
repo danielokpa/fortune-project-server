@@ -17,6 +17,7 @@ export declare class CngStation extends Model<CngStation> {
     isActive: boolean;
     longitude: number;
     latitude: number;
+    stationImage: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

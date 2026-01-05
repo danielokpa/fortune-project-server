@@ -264,9 +264,9 @@ export class CngStationRepository {
       whereConditions.push({ state: options.state });
     }
 
-    whereConditions.push({
-      isActive: options?.isActive !== undefined ? options.isActive : true,
-    });
+    // whereConditions.push({
+    //   isActive: options?.isActive !== undefined ? options.isActive : true,
+    // });
 
     const radiusMeters = radiusKm * 1000;
     
@@ -402,29 +402,112 @@ export class CngStationRepository {
     });
   }
 
-  /**
-   * Calculate distance between two coordinates using Haversine formula
-   * Returns distance in kilometers
-   */
-  private calculateDistance(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): number {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = this.toRad(lat2 - lat1);
-    const dLon = this.toRad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRad(lat1)) *
-        Math.cos(this.toRad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+  async search(
+    query: string,
+    options?: {
+      limit?: number;
+      offset?: number;
+      latitude?: number;
+      longitude?: number;
+      radiusKm?: number;
+      userId?: string;
+    },
+  ): Promise<{ stations: Array<{ id: string; name: string; address: string }>; total: number }> {
+    const searchPattern = `%${query}%`;
+    const where: any = {
+      [Op.or]: [
+        { name: { [Op.like]: searchPattern } },
+        { address: { [Op.like]: searchPattern } },
+      ],
+    };
+
+    // If coordinates provided, add distance calculation and filter
+    if (options?.latitude && options?.longitude) {
+      const radiusKm = options.radiusKm || 10;
+      const bufferMultiplier = 1.2;
+      const latDelta = (radiusKm * bufferMultiplier) / 111;
+      const lonDelta = (radiusKm * bufferMultiplier) / (111 * Math.cos(this.toRad(options.latitude)));
+
+      where.latitude = {
+        [Op.between]: [options.latitude - latDelta, options.latitude + latDelta],
+        [Op.ne]: null,
+      };
+      where.longitude = {
+        [Op.between]: [options.longitude - lonDelta, options.longitude + lonDelta],
+        [Op.ne]: null,
+      };
+
+      const radiusMeters = radiusKm * 1000;
+      const distanceExpression = literal(
+        `(ST_Distance_Sphere(
+          ST_GeomFromText(CONCAT('POINT(', longitude, ' ', latitude, ')'), 4326),
+          ST_GeomFromText('POINT(${options.longitude} ${options.latitude})', 4326)
+        ) / 1000)`,
+      );
+
+      const distanceCondition = literal(
+        `ST_Distance_Sphere(
+          ST_GeomFromText(CONCAT('POINT(', longitude, ' ', latitude, ')'), 4326),
+          ST_GeomFromText('POINT(${options.longitude} ${options.latitude})', 4326)
+        ) <= ${radiusMeters}`,
+      );
+
+      where[Op.and] = [distanceCondition];
+
+      const limit = options?.limit || 20;
+      const offset = options?.offset || 0;
+
+      const [stations, total] = await Promise.all([
+        this.cngStationModel.findAll({
+          where,
+          attributes: ['id', 'name', 'address'],
+          order: [[distanceExpression, 'ASC']],
+          limit,
+          offset,
+        }),
+        this.cngStationModel.count({ where }),
+      ]);
+
+      return {
+        stations: stations.map((s) => {
+          const data = s.get ? s.get({ plain: true }) : (s.toJSON ? s.toJSON() : s);
+          return {
+            id: String(data.id || ''),
+            name: String(data.name || ''),
+            address: String(data.address || ''),
+          };
+        }),
+        total,
+      };
+    }
+
+    // Search without coordinates (just name/address search)
+    const limit = options?.limit || 20;
+    const offset = options?.offset || 0;
+
+    const [stations, total] = await Promise.all([
+      this.cngStationModel.findAll({
+        where,
+        attributes: ['id', 'name', 'address'],
+        order: [['name', 'ASC']],
+        raw: true,
+      }),
+      this.cngStationModel.count({ where }),
+    ]);
+
+    return {
+      stations: (stations as any[]).map((s) => ({
+        id: String(s.id || ''),
+        name: String(s.name || ''),
+        address: String(s.address || ''),
+      })),
+      total,
+    };
   }
 
+  /**
+   * Helper method to convert degrees to radians
+   */
   private toRad(degrees: number): number {
     return (degrees * Math.PI) / 180;
   }

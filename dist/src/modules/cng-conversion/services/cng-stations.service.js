@@ -11,17 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var CngStationService_1;
+var CngStationsService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CngStationService = void 0;
+exports.CngStationsService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const cng_station_favorite_entity_1 = require("../entities/cng-station-favorite.entity");
 const cng_station_repository_1 = require("../repositories/cng-station.repository");
-let CngStationService = CngStationService_1 = class CngStationService {
+let CngStationsService = CngStationsService_1 = class CngStationsService {
     cngStationRepository;
     cngStationFavoriteModel;
-    logger = new common_1.Logger(CngStationService_1.name);
+    logger = new common_1.Logger(CngStationsService_1.name);
     DEFAULT_IMAGE_URL = 'https://www.peppcruise.com/images/about/';
     constructor(cngStationRepository, cngStationFavoriteModel) {
         this.cngStationRepository = cngStationRepository;
@@ -58,9 +58,8 @@ let CngStationService = CngStationService_1 = class CngStationService {
                 }, userId),
                 this.cngStationRepository.count({ where }),
             ]);
-            const stationsWithImages = this.addDefaultImages(stations);
             return {
-                stations: stationsWithImages,
+                stations: this.addDefaultImages(stations),
                 total,
                 page,
                 limit,
@@ -91,9 +90,8 @@ let CngStationService = CngStationService_1 = class CngStationService {
                     },
                 }),
             ]);
-            const stationsWithImages = this.addDefaultImages(stations);
             return {
-                stations: stationsWithImages,
+                stations: this.addDefaultImages(stations),
                 total,
                 page,
                 limit,
@@ -104,13 +102,6 @@ let CngStationService = CngStationService_1 = class CngStationService {
             this.logger.error(`Error fetching active CNG stations: ${error.message}`);
             throw new common_1.BadRequestException(`Failed to fetch active CNG stations: ${error.message}`);
         }
-    }
-    async findById(id, userId) {
-        const station = await this.cngStationRepository.findById(id, userId);
-        if (!station) {
-            throw new common_1.NotFoundException(`CNG station with ID ${id} not found`);
-        }
-        return this.addDefaultImage(station);
     }
     async findNearbyStations(findNearbyDto) {
         try {
@@ -125,9 +116,8 @@ let CngStationService = CngStationService_1 = class CngStationService {
                 state: findNearbyDto.state,
                 userId: findNearbyDto.userId,
             });
-            const stationsWithImages = this.addDefaultImages(stations);
             return {
-                stations: stationsWithImages,
+                stations: this.addDefaultImages(stations),
                 total,
                 page,
                 limit,
@@ -137,6 +127,22 @@ let CngStationService = CngStationService_1 = class CngStationService {
         catch (error) {
             this.logger.error(`Error finding nearby CNG stations: ${error.message}`);
             throw new common_1.BadRequestException(`Failed to find nearby CNG stations: ${error.message}`);
+        }
+    }
+    async findById(id, userId) {
+        try {
+            const station = await this.cngStationRepository.findById(id, userId);
+            if (!station) {
+                throw new common_1.NotFoundException(`CNG station with ID ${id} not found`);
+            }
+            return this.addDefaultImage(station);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            this.logger.error(`Error fetching CNG station by ID: ${error.message}`);
+            throw new common_1.BadRequestException(`Failed to fetch CNG station: ${error.message}`);
         }
     }
     async search(searchDto, userId) {
@@ -205,10 +211,10 @@ let CngStationService = CngStationService_1 = class CngStationService {
         }
     }
 };
-exports.CngStationService = CngStationService;
-exports.CngStationService = CngStationService = CngStationService_1 = __decorate([
+exports.CngStationsService = CngStationsService;
+exports.CngStationsService = CngStationsService = CngStationsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, sequelize_1.InjectModel)(cng_station_favorite_entity_1.CngStationFavorite)),
     __metadata("design:paramtypes", [cng_station_repository_1.CngStationRepository, Object])
-], CngStationService);
-//# sourceMappingURL=cng-station.service.js.map
+], CngStationsService);
+//# sourceMappingURL=cng-stations.service.js.map

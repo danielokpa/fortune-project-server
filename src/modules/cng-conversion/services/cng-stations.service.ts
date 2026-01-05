@@ -8,11 +8,21 @@ import { InjectModel } from '@nestjs/sequelize';
 import { CngStation } from '../entities/cng-station.entity';
 import { CngStationFavorite } from '../entities/cng-station-favorite.entity';
 import { CngStationRepository } from '../repositories/cng-station.repository';
-import { FindCngStationsDto, SearchCngStationsDto } from '../dto/cng-station.dto';
+import {
+  FindCngStationsDto,
+  SearchCngStationsDto,
+  FindCngStationsQueryDto,
+} from '../dto/cng-station.dto';
+import {
+  ICngStation,
+  IStationsListResponse,
+  IStationsSearchResponse,
+  IToggleFavoriteResponse,
+} from '../interfaces/cng-station.interface';
 
 @Injectable()
-export class CngStationService {
-  private readonly logger = new Logger(CngStationService.name);
+export class CngStationsService {
+  private readonly logger = new Logger(CngStationsService.name);
   private readonly DEFAULT_IMAGE_URL = 'https://www.peppcruise.com/images/about/';
 
   constructor(
@@ -24,18 +34,19 @@ export class CngStationService {
   /**
    * Add default image URL to station if not present
    */
-  private addDefaultImage(station: CngStation): CngStation {
+  private addDefaultImage(station: CngStation): ICngStation {
     const stationData = station.toJSON ? station.toJSON() : station;
     return {
       ...(stationData as any),
-      stationImage: (stationData as any).stationImage || this.DEFAULT_IMAGE_URL,
-    } as any;
+      stationImage:
+        (stationData as any).stationImage || this.DEFAULT_IMAGE_URL,
+    } as ICngStation;
   }
 
   /**
    * Add default image URL to multiple stations
    */
-  private addDefaultImages(stations: CngStation[]): CngStation[] {
+  private addDefaultImages(stations: CngStation[]): ICngStation[] {
     return stations.map((station) => this.addDefaultImage(station));
   }
 
@@ -43,21 +54,9 @@ export class CngStationService {
    * Get all CNG stations with optional filters
    */
   async findAll(
-    options?: {
-      page?: number;
-      limit?: number;
-      country?: string;
-      state?: string;
-      isActive?: boolean;
-    },
+    options?: FindCngStationsQueryDto,
     userId?: string,
-  ): Promise<{
-    stations: CngStation[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }> {
+  ): Promise<IStationsListResponse> {
     try {
       const page = options?.page || 1;
       const limit = options?.limit || 10;
@@ -82,11 +81,8 @@ export class CngStationService {
         this.cngStationRepository.count({ where }),
       ]);
 
-      // Add default image URL to stations
-      const stationsWithImages = this.addDefaultImages(stations);
-
       return {
-        stations: stationsWithImages as any,
+        stations: this.addDefaultImages(stations),
         total,
         page,
         limit,
@@ -104,20 +100,9 @@ export class CngStationService {
    * Get all active CNG stations with optional filters
    */
   async findActiveStations(
-    options?: {
-      page?: number;
-      limit?: number;
-      country?: string;
-      state?: string;
-    },
+    options?: FindCngStationsQueryDto,
     userId?: string,
-  ): Promise<{
-    stations: CngStation[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }> {
+  ): Promise<IStationsListResponse> {
     try {
       const page = options?.page || 1;
       const limit = options?.limit || 10;
@@ -141,18 +126,17 @@ export class CngStationService {
         }),
       ]);
 
-      // Add default image URL to stations
-      const stationsWithImages = this.addDefaultImages(stations);
-
       return {
-        stations: stationsWithImages as any,
+        stations: this.addDefaultImages(stations),
         total,
         page,
         limit,
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      this.logger.error(`Error fetching active CNG stations: ${error.message}`);
+      this.logger.error(
+        `Error fetching active CNG stations: ${error.message}`,
+      );
       throw new BadRequestException(
         `Failed to fetch active CNG stations: ${error.message}`,
       );
@@ -160,61 +144,74 @@ export class CngStationService {
   }
 
   /**
-   * Get a CNG station by ID
-   */
-  async findById(id: string, userId?: string): Promise<CngStation> {
-    const station = await this.cngStationRepository.findById(id, userId);
-    if (!station) {
-      throw new NotFoundException(`CNG station with ID ${id} not found`);
-    }
-    return this.addDefaultImage(station);
-  }
-
-  /**
-   * Find nearby CNG stations
+   * Find nearby CNG stations based on coordinates
    */
   async findNearbyStations(
-    findNearbyDto: FindCngStationsDto & { userId?: string },
-  ): Promise<{
-    stations: CngStation[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }> {
+    findNearbyDto: FindCngStationsDto & {
+      country?: string;
+      state?: string;
+      isActive?: boolean;
+      page?: number;
+      limit?: number;
+      userId?: string;
+    },
+  ): Promise<IStationsListResponse> {
     try {
       const page = findNearbyDto.page || 1;
       const limit = findNearbyDto.limit || 10;
       const offset = (page - 1) * limit;
       const radiusKm = findNearbyDto.radiusKm || 10;
 
-      const { stations, total } = await this.cngStationRepository.findNearbyStations(
-        findNearbyDto.latitude,
-        findNearbyDto.longitude,
-        radiusKm,
-        {
-          limit,
-          offset,
-          country: findNearbyDto.country,
-          state: findNearbyDto.state,
-          userId: findNearbyDto.userId,
-        },
-      );
-
-      // Add default image URL to stations
-      const stationsWithImages = this.addDefaultImages(stations);
+      const { stations, total } =
+        await this.cngStationRepository.findNearbyStations(
+          findNearbyDto.latitude,
+          findNearbyDto.longitude,
+          radiusKm,
+          {
+            limit,
+            offset,
+            country: findNearbyDto.country,
+            state: findNearbyDto.state,
+            userId: findNearbyDto.userId,
+          },
+        );
 
       return {
-        stations: stationsWithImages as any,
+        stations: this.addDefaultImages(stations),
         total,
         page,
         limit,
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      this.logger.error(`Error finding nearby CNG stations: ${error.message}`);
+      this.logger.error(
+        `Error finding nearby CNG stations: ${error.message}`,
+      );
       throw new BadRequestException(
         `Failed to find nearby CNG stations: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Get a CNG station by ID
+   */
+  async findById(id: string, userId?: string): Promise<ICngStation> {
+    try {
+      const station = await this.cngStationRepository.findById(id, userId);
+      if (!station) {
+        throw new NotFoundException(`CNG station with ID ${id} not found`);
+      }
+      return this.addDefaultImage(station);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(
+        `Error fetching CNG station by ID: ${error.message}`,
+      );
+      throw new BadRequestException(
+        `Failed to fetch CNG station: ${error.message}`,
       );
     }
   }
@@ -227,13 +224,7 @@ export class CngStationService {
   async search(
     searchDto: SearchCngStationsDto,
     userId?: string,
-  ): Promise<{
-    stations: Array<{ id: string; name: string; address: string }>;
-    total: number;
-    limit: number;
-    offset: number;
-    totalPages: number;
-  }> {
+  ): Promise<IStationsSearchResponse> {
     try {
       const limit = searchDto.limit || 20;
       const offset = searchDto.offset || 0;
@@ -273,7 +264,7 @@ export class CngStationService {
   async toggleFavorite(
     userId: string,
     stationId: string,
-  ): Promise<{ isFavorite: boolean; message: string }> {
+  ): Promise<IToggleFavoriteResponse> {
     try {
       // Verify station exists
       const station = await this.cngStationRepository.findById(stationId);

@@ -28,6 +28,7 @@ let CngStation = class CngStation extends sequelize_typescript_1.Model {
     isActive;
     longitude;
     latitude;
+    stationImage;
 };
 exports.CngStation = CngStation;
 __decorate([
@@ -151,6 +152,16 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], CngStation.prototype, "latitude", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)('default.png'),
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(500),
+        allowNull: true,
+        defaultValue: 'default.png',
+    }),
+    __metadata("design:type", String)
+], CngStation.prototype, "stationImage", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.Column)({

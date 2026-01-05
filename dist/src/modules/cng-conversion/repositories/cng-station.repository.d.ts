@@ -37,6 +37,20 @@ export declare class CngStationRepository {
     create(cngStationData: Partial<CngStation>): Promise<CngStation>;
     update(id: string, cngStationData: Partial<CngStation>): Promise<[number, CngStation[]]>;
     delete(id: string): Promise<number>;
-    private calculateDistance;
+    search(query: string, options?: {
+        limit?: number;
+        offset?: number;
+        latitude?: number;
+        longitude?: number;
+        radiusKm?: number;
+        userId?: string;
+    }): Promise<{
+        stations: Array<{
+            id: string;
+            name: string;
+            address: string;
+        }>;
+        total: number;
+    }>;
     private toRad;
 }

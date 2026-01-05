@@ -1,0 +1,73 @@
+const { QueryInterface, DataTypes } = require('sequelize');
+
+module.exports = {
+  up: async (queryInterface) => {
+    await queryInterface.addColumn('cng_stations', 'address', {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'contactPhone', {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'openingTime', {
+      type: DataTypes.TIME,
+      allowNull: false,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'closingTime', {
+      type: DataTypes.TIME,
+      allowNull: false,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'amountPerUnit', {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'currency', {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      defaultValue: 'NGN',
+    });
+
+    await queryInterface.addColumn('cng_stations', 'amountPerUnitType', {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      defaultValue: 'kwh',
+    });
+
+    await queryInterface.addColumn('cng_stations', 'contactEmail', {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'isActive', {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    });
+
+    await queryInterface.addColumn('cng_stations', 'stationImage', {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: 'default.png',
+    });
+  },
+
+  down: async (queryInterface) => {
+    await queryInterface.removeColumn('cng_stations', 'address');
+    await queryInterface.removeColumn('cng_stations', 'contactPhone');
+    await queryInterface.removeColumn('cng_stations', 'openingTime');
+    await queryInterface.removeColumn('cng_stations', 'closingTime');
+    await queryInterface.removeColumn('cng_stations', 'amountPerUnit');
+    await queryInterface.removeColumn('cng_stations', 'currency');
+    await queryInterface.removeColumn('cng_stations', 'amountPerUnitType');
+    await queryInterface.removeColumn('cng_stations', 'contactEmail');
+    await queryInterface.removeColumn('cng_stations', 'isActive');
+    await queryInterface.removeColumn('cng_stations', 'stationImage');
+  },
+};
+
