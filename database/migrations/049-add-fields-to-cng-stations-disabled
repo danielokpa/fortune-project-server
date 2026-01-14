@@ -2,25 +2,25 @@ const { QueryInterface, DataTypes } = require('sequelize');
 
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.addColumn('cng_stations', 'address', {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    });
+    // await queryInterface.addColumn('cng_stations', 'address', {
+    //   type: DataTypes.STRING(100),
+    //   allowNull: false,
+    // });
 
-    await queryInterface.addColumn('cng_stations', 'contactPhone', {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    });
+    // await queryInterface.addColumn('cng_stations', 'contactPhone', {
+    //   type: DataTypes.STRING(100),
+    //   allowNull: false,
+    // });
 
-    await queryInterface.addColumn('cng_stations', 'openingTime', {
-      type: DataTypes.TIME,
-      allowNull: false,
-    });
+    // await queryInterface.addColumn('cng_stations', 'openingTime', {
+    //   type: DataTypes.TIME,
+    //   allowNull: false,
+    // });
 
-    await queryInterface.addColumn('cng_stations', 'closingTime', {
-      type: DataTypes.TIME,
-      allowNull: false,
-    });
+    // await queryInterface.addColumn('cng_stations', 'closingTime', {
+    //   type: DataTypes.TIME,
+    //   allowNull: false,
+    // });
 
     await queryInterface.addColumn('cng_stations', 'amountPerUnit', {
       type: DataTypes.DECIMAL(10, 2),

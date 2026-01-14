@@ -20,6 +20,45 @@ module.exports = {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      address: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      contactPhone: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      openingTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
+      },
+      closingTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
+      },
+      amountPerUnit: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
+      currency: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        defaultValue: 'NGN',
+      },
+      amountPerUnitType: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        defaultValue: 'kwh',
+      },
+      contactEmail: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       longitude: {
         type: DataTypes.DECIMAL(10, 8),
         allowNull: true,
@@ -31,6 +70,11 @@ module.exports = {
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
+      },
+      stationImage: {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+        defaultValue: 'default.png',
       },
       updatedAt: {
         type: DataTypes.DATE,

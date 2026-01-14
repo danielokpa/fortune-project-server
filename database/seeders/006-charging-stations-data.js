@@ -192,8 +192,8 @@ module.exports = {
         amountPerUnit: 50.00, // Default 50 NGN per kWh
         currency: 'NGN', // Nigerian Naira
         amountPerUnitType: 'kwh',
-        rating: 0,
-        reviews: 0,
+        // rating: 0,
+        // reviews: 0,
         isActive: true,
         latitude: station.latitude,
         longitude: station.longitude,
