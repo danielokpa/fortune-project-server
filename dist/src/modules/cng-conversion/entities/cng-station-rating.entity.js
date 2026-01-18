@@ -12,12 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CngStationRating = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const cng_station_entity_1 = require("./cng-station.entity");
-const user_entity_1 = require("../../users/entities/user.entity");
 let CngStationRating = class CngStationRating extends sequelize_typescript_1.Model {
     stationId;
     cngStation;
     userId;
-    user;
     rating;
 };
 exports.CngStationRating = CngStationRating;
@@ -42,17 +40,12 @@ __decorate([
 ], CngStationRating.prototype, "cngStation", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.UUID,
         allowNull: false,
     }),
     __metadata("design:type", String)
 ], CngStationRating.prototype, "userId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User),
-    __metadata("design:type", user_entity_1.User)
-], CngStationRating.prototype, "user", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({

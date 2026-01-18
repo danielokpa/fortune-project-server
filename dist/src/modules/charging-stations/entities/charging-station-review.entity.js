@@ -12,12 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChargingStationReview = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const charging_station_entity_1 = require("./charging-station.entity");
-const user_entity_1 = require("../../users/entities/user.entity");
 let ChargingStationReview = class ChargingStationReview extends sequelize_typescript_1.Model {
     stationId;
     chargingStation;
     userId;
-    user;
     message;
 };
 exports.ChargingStationReview = ChargingStationReview;
@@ -42,17 +40,12 @@ __decorate([
 ], ChargingStationReview.prototype, "chargingStation", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.UUID,
         allowNull: false,
     }),
     __metadata("design:type", String)
 ], ChargingStationReview.prototype, "userId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User),
-    __metadata("design:type", user_entity_1.User)
-], ChargingStationReview.prototype, "user", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
