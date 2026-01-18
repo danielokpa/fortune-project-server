@@ -201,10 +201,21 @@ export class CngStationsService {
 
   /**
    * Get a CNG station by ID
+   * If coordinates are provided, distance will be calculated and included in the response
    */
-  async findById(id: string, userId?: string): Promise<ICngStation> {
+  async findById(
+    id: string, 
+    userId?: string,
+    latitude?: number,
+    longitude?: number,
+  ): Promise<ICngStation> {
     try {
-      const station = await this.cngStationRepository.findById(id, userId);
+      const station = await this.cngStationRepository.findById(
+        id, 
+        userId,
+        latitude,
+        longitude,
+      );
       if (!station) {
         throw new NotFoundException(`CNG station with ID ${id} not found`);
       }

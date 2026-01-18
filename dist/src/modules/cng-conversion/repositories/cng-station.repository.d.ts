@@ -9,7 +9,7 @@ export declare class CngStationRepository {
     private readonly cngStationReviewModel;
     constructor(cngStationModel: typeof CngStation, cngStationFavoriteModel: typeof CngStationFavorite, cngStationRatingModel: typeof CngStationRating, cngStationReviewModel: typeof CngStationReview);
     count(options?: any): Promise<number>;
-    findById(id: string, userId?: string): Promise<CngStation | null>;
+    findById(id: string, userId?: string, latitude?: number, longitude?: number): Promise<CngStation | null>;
     findAll(options?: {
         where?: any;
         limit?: number;

@@ -20,12 +20,6 @@ module.exports = {
       },
       userId: {
         type: DataTypes.UUID,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
         allowNull: false,
       },
       message: {

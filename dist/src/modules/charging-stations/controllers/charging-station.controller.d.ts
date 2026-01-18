@@ -39,9 +39,9 @@ export declare class ChargingStationController {
         offset: number;
         totalPages: number;
     }>>;
-    findById(id: string, req: ExpressRequest & {
+    findById(req: ExpressRequest & {
         user: JwtAuthPayload;
-    }): Promise<import("src/utils/response.utils").ApiResponse<import("../entities/charging-station.entity").ChargingStation>>;
+    }, id: string, latitude?: number, longitude?: number): Promise<import("src/utils/response.utils").ApiResponse<import("../entities/charging-station.entity").ChargingStation>>;
     startTrip(req: ExpressRequest & {
         user: JwtAuthPayload;
     }, startTripDto: StartTripDto): Promise<import("src/utils/response.utils").ApiResponse<import("../entities/user-charging-station.entity").UserChargingStation>>;

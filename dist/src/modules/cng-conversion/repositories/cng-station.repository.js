@@ -35,8 +35,20 @@ let CngStationRepository = class CngStationRepository {
         const count = await this.cngStationModel.count(options);
         return typeof count === 'number' ? count : count.length || 0;
     }
-    async findById(id, userId) {
-        const station = await this.cngStationModel.findByPk(id);
+    async findById(id, userId, latitude, longitude) {
+        let findOptions = {};
+        if (latitude !== undefined && longitude !== undefined) {
+            const distanceExpression = (0, sequelize_2.literal)(`(ST_Distance_Sphere(
+          ST_GeomFromText(CONCAT('POINT(', longitude, ' ', latitude, ')'), 4326),
+          ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)
+        ) / 1000)`);
+            findOptions.attributes = {
+                include: [
+                    [distanceExpression, 'distance'],
+                ],
+            };
+        }
+        const station = await this.cngStationModel.findByPk(id, findOptions);
         if (!station)
             return null;
         const [isFavorite, ratingData, totalReviews] = await Promise.all([

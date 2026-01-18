@@ -135,9 +135,9 @@ let CngStationsService = CngStationsService_1 = class CngStationsService {
             throw new common_1.BadRequestException(`Failed to find nearby CNG stations: ${error.message}`);
         }
     }
-    async findById(id, userId) {
+    async findById(id, userId, latitude, longitude) {
         try {
-            const station = await this.cngStationRepository.findById(id, userId);
+            const station = await this.cngStationRepository.findById(id, userId, latitude, longitude);
             if (!station) {
                 throw new common_1.NotFoundException(`CNG station with ID ${id} not found`);
             }

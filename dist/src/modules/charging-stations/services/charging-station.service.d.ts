@@ -48,7 +48,7 @@ export declare class ChargingStationService {
         limit: number;
         totalPages: number;
     }>;
-    findById(id: string, userId?: string): Promise<ChargingStation>;
+    findById(id: string, userId?: string, latitude?: number, longitude?: number): Promise<ChargingStation>;
     update(id: string, updateDto: UpdateChargingStationDto): Promise<ChargingStation>;
     delete(id: string): Promise<void>;
     search(searchDto: SearchChargingStationsDto, userId?: string): Promise<{

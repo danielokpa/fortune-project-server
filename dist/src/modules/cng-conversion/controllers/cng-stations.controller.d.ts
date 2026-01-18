@@ -19,9 +19,9 @@ export declare class CngStationsController {
     search(searchDto: SearchCngStationsDto, req: ExpressRequest & {
         user: JwtAuthPayload;
     }): Promise<import("src/utils/response.utils").ApiResponse<import("../interfaces/cng-station.interface").IStationsSearchResponse>>;
-    findById(id: string, req: ExpressRequest & {
+    findById(req: ExpressRequest & {
         user: JwtAuthPayload;
-    }): Promise<import("src/utils/response.utils").ApiResponse<import("../interfaces/cng-station.interface").ICngStation>>;
+    }, id: string, latitude?: number, longitude?: number): Promise<import("src/utils/response.utils").ApiResponse<import("../interfaces/cng-station.interface").ICngStation>>;
     toggleFavorite(req: ExpressRequest & {
         user: JwtAuthPayload;
     }, cngStationId: string): Promise<import("src/utils/response.utils").ApiResponse<import("../interfaces/cng-station.interface").IToggleFavoriteResponse>>;

@@ -171,18 +171,42 @@ export class CngStationsController {
     UserType.DRIVER,
   )
   @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Get a CNG station by ID' })
+  @ApiOperation({ 
+    summary: 'Get a CNG station by ID',
+    description: 'Optionally provide latitude and longitude to calculate distance from user location',
+  })
+  @ApiQuery({ 
+    name: 'latitude', 
+    required: false, 
+    type: Number, 
+    description: 'User\'s current latitude for distance calculation',
+    example: 6.5244,
+  })
+  @ApiQuery({ 
+    name: 'longitude', 
+    required: false, 
+    type: Number, 
+    description: 'User\'s current longitude for distance calculation',
+    example: 3.3792,
+  })
   @ApiResponse({
     status: 200,
     description: 'CNG station retrieved successfully',
   })
   @ApiResponse({ status: 404, description: 'CNG station not found' })
   async findById(
-    @Param('id', ParseUUIDPipe) id: string,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
   ) {
     const userId = req.user?.userId;
-    const data = await this.cngStationsService.findById(id, userId);
+    const data = await this.cngStationsService.findById(
+      id, 
+      userId,
+      latitude ? Number(latitude) : undefined,
+      longitude ? Number(longitude) : undefined,
+    );
     return ResponseUtil.handleResponse(
       data,
       'CNG station retrieved successfully',

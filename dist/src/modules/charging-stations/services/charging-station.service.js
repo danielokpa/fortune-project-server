@@ -177,9 +177,9 @@ let ChargingStationService = ChargingStationService_1 = class ChargingStationSer
             throw new common_1.BadRequestException(`Failed to find nearby charging stations: ${error.message}`);
         }
     }
-    async findById(id, userId) {
+    async findById(id, userId, latitude, longitude) {
         try {
-            const station = await this.chargingStationRepository.findById(id, userId);
+            const station = await this.chargingStationRepository.findById(id, userId, latitude, longitude);
             if (!station) {
                 throw new common_1.NotFoundException(`Charging station with ID ${id} not found`);
             }

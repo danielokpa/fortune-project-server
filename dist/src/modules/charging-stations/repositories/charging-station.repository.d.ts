@@ -9,7 +9,7 @@ export declare class ChargingStationRepository {
     private readonly chargingStationReviewModel;
     constructor(chargingStationModel: typeof ChargingStation, chargingStationFavoriteModel: typeof ChargingStationFavorite, chargingStationRatingModel: typeof ChargingStationRating, chargingStationReviewModel: typeof ChargingStationReview);
     count(options?: any): Promise<number>;
-    findById(id: string, userId?: string): Promise<ChargingStation | null>;
+    findById(id: string, userId?: string, latitude?: number, longitude?: number): Promise<ChargingStation | null>;
     findAll(options?: {
         where?: any;
         limit?: number;

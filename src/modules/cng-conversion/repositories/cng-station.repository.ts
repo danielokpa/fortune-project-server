@@ -24,8 +24,29 @@ export class CngStationRepository {
     return typeof count === 'number' ? count : (count as any).length || 0;
   }
 
-  async findById(id: string, userId?: string): Promise<CngStation | null> {
-    const station = await this.cngStationModel.findByPk(id);
+  async findById(
+    id: string, 
+    userId?: string,
+    latitude?: number,
+    longitude?: number,
+  ): Promise<CngStation | null> {
+    // If coordinates are provided, calculate distance
+    let findOptions: any = {};
+    if (latitude !== undefined && longitude !== undefined) {
+      const distanceExpression = literal(
+        `(ST_Distance_Sphere(
+          ST_GeomFromText(CONCAT('POINT(', longitude, ' ', latitude, ')'), 4326),
+          ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)
+        ) / 1000)`,
+      );
+      findOptions.attributes = {
+        include: [
+          [distanceExpression, 'distance'],
+        ],
+      };
+    }
+
+    const station = await this.cngStationModel.findByPk(id, findOptions);
 
     if (!station) return null;
 

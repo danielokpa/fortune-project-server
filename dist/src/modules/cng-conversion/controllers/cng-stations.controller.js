@@ -53,9 +53,9 @@ let CngStationsController = class CngStationsController {
         const data = await this.cngStationsService.search(searchDto, userId);
         return response_utils_1.ResponseUtil.handleResponse(data, 'CNG stations retrieved successfully', common_1.HttpStatus.OK);
     }
-    async findById(id, req) {
+    async findById(req, id, latitude, longitude) {
         const userId = req.user?.userId;
-        const data = await this.cngStationsService.findById(id, userId);
+        const data = await this.cngStationsService.findById(id, userId, latitude ? Number(latitude) : undefined, longitude ? Number(longitude) : undefined);
         return response_utils_1.ResponseUtil.handleResponse(data, 'CNG station retrieved successfully', common_1.HttpStatus.OK);
     }
     async toggleFavorite(req, cngStationId) {
@@ -171,16 +171,35 @@ __decorate([
     (0, common_1.Get)(':id'),
     (0, roles_decorator_1.Roles)(enums_1.UserType.PEPP_ADMIN, enums_1.UserType.SUPER_ADMIN, enums_1.UserType.USER, enums_1.UserType.DRIVER),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Get a CNG station by ID' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get a CNG station by ID',
+        description: 'Optionally provide latitude and longitude to calculate distance from user location',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'latitude',
+        required: false,
+        type: Number,
+        description: 'User\'s current latitude for distance calculation',
+        example: 6.5244,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'longitude',
+        required: false,
+        type: Number,
+        description: 'User\'s current longitude for distance calculation',
+        example: 3.3792,
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'CNG station retrieved successfully',
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'CNG station not found' }),
-    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
-    __param(1, (0, common_1.Request)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    __param(2, (0, common_1.Query)('latitude')),
+    __param(3, (0, common_1.Query)('longitude')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object, String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], CngStationsController.prototype, "findById", null);
 __decorate([

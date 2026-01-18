@@ -12,7 +12,6 @@ import {
   AllowNull,
 } from 'sequelize-typescript';
 import { CngStation } from './cng-station.entity';
-import { User } from '../../users/entities/user.entity';
 
 @Table({
   tableName: 'cng_station_reviews',
@@ -36,15 +35,11 @@ export class CngStationReview extends Model<CngStationReview> {
   public cngStation: CngStation;
 
   @AllowNull(false)
-  @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
   public userId: string;
-
-  @BelongsTo(() => User)
-  public user: User;
 
   @AllowNull(false)
   @Column({

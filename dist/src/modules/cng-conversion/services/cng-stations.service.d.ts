@@ -24,7 +24,7 @@ export declare class CngStationsService {
         limit?: number;
         userId?: string;
     }): Promise<IStationsListResponse>;
-    findById(id: string, userId?: string): Promise<ICngStation>;
+    findById(id: string, userId?: string, latitude?: number, longitude?: number): Promise<ICngStation>;
     search(searchDto: SearchCngStationsDto, userId?: string): Promise<IStationsSearchResponse>;
     toggleFavorite(userId: string, stationId: string): Promise<IToggleFavoriteResponse>;
 }

@@ -285,10 +285,21 @@ export class ChargingStationService {
 
   /**
    * Get a charging station by ID
+   * If coordinates are provided, distance will be calculated and included in the response
    */
-  async findById(id: string, userId?: string): Promise<ChargingStation> {
+  async findById(
+    id: string, 
+    userId?: string,
+    latitude?: number,
+    longitude?: number,
+  ): Promise<ChargingStation> {
     try {
-      const station = await this.chargingStationRepository.findById(id, userId);
+      const station = await this.chargingStationRepository.findById(
+        id, 
+        userId,
+        latitude,
+        longitude,
+      );
       if (!station) {
         throw new NotFoundException(`Charging station with ID ${id} not found`);
       }

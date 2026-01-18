@@ -208,18 +208,42 @@ export class ChargingStationController {
     UserType.DRIVER,
   )
   @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Get a charging station by ID' })
+  @ApiOperation({ 
+    summary: 'Get a charging station by ID',
+    description: 'If latitude and longitude are provided, distance will be calculated and included in the response.',
+  })
+  @ApiQuery({ 
+    name: 'latitude', 
+    required: false, 
+    type: Number, 
+    example: 6.5244,
+    description: 'User\'s current latitude for distance calculation',
+  })
+  @ApiQuery({ 
+    name: 'longitude', 
+    required: false, 
+    type: Number, 
+    example: 3.3792,
+    description: 'User\'s current longitude for distance calculation',
+  })
   @ApiResponse({
     status: 200,
     description: 'Charging station retrieved successfully',
   })
   @ApiResponse({ status: 404, description: 'Charging station not found' })
   async findById(
-    @Param('id', ParseUUIDPipe) id: string,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
   ) {
     const userId = req.user?.userId;
-    const data = await this.chargingStationService.findById(id, userId);
+    const data = await this.chargingStationService.findById(
+      id, 
+      userId,
+      latitude ? Number(latitude) : undefined,
+      longitude ? Number(longitude) : undefined,
+    );
     return ResponseUtil.handleResponse(
       data,
       'Charging station retrieved successfully',
