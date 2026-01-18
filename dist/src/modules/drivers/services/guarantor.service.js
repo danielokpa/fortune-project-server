@@ -76,7 +76,7 @@ let GuarantorService = class GuarantorService {
                     });
                 }
             }
-            return data;
+            return [data];
         }
         catch (error) {
             throw new common_1.BadRequestException(error.message);

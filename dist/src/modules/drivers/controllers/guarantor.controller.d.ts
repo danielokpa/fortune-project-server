@@ -8,7 +8,7 @@ export declare class GuarantorController {
     constructor(guarantorService: GuarantorService);
     create(driverId: string, guarantorData: CreateGuarantorDto, req: ExpressRequest & {
         user: JwtAuthPayload;
-    }): Promise<import("src/utils/response.utils").ApiResponse<Guarantor>>;
+    }): Promise<import("src/utils/response.utils").ApiResponse<Guarantor[]>>;
     findByDriverId(req: ExpressRequest & {
         user: JwtAuthPayload;
     }): Promise<import("src/utils/response.utils").ApiResponse<Guarantor[]>>;

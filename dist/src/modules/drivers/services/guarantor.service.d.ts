@@ -12,7 +12,7 @@ export declare class GuarantorService {
     findById(id: string): Promise<Guarantor | null>;
     findByDriverId(driverId: string): Promise<Guarantor[]>;
     countByDriverId(driverId: string): Promise<number>;
-    create(driverId: string, guarantorData: CreateGuarantorDto): Promise<Guarantor>;
+    create(driverId: string, guarantorData: CreateGuarantorDto): Promise<Guarantor[]>;
     update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]>;
     deleteGuarantor(id: string, driverId: string): Promise<number>;
     deleteByDriverId(driverId: string): Promise<number>;

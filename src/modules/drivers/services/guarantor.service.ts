@@ -31,7 +31,7 @@ export class GuarantorService {
     return await this.guarantorRepository.countByDriverId(driverId);
   }
 
-  async create(driverId: string, guarantorData: CreateGuarantorDto): Promise<Guarantor> {
+  async create(driverId: string, guarantorData: CreateGuarantorDto): Promise<Guarantor[]> {
 
     try {
       const count = await this.guarantorRepository.countByDriverId(driverId);
@@ -81,7 +81,7 @@ export class GuarantorService {
         }
       }
 
-      return data;
+      return [data];
     } catch (error) {
       throw new BadRequestException(error.message);
     }
