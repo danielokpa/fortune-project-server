@@ -6,6 +6,7 @@ import { ChargingStationFavorite } from './entities/charging-station-favorite.en
 import { ChargingStationRating } from './entities/charging-station-rating.entity';
 import { ChargingStationReview } from './entities/charging-station-review.entity';
 import { User } from '../users/entities/user.entity';
+import { Driver } from '../drivers/entities/driver.entity';
 import { Country } from '../countries/entities/country.entity';
 import { State } from '../countries/entities/state.entity';
 import { UsersModule } from '../users/users.module';
@@ -25,6 +26,7 @@ import { UserChargingStationRepository } from './repositories/user-charging-stat
       ChargingStationRating,
       ChargingStationReview,
       User,
+      Driver,
       Country,
       State,
     ]),

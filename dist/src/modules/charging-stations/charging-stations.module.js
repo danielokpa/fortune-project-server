@@ -15,6 +15,7 @@ const charging_station_favorite_entity_1 = require("./entities/charging-station-
 const charging_station_rating_entity_1 = require("./entities/charging-station-rating.entity");
 const charging_station_review_entity_1 = require("./entities/charging-station-review.entity");
 const user_entity_1 = require("../users/entities/user.entity");
+const driver_entity_1 = require("../drivers/entities/driver.entity");
 const country_entity_1 = require("../countries/entities/country.entity");
 const state_entity_1 = require("../countries/entities/state.entity");
 const users_module_1 = require("../users/users.module");
@@ -37,6 +38,7 @@ exports.ChargingStationsModule = ChargingStationsModule = __decorate([
                 charging_station_rating_entity_1.ChargingStationRating,
                 charging_station_review_entity_1.ChargingStationReview,
                 user_entity_1.User,
+                driver_entity_1.Driver,
                 country_entity_1.Country,
                 state_entity_1.State,
             ]),

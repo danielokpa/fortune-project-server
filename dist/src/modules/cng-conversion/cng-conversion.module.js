@@ -16,6 +16,7 @@ const cng_station_favorite_entity_1 = require("./entities/cng-station-favorite.e
 const cng_station_rating_entity_1 = require("./entities/cng-station-rating.entity");
 const cng_station_review_entity_1 = require("./entities/cng-station-review.entity");
 const user_entity_1 = require("../users/entities/user.entity");
+const driver_entity_1 = require("../drivers/entities/driver.entity");
 const users_module_1 = require("../users/users.module");
 const cng_conversion_controller_1 = require("./controllers/cng-conversion.controller");
 const cng_stations_controller_1 = require("./controllers/cng-stations.controller");
@@ -40,6 +41,7 @@ exports.CngConversionModule = CngConversionModule = __decorate([
                 cng_station_rating_entity_1.CngStationRating,
                 cng_station_review_entity_1.CngStationReview,
                 user_entity_1.User,
+                driver_entity_1.Driver,
             ]),
             users_module_1.UsersModule,
         ],

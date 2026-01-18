@@ -18,14 +18,20 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const charging_station_favorite_entity_1 = require("../entities/charging-station-favorite.entity");
 const charging_station_repository_1 = require("../repositories/charging-station.repository");
+const user_entity_1 = require("../../users/entities/user.entity");
+const driver_entity_1 = require("../../drivers/entities/driver.entity");
 let ChargingStationService = ChargingStationService_1 = class ChargingStationService {
     chargingStationRepository;
     chargingStationFavoriteModel;
+    userModel;
+    driverModel;
     logger = new common_1.Logger(ChargingStationService_1.name);
     DEFAULT_IMAGE_URL = 'https://www.peppcruise.com/images/about/';
-    constructor(chargingStationRepository, chargingStationFavoriteModel) {
+    constructor(chargingStationRepository, chargingStationFavoriteModel, userModel, driverModel) {
         this.chargingStationRepository = chargingStationRepository;
         this.chargingStationFavoriteModel = chargingStationFavoriteModel;
+        this.userModel = userModel;
+        this.driverModel = driverModel;
     }
     addDefaultImage(station) {
         const stationData = station.toJSON ? station.toJSON() : station;
@@ -249,6 +255,13 @@ let ChargingStationService = ChargingStationService_1 = class ChargingStationSer
     }
     async toggleFavorite(userId, stationId) {
         try {
+            const [user, driver] = await Promise.all([
+                this.userModel.findByPk(userId),
+                this.driverModel.findByPk(userId),
+            ]);
+            if (!user && !driver) {
+                throw new common_1.NotFoundException(`User with ID ${userId} not found`);
+            }
             const station = await this.chargingStationRepository.findById(stationId);
             if (!station) {
                 throw new common_1.NotFoundException(`Charging station with ID ${stationId} not found`);
@@ -292,6 +305,8 @@ exports.ChargingStationService = ChargingStationService;
 exports.ChargingStationService = ChargingStationService = ChargingStationService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, sequelize_1.InjectModel)(charging_station_favorite_entity_1.ChargingStationFavorite)),
-    __metadata("design:paramtypes", [charging_station_repository_1.ChargingStationRepository, Object])
+    __param(2, (0, sequelize_1.InjectModel)(user_entity_1.User)),
+    __param(3, (0, sequelize_1.InjectModel)(driver_entity_1.Driver)),
+    __metadata("design:paramtypes", [charging_station_repository_1.ChargingStationRepository, Object, Object, Object])
 ], ChargingStationService);
 //# sourceMappingURL=charging-station.service.js.map

@@ -1,13 +1,17 @@
 import { ChargingStation } from '../entities/charging-station.entity';
 import { ChargingStationFavorite } from '../entities/charging-station-favorite.entity';
 import { ChargingStationRepository } from '../repositories/charging-station.repository';
+import { User } from '../../users/entities/user.entity';
+import { Driver } from '../../drivers/entities/driver.entity';
 import { CreateChargingStationDto, UpdateChargingStationDto, FindNearbyStationsDto, FindChargingStationsDto, SearchChargingStationsDto } from '../dto/charging-station.dto';
 export declare class ChargingStationService {
     private readonly chargingStationRepository;
     private readonly chargingStationFavoriteModel;
+    private readonly userModel;
+    private readonly driverModel;
     private readonly logger;
     private readonly DEFAULT_IMAGE_URL;
-    constructor(chargingStationRepository: ChargingStationRepository, chargingStationFavoriteModel: typeof ChargingStationFavorite);
+    constructor(chargingStationRepository: ChargingStationRepository, chargingStationFavoriteModel: typeof ChargingStationFavorite, userModel: typeof User, driverModel: typeof Driver);
     private addDefaultImage;
     private addDefaultImages;
     create(createDto: CreateChargingStationDto): Promise<ChargingStation>;

@@ -8,6 +8,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { ChargingStation } from '../entities/charging-station.entity';
 import { ChargingStationFavorite } from '../entities/charging-station-favorite.entity';
 import { ChargingStationRepository } from '../repositories/charging-station.repository';
+import { User } from '../../users/entities/user.entity';
+import { Driver } from '../../drivers/entities/driver.entity';
 import {
   CreateChargingStationDto,
   UpdateChargingStationDto,
@@ -25,6 +27,10 @@ export class ChargingStationService {
     private readonly chargingStationRepository: ChargingStationRepository,
     @InjectModel(ChargingStationFavorite)
     private readonly chargingStationFavoriteModel: typeof ChargingStationFavorite,
+    @InjectModel(User)
+    private readonly userModel: typeof User,
+    @InjectModel(Driver)
+    private readonly driverModel: typeof Driver,
   ) {}
 
   /**
@@ -122,9 +128,9 @@ export class ChargingStationService {
       const [stations, total] = await Promise.all([
         this.chargingStationRepository.findAll(
           {
-            where,
-            limit,
-            offset,
+          where,
+          limit,
+          offset,
             order: [['createdAt', 'DESC']],
           },
           userId,
@@ -152,10 +158,10 @@ export class ChargingStationService {
    */
   async findActiveStations(
     options?: {
-      page?: number;
-      limit?: number;
-      country?: string;
-      state?: string;
+    page?: number;
+    limit?: number;
+    country?: string;
+    state?: string;
     },
     userId?: string,
   ): Promise<{
@@ -173,10 +179,10 @@ export class ChargingStationService {
       const [stations, total] = await Promise.all([
         this.chargingStationRepository.findActiveStations(
           {
-            limit,
-            offset,
-            country: options?.country,
-            state: options?.state,
+          limit,
+          offset,
+          country: options?.country,
+          state: options?.state,
           },
           userId,
         ),
@@ -412,6 +418,17 @@ export class ChargingStationService {
     stationId: string,
   ): Promise<{ isFavorite: boolean; message: string }> {
     try {
+      // Verify user exists in either users or drivers table
+      const [user, driver] = await Promise.all([
+        this.userModel.findByPk(userId),
+        this.driverModel.findByPk(userId),
+      ]);
+      if (!user && !driver) {
+        throw new NotFoundException(
+          `User with ID ${userId} not found`,
+        );
+      }
+
       // Verify station exists
       const station = await this.chargingStationRepository.findById(stationId);
       if (!station) {

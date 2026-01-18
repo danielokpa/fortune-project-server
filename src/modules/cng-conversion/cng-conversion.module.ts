@@ -7,6 +7,7 @@ import { CngStationFavorite } from './entities/cng-station-favorite.entity';
 import { CngStationRating } from './entities/cng-station-rating.entity';
 import { CngStationReview } from './entities/cng-station-review.entity';
 import { User } from '../users/entities/user.entity';
+import { Driver } from '../drivers/entities/driver.entity';
 import { UsersModule } from '../users/users.module';
 import { CngConversionController } from './controllers/cng-conversion.controller';
 import { CngStationsController } from './controllers/cng-stations.controller';
@@ -28,6 +29,7 @@ import { UserCngStationRepository } from './repositories/user-cng-station.reposi
       CngStationRating,
       CngStationReview,
       User,
+      Driver,
     ]),
     UsersModule,
   ],

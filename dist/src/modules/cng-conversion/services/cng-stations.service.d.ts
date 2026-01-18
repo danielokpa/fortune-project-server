@@ -1,13 +1,17 @@
 import { CngStationFavorite } from '../entities/cng-station-favorite.entity';
 import { CngStationRepository } from '../repositories/cng-station.repository';
+import { User } from '../../users/entities/user.entity';
+import { Driver } from '../../drivers/entities/driver.entity';
 import { FindCngStationsDto, SearchCngStationsDto, FindCngStationsQueryDto } from '../dto/cng-station.dto';
 import { ICngStation, IStationsListResponse, IStationsSearchResponse, IToggleFavoriteResponse } from '../interfaces/cng-station.interface';
 export declare class CngStationsService {
     private readonly cngStationRepository;
     private readonly cngStationFavoriteModel;
+    private readonly userModel;
+    private readonly driverModel;
     private readonly logger;
     private readonly DEFAULT_IMAGE_URL;
-    constructor(cngStationRepository: CngStationRepository, cngStationFavoriteModel: typeof CngStationFavorite);
+    constructor(cngStationRepository: CngStationRepository, cngStationFavoriteModel: typeof CngStationFavorite, userModel: typeof User, driverModel: typeof Driver);
     private addDefaultImage;
     private addDefaultImages;
     findAll(options?: FindCngStationsQueryDto, userId?: string): Promise<IStationsListResponse>;

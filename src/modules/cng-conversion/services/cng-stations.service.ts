@@ -8,6 +8,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { CngStation } from '../entities/cng-station.entity';
 import { CngStationFavorite } from '../entities/cng-station-favorite.entity';
 import { CngStationRepository } from '../repositories/cng-station.repository';
+import { User } from '../../users/entities/user.entity';
+import { Driver } from '../../drivers/entities/driver.entity';
 import {
   FindCngStationsDto,
   SearchCngStationsDto,
@@ -29,6 +31,10 @@ export class CngStationsService {
     private readonly cngStationRepository: CngStationRepository,
     @InjectModel(CngStationFavorite)
     private readonly cngStationFavoriteModel: typeof CngStationFavorite,
+    @InjectModel(User)
+    private readonly userModel: typeof User,
+    @InjectModel(Driver)
+    private readonly driverModel: typeof Driver,
   ) {}
 
   /**
@@ -266,6 +272,17 @@ export class CngStationsService {
     stationId: string,
   ): Promise<IToggleFavoriteResponse> {
     try {
+      // Verify user exists in either users or drivers table
+      const [user, driver] = await Promise.all([
+        this.userModel.findByPk(userId),
+        this.driverModel.findByPk(userId),
+      ]);
+      if (!user && !driver) {
+        throw new NotFoundException(
+          `User with ID ${userId} not found`,
+        );
+      }
+
       // Verify station exists
       const station = await this.cngStationRepository.findById(stationId);
       if (!station) {

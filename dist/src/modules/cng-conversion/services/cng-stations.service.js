@@ -18,14 +18,20 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const cng_station_favorite_entity_1 = require("../entities/cng-station-favorite.entity");
 const cng_station_repository_1 = require("../repositories/cng-station.repository");
+const user_entity_1 = require("../../users/entities/user.entity");
+const driver_entity_1 = require("../../drivers/entities/driver.entity");
 let CngStationsService = CngStationsService_1 = class CngStationsService {
     cngStationRepository;
     cngStationFavoriteModel;
+    userModel;
+    driverModel;
     logger = new common_1.Logger(CngStationsService_1.name);
     DEFAULT_IMAGE_URL = 'https://www.peppcruise.com/images/about/';
-    constructor(cngStationRepository, cngStationFavoriteModel) {
+    constructor(cngStationRepository, cngStationFavoriteModel, userModel, driverModel) {
         this.cngStationRepository = cngStationRepository;
         this.cngStationFavoriteModel = cngStationFavoriteModel;
+        this.userModel = userModel;
+        this.driverModel = driverModel;
     }
     addDefaultImage(station) {
         const stationData = station.toJSON ? station.toJSON() : station;
@@ -172,6 +178,13 @@ let CngStationsService = CngStationsService_1 = class CngStationsService {
     }
     async toggleFavorite(userId, stationId) {
         try {
+            const [user, driver] = await Promise.all([
+                this.userModel.findByPk(userId),
+                this.driverModel.findByPk(userId),
+            ]);
+            if (!user && !driver) {
+                throw new common_1.NotFoundException(`User with ID ${userId} not found`);
+            }
             const station = await this.cngStationRepository.findById(stationId);
             if (!station) {
                 throw new common_1.NotFoundException(`CNG station with ID ${stationId} not found`);
@@ -215,6 +228,8 @@ exports.CngStationsService = CngStationsService;
 exports.CngStationsService = CngStationsService = CngStationsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, sequelize_1.InjectModel)(cng_station_favorite_entity_1.CngStationFavorite)),
-    __metadata("design:paramtypes", [cng_station_repository_1.CngStationRepository, Object])
+    __param(2, (0, sequelize_1.InjectModel)(user_entity_1.User)),
+    __param(3, (0, sequelize_1.InjectModel)(driver_entity_1.Driver)),
+    __metadata("design:paramtypes", [cng_station_repository_1.CngStationRepository, Object, Object, Object])
 ], CngStationsService);
 //# sourceMappingURL=cng-stations.service.js.map
