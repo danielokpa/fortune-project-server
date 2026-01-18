@@ -15,7 +15,6 @@ export declare class UserCngStation extends Model<UserCngStation> {
     distance: number;
     selfTripStatus: SelfTripStatus;
     userType: UserType;
-    stationImage: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

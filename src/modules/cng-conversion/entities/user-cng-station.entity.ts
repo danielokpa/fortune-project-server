@@ -98,15 +98,6 @@ export class UserCngStation extends Model<UserCngStation> {
   })
   public userType: UserType;
 
-  @Default('default.png')
-  @AllowNull(true)
-  @Column({
-    type: DataType.STRING(500),
-    allowNull: true,
-    defaultValue: 'default.png',
-  })
-  public stationImage: string;
-
   @CreatedAt
   @Column({
     type: DataType.DATE,

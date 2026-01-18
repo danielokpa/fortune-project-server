@@ -10,8 +10,8 @@ export declare class UserCngStationRepository {
     count(options?: any): Promise<number>;
     findById(id: string): Promise<UserCngStation | null>;
     findByUserIdAndStationId(userId: string, cngStationId: string): Promise<UserCngStation | null>;
-    findByUserIdSelfTripStatusAndStationId(userId: string, selfTripStatus: SelfTripStatus, cngStationId: string): Promise<UserCngStation | null>;
-    findActiveTripByUserIdAndUserStationId(userId: string, id: string): Promise<UserCngStation | null>;
+    findByUserIdSelfTripStatusAndStationId(userId: string, selfTripStatus: SelfTripStatus): Promise<UserCngStation | null>;
+    findActiveTripByUserIdAndId(userId: string, id: string): Promise<UserCngStation | null>;
     findActiveTripByUserId(userId: string): Promise<UserCngStation | null>;
     findRecentByUserId(userId: string, options?: {
         limit?: number;

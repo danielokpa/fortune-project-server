@@ -138,9 +138,9 @@ let UserCngStationService = UserCngStationService_1 = class UserCngStationServic
             if (!station) {
                 throw new common_1.NotFoundException(`CNG station with ID ${startTripDto.id} not found`);
             }
-            const existingRecord = await this.userCngStationRepository.findByUserIdSelfTripStatusAndStationId(userId, self_trip_status_enum_1.SelfTripStatus.START_TRIP, startTripDto.id);
+            const existingRecord = await this.userCngStationRepository.findByUserIdSelfTripStatusAndStationId(userId, self_trip_status_enum_1.SelfTripStatus.START_TRIP);
             if (existingRecord) {
-                throw new common_1.ConflictException('Trip already started for this station');
+                throw new common_1.ConflictException('Already have an active trip.');
             }
             const userStation = await this.userCngStationRepository.create({
                 userId,
@@ -161,8 +161,9 @@ let UserCngStationService = UserCngStationService_1 = class UserCngStationServic
         }
     }
     async endTrip(userId, endTripDto) {
+        console.log(userId, endTripDto.id);
         try {
-            const userStation = await this.userCngStationRepository.findActiveTripByUserIdAndUserStationId(userId, endTripDto.id);
+            const userStation = await this.userCngStationRepository.findActiveTripByUserIdAndId(userId, endTripDto.id);
             if (!userStation) {
                 throw new common_1.NotFoundException('Active trip not found. Please start a trip first.');
             }
@@ -185,7 +186,7 @@ let UserCngStationService = UserCngStationService_1 = class UserCngStationServic
     }
     async cancelTrip(userId, cancelTripDto) {
         try {
-            const userStation = await this.userCngStationRepository.findActiveTripByUserIdAndUserStationId(userId, cancelTripDto.id);
+            const userStation = await this.userCngStationRepository.findActiveTripByUserIdAndId(userId, cancelTripDto.id);
             if (!userStation) {
                 throw new common_1.NotFoundException('No active trip found to cancel');
             }

@@ -26,7 +26,6 @@ let UserCngStation = class UserCngStation extends sequelize_typescript_1.Model {
     distance;
     selfTripStatus;
     userType;
-    stationImage;
 };
 exports.UserCngStation = UserCngStation;
 __decorate([
@@ -110,16 +109,6 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], UserCngStation.prototype, "userType", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)('default.png'),
-    (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING(500),
-        allowNull: true,
-        defaultValue: 'default.png',
-    }),
-    __metadata("design:type", String)
-], UserCngStation.prototype, "stationImage", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.Column)({

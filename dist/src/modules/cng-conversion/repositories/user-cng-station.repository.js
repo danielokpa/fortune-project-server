@@ -46,17 +46,16 @@ let UserCngStationRepository = class UserCngStationRepository {
             include: ['cngStation'],
         });
     }
-    async findByUserIdSelfTripStatusAndStationId(userId, selfTripStatus, cngStationId) {
+    async findByUserIdSelfTripStatusAndStationId(userId, selfTripStatus) {
         return await this.userCngStationModel.findOne({
             where: {
                 userId,
-                cngStationId,
                 selfTripStatus,
             },
             include: ['cngStation'],
         });
     }
-    async findActiveTripByUserIdAndUserStationId(userId, id) {
+    async findActiveTripByUserIdAndId(userId, id) {
         return await this.userCngStationModel.findOne({
             where: {
                 userId,

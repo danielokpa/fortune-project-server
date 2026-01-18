@@ -44,19 +44,17 @@ export class UserCngStationRepository {
   async findByUserIdSelfTripStatusAndStationId(
     userId: string,
     selfTripStatus: SelfTripStatus,
-    cngStationId: string,
   ): Promise<UserCngStation | null> {
     return await this.userCngStationModel.findOne({
       where: {
         userId,
-        cngStationId,
         selfTripStatus,
       },
       include: ['cngStation'],
     });
   }
 
-  async findActiveTripByUserIdAndUserStationId(
+  async findActiveTripByUserIdAndId(
     userId: string,
     id: string,
   ): Promise<UserCngStation | null> {

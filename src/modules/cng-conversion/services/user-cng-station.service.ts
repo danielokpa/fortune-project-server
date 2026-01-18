@@ -228,12 +228,11 @@ export class UserCngStationService {
         await this.userCngStationRepository.findByUserIdSelfTripStatusAndStationId(
           userId,
           SelfTripStatus.START_TRIP,
-          startTripDto.id,
         );
 
       if (existingRecord) {
         throw new ConflictException(
-          'Trip already started for this station',
+          'Already have an active trip.',
         );
       }
       
@@ -267,9 +266,10 @@ export class UserCngStationService {
     userId: string,
     endTripDto: EndCngTripDto,
   ): Promise<UserCngStation> {
+    console.log(userId, endTripDto.id);
     try {
       const userStation =
-        await this.userCngStationRepository.findActiveTripByUserIdAndUserStationId(
+        await this.userCngStationRepository.findActiveTripByUserIdAndId(
           userId,
           endTripDto.id,
         );
@@ -315,7 +315,7 @@ export class UserCngStationService {
   ): Promise<void> {
     try {
       const userStation =
-        await this.userCngStationRepository.findActiveTripByUserIdAndUserStationId(
+        await this.userCngStationRepository.findActiveTripByUserIdAndId(
           userId,
           cancelTripDto.id,
         );
