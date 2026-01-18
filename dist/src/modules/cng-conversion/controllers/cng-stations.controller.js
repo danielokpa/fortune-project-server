@@ -184,7 +184,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CngStationsController.prototype, "findById", null);
 __decorate([
-    (0, common_1.Put)(':cngStationId/favorite'),
+    (0, common_1.Put)('/user/:cngStationId/favorite'),
     (0, roles_decorator_1.Roles)(enums_1.UserType.PEPP_ADMIN, enums_1.UserType.SUPER_ADMIN, enums_1.UserType.USER, enums_1.UserType.DRIVER),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     (0, swagger_1.ApiOperation)({ summary: 'Toggle favorite status' }),

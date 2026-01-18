@@ -190,7 +190,7 @@ export class CngStationsController {
     );
   }
 
-  @Put(':cngStationId/favorite')
+  @Put('/user/:cngStationId/favorite')
   @Roles(
     UserType.PEPP_ADMIN,
     UserType.SUPER_ADMIN,
