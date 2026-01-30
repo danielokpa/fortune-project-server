@@ -62,28 +62,28 @@ export class AuthService {
 
       const { country, phoneNo } = input;
 
-    const existingCountry = await this.countryService.findById(country)
-    if (!existingCountry){
-      throw new ConflictException('Country code not found!') 
-    }
+      const existingCountry = await this.countryService.findById(country)
+      if (!existingCountry){
+        throw new ConflictException('Country code not found!') 
+      }
 
-    const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
+      const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
 
-    const existingUser = await this.userRepository.findByPhone(phone);
-    if(existingUser){
-      throw new ConflictException('User with this phoneNo already exist');
-    }
-    
-    const otpToken = await this.tokenService.generateOTPtoken({
-      phoneNo: phone,
-      expiry: moment().add(10, 'minutes').toDate(),
-      subject: TokenSubject.SIGN_UP_PHONE,
-    })
+      const existingUser = await this.userRepository.findByPhone(phone);
+      if(existingUser){
+        throw new ConflictException('User with this phoneNo already exist');
+      }
+      
+      const otpToken = await this.tokenService.generateOTPtoken({
+        phoneNo: phone,
+        expiry: moment().add(10, 'minutes').toDate(),
+        subject: TokenSubject.SIGN_UP_PHONE,
+      })
 
-    // Send SMS with OTP
-    await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
-    
-    return {};
+      // Send SMS with OTP
+      await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
+      
+      return {};
       
     } catch (error) {
       throw new BadRequestException(error);
