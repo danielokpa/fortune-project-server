@@ -24,6 +24,9 @@ let Vehicle = class Vehicle extends sequelize_typescript_1.Model {
     year;
     vinNumber;
     isPeppcruiseVehicle;
+    capacity;
+    region;
+    fleetStatus;
     expiryDate;
 };
 exports.Vehicle = Vehicle;
@@ -109,6 +112,28 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], Vehicle.prototype, "isPeppcruiseVehicle", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER,
+        allowNull: true,
+    }),
+    __metadata("design:type", Object)
+], Vehicle.prototype, "capacity", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(128),
+        allowNull: true,
+    }),
+    __metadata("design:type", Object)
+], Vehicle.prototype, "region", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(32),
+        allowNull: false,
+        defaultValue: 'unassigned',
+    }),
+    __metadata("design:type", String)
+], Vehicle.prototype, "fleetStatus", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.DATE,

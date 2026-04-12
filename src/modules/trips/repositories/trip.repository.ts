@@ -20,6 +20,29 @@ export class TripRepository {
     });
   }
 
+  async findDriverActiveTrip(driverId: string): Promise<Trip | null> {
+    return await this.tripModel.findOne({
+      where: {
+        driverId,
+        status: {
+          [Op.in]: [TripStatus.PENDING, TripStatus.ACCEPTED, TripStatus.ON_THE_WAY, TripStatus.ARRIVED],
+        },
+      },
+      include: [
+        {
+          association: 'user',
+          attributes: ['id', 'fullName', 'email', 'phoneNo', 'imageUrl'],
+        },
+        {
+          association: 'driver',
+          attributes: ['id', 'fullName', 'email', 'phoneNo', 'profileImageUrl'],
+          required: false,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+  }
+
   async findUserActiveTrip(userId: string): Promise<Trip | null> {
     return await this.tripModel.findOne({
       where: {

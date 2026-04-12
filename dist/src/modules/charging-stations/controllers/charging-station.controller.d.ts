@@ -29,11 +29,11 @@ export declare class ChargingStationController {
     search(searchDto: SearchChargingStationsDto, req: ExpressRequest & {
         user: JwtAuthPayload;
     }): Promise<import("src/utils/response.utils").ApiResponse<{
-        stations: Array<{
+        stations: {
             id: string;
             name: string;
             address: string;
-        }>;
+        }[];
         total: number;
         limit: number;
         offset: number;
@@ -54,11 +54,11 @@ export declare class ChargingStationController {
     getRecentStations(req: ExpressRequest & {
         user: JwtAuthPayload;
     }, page?: number, limit?: number): Promise<import("src/utils/response.utils").ApiResponse<{
-        stations: Array<{
+        stations: {
             id: string;
             name: string;
             address: string;
-        }>;
+        }[];
         activeTrip: {
             id: string;
             name: string;
@@ -78,11 +78,11 @@ export declare class ChargingStationController {
     getUserFavoriteStations(req: ExpressRequest & {
         user: JwtAuthPayload;
     }, page?: number, limit?: number): Promise<import("src/utils/response.utils").ApiResponse<{
-        stations: Array<{
+        stations: {
             id: string;
             name: string;
             address: string;
-        }>;
+        }[];
         activeTrip: {
             id: string;
             name: string;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VerifyClientDevice = VerifyClientDevice;
+exports.VerifyClientDevice = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const client_device_guard_1 = require("../guards/client-device.guard");
@@ -11,4 +11,5 @@ function VerifyClientDevice() {
         required: true,
     }));
 }
+exports.VerifyClientDevice = VerifyClientDevice;
 //# sourceMappingURL=verify-client-device.decorator.js.map

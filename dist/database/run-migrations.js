@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runMigrations = runMigrations;
+exports.runMigrations = void 0;
 const sequelize_1 = require("sequelize");
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
@@ -33,6 +33,7 @@ async function runMigrations() {
         await sequelize.close();
     }
 }
+exports.runMigrations = runMigrations;
 if (require.main === module) {
     runMigrations();
 }

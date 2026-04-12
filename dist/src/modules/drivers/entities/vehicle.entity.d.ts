@@ -13,6 +13,9 @@ export declare class Vehicle extends Model<Vehicle> {
     year: string;
     vinNumber: string;
     isPeppcruiseVehicle: boolean;
+    capacity: number | null;
+    region: string | null;
+    fleetStatus: string;
     expiryDate: Date;
     createdAt: Date;
     updatedAt: Date;

@@ -5,13 +5,15 @@ import { DashboardDto } from 'src/modules/users/dto/user.dto';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
 import { AddDriverLicenseDto, UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
+import { TripRepository } from 'src/modules/trips/repositories/trip.repository';
 
 @Injectable()
 export class DriverService {
   
   constructor(
     private readonly driverRepository: DriverRepository,
-    private readonly clientDeviceService: ClientDeviceService    
+    private readonly clientDeviceService: ClientDeviceService,
+    private readonly tripRepository: TripRepository,    
   ) {}
 
   async addDriverLicense(userId: string, reqBody: AddDriverLicenseDto) {
@@ -82,7 +84,8 @@ export class DriverService {
         fullName: user.fullName,
         email: user.email,
         phoneNo: user.phoneNo,
-        userId: user.id
+        userId: user.id,
+        activeTrip: await this.tripRepository.findUserActiveTrip(userId)
       }
       return dashboardRes;
     }catch(error: unknown){

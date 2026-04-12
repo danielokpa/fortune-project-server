@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SmsEventService = void 0;
 const common_1 = require("@nestjs/common");
@@ -30,6 +31,6 @@ let SmsEventService = class SmsEventService {
 exports.SmsEventService = SmsEventService;
 exports.SmsEventService = SmsEventService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [event_emitter_1.EventEmitter2])
+    __metadata("design:paramtypes", [typeof (_a = typeof event_emitter_1.EventEmitter2 !== "undefined" && event_emitter_1.EventEmitter2) === "function" ? _a : Object])
 ], SmsEventService);
 //# sourceMappingURL=sms-event.service.js.map

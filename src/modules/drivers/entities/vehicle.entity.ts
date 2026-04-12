@@ -94,6 +94,27 @@ import { Driver } from './driver.entity';
     })
     public isPeppcruiseVehicle: boolean;
 
+    /** Passenger capacity for fleet / shuttle planning */
+    @Column({
+      type: DataType.INTEGER,
+      allowNull: true,
+    })
+    public capacity: number | null;
+
+    /** Operating region label (e.g. state or city) */
+    @Column({
+      type: DataType.STRING(128),
+      allowNull: true,
+    })
+    public region: string | null;
+
+    /** Fleet ops: active | maintenance | unassigned */
+    @Column({
+      type: DataType.STRING(32),
+      allowNull: false,
+      defaultValue: 'unassigned',
+    })
+    public fleetStatus: string;
 
     @Column({
       type: DataType.DATE,
