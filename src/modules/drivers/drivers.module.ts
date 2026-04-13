@@ -32,6 +32,8 @@ import { TokenModule } from 'src/services/token/token.module';
 import { SmsModule } from 'src/services/sms/sms.module';
 import { AuthModule } from '../auth/auth.module';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
+import { TripsModule } from '../trips/trips.module';
+
 
 @Module({
   imports: [
