@@ -11,14 +11,16 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const trip_entity_1 = require("./entities/trip.entity");
 const trip_repository_1 = require("./repositories/trip.repository");
+const vehicle_registration_entity_1 = require("../drivers/entities/vehicle-registration.entity");
+const vehicle_registration_repository_1 = require("../drivers/repositories/vehicle-registration.repository");
 let TripsModule = class TripsModule {
 };
 exports.TripsModule = TripsModule;
 exports.TripsModule = TripsModule = __decorate([
     (0, common_1.Module)({
-        imports: [sequelize_1.SequelizeModule.forFeature([trip_entity_1.Trip])],
-        providers: [trip_repository_1.TripRepository],
-        exports: [trip_repository_1.TripRepository, sequelize_1.SequelizeModule],
+        imports: [sequelize_1.SequelizeModule.forFeature([trip_entity_1.Trip, vehicle_registration_entity_1.VehicleRegistration])],
+        providers: [trip_repository_1.TripRepository, vehicle_registration_repository_1.VehicleRegistrationRepository],
+        exports: [trip_repository_1.TripRepository, vehicle_registration_repository_1.VehicleRegistrationRepository, sequelize_1.SequelizeModule],
     })
 ], TripsModule);
 //# sourceMappingURL=trips.module.js.map

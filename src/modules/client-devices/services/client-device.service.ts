@@ -16,6 +16,22 @@ export class ClientDeviceService {
     return devices;
   }
 
+  async findByDriverId(driverId: string) {
+    return await this.clientDeviceRepository.findByDriverId(driverId);
+  }
+
+  /** Distinct FCM tokens for a passenger (users table id). */
+  async getFcmTokensForUserId(userId: string): Promise<string[]> {
+    const rows = await this.clientDeviceRepository.findWithFcmByUserId(userId);
+    return [...new Set(rows.map((d) => d.deviceFCMToken).filter((t): t is string => Boolean(t)))];
+  }
+
+  /** Distinct FCM tokens for a driver (drivers table id). */
+  async getFcmTokensForDriverId(driverId: string): Promise<string[]> {
+    const rows = await this.clientDeviceRepository.findWithFcmByDriverId(driverId);
+    return [...new Set(rows.map((d) => d.deviceFCMToken).filter((t): t is string => Boolean(t)))];
+  }
+
   async findByIpAddress(ipAddress: string) {
     const devices = await this.clientDeviceRepository.findByIpAddress(ipAddress);
     return devices;

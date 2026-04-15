@@ -17,7 +17,7 @@ export declare class LoginDriverDto {
     readonly deviceInfo: string;
     readonly country: string;
 }
-export declare class LoginOtpDto {
+export declare class LoginDriverOtpDto {
     readonly identity: string;
     readonly password: string;
     otp: string;
@@ -44,21 +44,14 @@ export declare class ResendOtpDto {
 export declare class SignupEmail {
     email: string;
 }
-export declare class SignupPhone {
+export declare class SignUpDriverPhoneDto {
     readonly phoneNo: string;
     country: string;
 }
-export declare class VerifyOtpDto {
+export declare class VerifyDriverOtpDto {
     token: string;
     email: string;
     phoneNo: string;
     readonly subject: TokenSubject;
     country?: string;
-}
-export declare class SignUserDto {
-    readonly fullName: string;
-    readonly email: string;
-    readonly phoneNo: string;
-    readonly country: string;
-    readonly password: string;
 }

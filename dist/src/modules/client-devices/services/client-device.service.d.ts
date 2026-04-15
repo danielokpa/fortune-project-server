@@ -6,6 +6,9 @@ export declare class ClientDeviceService {
     constructor(clientDeviceRepository: ClientDeviceRepository);
     findById(id: string): Promise<ClientDevice | null>;
     findByUserId(userId: string): Promise<ClientDevice[]>;
+    findByDriverId(driverId: string): Promise<ClientDevice[]>;
+    getFcmTokensForUserId(userId: string): Promise<string[]>;
+    getFcmTokensForDriverId(driverId: string): Promise<string[]>;
     findByIpAddress(ipAddress: string): Promise<ClientDevice[]>;
     findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
     findByDriverIdAndDeviceToken(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null>;

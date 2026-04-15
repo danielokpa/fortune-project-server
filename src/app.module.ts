@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -42,11 +43,13 @@ import { CngStationReview } from './modules/cng-conversion/entities/cng-station-
 import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
 import { Trip } from './modules/trips/entities/trip.entity';
+import { TripsModule } from './modules/trips/trips.module';
 import { ReferredUser } from './modules/referred-users/entities/referred-user.entity';
 
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig],
@@ -102,6 +105,7 @@ import { ReferredUser } from './modules/referred-users/entities/referred-user.en
     AuthModule,
     UsersModule,
     DriversModule,
+    TripsModule,
     CountriesModule,
     CngConversionModule,
     ChargingStationsModule,

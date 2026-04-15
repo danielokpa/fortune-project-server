@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SignUserDto = exports.VerifyOtpDto = exports.SignupPhone = exports.SignupEmail = exports.ResendOtpDto = exports.ChangePasswordDto = exports.ResetPasswordDto = exports.ForgotPasswordDto = exports.LoginOtpDto = exports.LoginDriverDto = exports.CreateAccountDto = void 0;
+exports.VerifyDriverOtpDto = exports.SignUpDriverPhoneDto = exports.SignupEmail = exports.ResendOtpDto = exports.ChangePasswordDto = exports.ResetPasswordDto = exports.ForgotPasswordDto = exports.LoginDriverOtpDto = exports.LoginDriverDto = exports.CreateAccountDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const gender_enum_1 = require("../../../enums/gender.enum");
@@ -144,14 +144,14 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], LoginDriverDto.prototype, "country", void 0);
-class LoginOtpDto {
+class LoginDriverOtpDto {
     identity;
     password;
     otp;
     deviceInfo;
     country;
 }
-exports.LoginOtpDto = LoginOtpDto;
+exports.LoginDriverOtpDto = LoginDriverOtpDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'User email address or phone number',
@@ -161,7 +161,7 @@ __decorate([
     (0, class_validator_1.MinLength)(4),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
-], LoginOtpDto.prototype, "identity", void 0);
+], LoginDriverOtpDto.prototype, "identity", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'User password',
@@ -169,13 +169,13 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], LoginOtpDto.prototype, "password", void 0);
+], LoginDriverOtpDto.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6),
     (0, class_validator_1.MaxLength)(6),
     __metadata("design:type", String)
-], LoginOtpDto.prototype, "otp", void 0);
+], LoginDriverOtpDto.prototype, "otp", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Device information',
@@ -184,7 +184,7 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(50),
     __metadata("design:type", String)
-], LoginOtpDto.prototype, "deviceInfo", void 0);
+], LoginDriverOtpDto.prototype, "deviceInfo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Country',
@@ -192,7 +192,7 @@ __decorate([
     }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], LoginOtpDto.prototype, "country", void 0);
+], LoginDriverOtpDto.prototype, "country", void 0);
 class ForgotPasswordDto {
     email;
 }
@@ -298,11 +298,11 @@ __decorate([
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], SignupEmail.prototype, "email", void 0);
-class SignupPhone {
+class SignUpDriverPhoneDto {
     phoneNo;
     country;
 }
-exports.SignupPhone = SignupPhone;
+exports.SignUpDriverPhoneDto = SignUpDriverPhoneDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'PhoneNo sign up phone',
@@ -310,7 +310,7 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], SignupPhone.prototype, "phoneNo", void 0);
+], SignUpDriverPhoneDto.prototype, "phoneNo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Country',
@@ -318,15 +318,15 @@ __decorate([
     }),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
-], SignupPhone.prototype, "country", void 0);
-class VerifyOtpDto {
+], SignUpDriverPhoneDto.prototype, "country", void 0);
+class VerifyDriverOtpDto {
     token;
     email;
     phoneNo;
     subject;
     country;
 }
-exports.VerifyOtpDto = VerifyOtpDto;
+exports.VerifyDriverOtpDto = VerifyDriverOtpDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Token to verify OTP',
@@ -334,7 +334,7 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], VerifyOtpDto.prototype, "token", void 0);
+], VerifyDriverOtpDto.prototype, "token", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Email to verify OTP',
@@ -343,7 +343,7 @@ __decorate([
     (0, class_validator_1.IsEmail)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], VerifyOtpDto.prototype, "email", void 0);
+], VerifyDriverOtpDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'PhoneNo to verify OTP',
@@ -352,12 +352,12 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], VerifyOtpDto.prototype, "phoneNo", void 0);
+], VerifyDriverOtpDto.prototype, "phoneNo", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], VerifyOtpDto.prototype, "subject", void 0);
+], VerifyDriverOtpDto.prototype, "subject", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Country',
@@ -366,56 +366,5 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], VerifyOtpDto.prototype, "country", void 0);
-class SignUserDto {
-    fullName;
-    email;
-    phoneNo;
-    country;
-    password;
-}
-exports.SignUserDto = SignUserDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'User Name',
-        example: 'John Doe',
-    }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.Matches)(/^[A-Za-z _'-]+$/, {
-        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
-    }),
-    __metadata("design:type", String)
-], SignUserDto.prototype, "fullName", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'User email address',
-        example: 'user@example.com',
-    }),
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], SignUserDto.prototype, "email", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'User Phone',
-        example: '8100000000',
-    }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SignUserDto.prototype, "phoneNo", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'Country ',
-        example: 'Country',
-    }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SignUserDto.prototype, "country", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'User password',
-        example: 'password123',
-    }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SignUserDto.prototype, "password", void 0);
+], VerifyDriverOtpDto.prototype, "country", void 0);
 //# sourceMappingURL=auth.driver.dto.js.map

@@ -13,12 +13,15 @@ exports.DriverService = void 0;
 const common_1 = require("@nestjs/common");
 const driver_repository_1 = require("../repositories/driver.repository");
 const client_device_service_1 = require("../../client-devices/services/client-device.service");
+const trip_repository_1 = require("../../trips/repositories/trip.repository");
 let DriverService = class DriverService {
     driverRepository;
     clientDeviceService;
-    constructor(driverRepository, clientDeviceService) {
+    tripRepository;
+    constructor(driverRepository, clientDeviceService, tripRepository) {
         this.driverRepository = driverRepository;
         this.clientDeviceService = clientDeviceService;
+        this.tripRepository = tripRepository;
     }
     async addDriverLicense(userId, reqBody) {
         try {
@@ -82,7 +85,8 @@ let DriverService = class DriverService {
                 fullName: user.fullName,
                 email: user.email,
                 phoneNo: user.phoneNo,
-                userId: user.id
+                userId: user.id,
+                activeTrip: await this.tripRepository.findDriverActiveTrip(userId)
             };
             return dashboardRes;
         }
@@ -123,6 +127,7 @@ exports.DriverService = DriverService;
 exports.DriverService = DriverService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [driver_repository_1.DriverRepository,
-        client_device_service_1.ClientDeviceService])
+        client_device_service_1.ClientDeviceService,
+        trip_repository_1.TripRepository])
 ], DriverService);
 //# sourceMappingURL=driver.service.js.map

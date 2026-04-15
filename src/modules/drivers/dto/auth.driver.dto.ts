@@ -112,7 +112,7 @@ export class LoginDriverDto {
 
 }
 
-export class LoginOtpDto {
+export class LoginDriverOtpDto {
   @ApiProperty({
     description: 'User email address or phone number',
     example: 'user@example.com or 08100000000',
@@ -231,7 +231,7 @@ export class SignupEmail {
   email: string;
 }
 
-export class SignupPhone {
+export class SignUpDriverPhoneDto {
   @ApiProperty({
     description: 'PhoneNo sign up phone',
     example: '08100000000',
@@ -247,7 +247,7 @@ export class SignupPhone {
   country: string;
 }
 
-export class VerifyOtpDto {
+export class VerifyDriverOtpDto {
   @ApiProperty({
     description: 'Token to verify OTP',
     example: 'token123',
@@ -285,43 +285,43 @@ export class VerifyOtpDto {
   country?: string;
 }
 
-export class SignUserDto {
+// export class SignUserDto {
 
-  @ApiProperty({
-    description: 'User Name',
-    example: 'John Doe',
-  })
-  @IsString()
-  @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
-  })
-  readonly fullName: string;
+//   @ApiProperty({
+//     description: 'User Name',
+//     example: 'John Doe',
+//   })
+//   @IsString()
+//   @Matches(/^[A-Za-z _'-]+$/, {
+//     message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+//   })
+//   readonly fullName: string;
 
-  @ApiProperty({
-    description: 'User email address',
-    example: 'user@example.com',
-  })
-  @IsEmail()
-  readonly email: string;
+//   @ApiProperty({
+//     description: 'User email address',
+//     example: 'user@example.com',
+//   })
+//   @IsEmail()
+//   readonly email: string;
 
-  @ApiProperty({
-    description: 'User Phone',
-    example: '8100000000',
-  })
-  @IsString()
-  readonly phoneNo: string;
+//   @ApiProperty({
+//     description: 'User Phone',
+//     example: '8100000000',
+//   })
+//   @IsString()
+//   readonly phoneNo: string;
 
-  @ApiProperty({
-    description: 'Country ',
-    example: 'Country',
-  })
-  @IsString()
-  readonly country: string;
+//   @ApiProperty({
+//     description: 'Country ',
+//     example: 'Country',
+//   })
+//   @IsString()
+//   readonly country: string;
 
-  @ApiProperty({
-    description: 'User password',
-    example: 'password123',
-  })
-  @IsString()
-  readonly password: string;
-}
+//   @ApiProperty({
+//     description: 'User password',
+//     example: 'password123',
+//   })
+//   @IsString()
+//   readonly password: string;
+// }

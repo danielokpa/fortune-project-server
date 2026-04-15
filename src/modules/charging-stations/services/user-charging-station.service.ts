@@ -16,7 +16,6 @@ import {
   CancelTripDto,
 } from '../dto/charging-station.dto';
 import { SelfTripStatus } from '../../../enums/self-trip-status.enum';
-import { TripStatus } from 'src/modules/trips/entities/trip.entity';
 
 @Injectable()
 export class UserChargingStationService {

@@ -85,7 +85,7 @@ export class DriverService {
         email: user.email,
         phoneNo: user.phoneNo,
         userId: user.id,
-        activeTrip: await this.tripRepository.findUserActiveTrip(userId)
+        activeTrip: await this.tripRepository.findDriverActiveTrip(userId)
       }
       return dashboardRes;
     }catch(error: unknown){

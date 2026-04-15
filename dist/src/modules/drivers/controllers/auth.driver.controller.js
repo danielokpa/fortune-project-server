@@ -74,7 +74,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_driver_dto_1.SignupPhone]),
+    __metadata("design:paramtypes", [auth_driver_dto_1.SignUpDriverPhoneDto]),
     __metadata("design:returntype", Promise)
 ], AuthDriverController.prototype, "signUpPhoneNo", null);
 __decorate([
@@ -90,7 +90,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_driver_dto_1.VerifyOtpDto]),
+    __metadata("design:paramtypes", [auth_driver_dto_1.VerifyDriverOtpDto]),
     __metadata("design:returntype", Promise)
 ], AuthDriverController.prototype, "verifyOtp", null);
 __decorate([
@@ -114,7 +114,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_driver_dto_1.LoginOtpDto]),
+    __metadata("design:paramtypes", [auth_driver_dto_1.LoginDriverOtpDto]),
     __metadata("design:returntype", Promise)
 ], AuthDriverController.prototype, "loginOtp", null);
 __decorate([

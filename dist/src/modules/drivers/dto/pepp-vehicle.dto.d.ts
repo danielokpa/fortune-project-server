@@ -19,7 +19,7 @@ export declare class CreatePeppVehicleDto {
     fleetStatus?: PeppFleetStatus;
     isPeppcruiseVehicle?: boolean;
 }
-declare const UpdatePeppVehicleDto_base: any;
+declare const UpdatePeppVehicleDto_base: import("@nestjs/common").Type<Partial<CreatePeppVehicleDto>>;
 export declare class UpdatePeppVehicleDto extends UpdatePeppVehicleDto_base {
 }
 export declare class PeppVehicleListItemDto {

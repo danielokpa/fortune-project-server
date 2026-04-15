@@ -24,6 +24,17 @@ let ClientDeviceService = class ClientDeviceService {
         const devices = await this.clientDeviceRepository.findByUserId(userId);
         return devices;
     }
+    async findByDriverId(driverId) {
+        return await this.clientDeviceRepository.findByDriverId(driverId);
+    }
+    async getFcmTokensForUserId(userId) {
+        const rows = await this.clientDeviceRepository.findWithFcmByUserId(userId);
+        return [...new Set(rows.map((d) => d.deviceFCMToken).filter((t) => Boolean(t)))];
+    }
+    async getFcmTokensForDriverId(driverId) {
+        const rows = await this.clientDeviceRepository.findWithFcmByDriverId(driverId);
+        return [...new Set(rows.map((d) => d.deviceFCMToken).filter((t) => Boolean(t)))];
+    }
     async findByIpAddress(ipAddress) {
         const devices = await this.clientDeviceRepository.findByIpAddress(ipAddress);
         return devices;

@@ -3,7 +3,7 @@ import { EmailEventService } from 'src/services/mail/email-event.service';
 import { SmsEventService } from 'src/services/sms/sms-event.service';
 import { TokenService } from 'src/services/token/token.service';
 import { JwtAuthPayload } from '../../auth/auth.interface';
-import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginDriverDto, ResetPasswordDto, SignupEmail, SignupPhone, CreateAccountDto, VerifyOtpDto } from '../dto/auth.driver.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginDriverOtpDto, LoginDriverDto, ResetPasswordDto, SignupEmail, SignUpDriverPhoneDto, CreateAccountDto, VerifyDriverOtpDto } from '../dto/auth.driver.dto';
 import { CountryService } from '../../countries/services/country.service';
 import { DriverRepository } from '../repositories/driver.repository';
 import { ClientDeviceService } from '../../client-devices/services/client-device.service';
@@ -18,12 +18,12 @@ export declare class AuthDriverService {
     private readonly clientDeviceService;
     constructor(driverRepository: DriverRepository, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, clientDeviceService: ClientDeviceService);
     deleteUserAccount(identity: string, password: string): Promise<null>;
-    signUpPhoneNo(input: SignupPhone): Promise<{}>;
+    signUpPhoneNo(input: SignUpDriverPhoneDto): Promise<{}>;
     signUpEmail(input: SignupEmail): Promise<null>;
-    verifyOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;
+    verifyOtp(input: VerifyDriverOtpDto): Promise<VerifyDriverOtpDto>;
     createAccount(input: CreateAccountDto): Promise<IDriverLoginData>;
     login(input: LoginDriverDto): Promise<IDriverLoginData>;
-    loginOtp(input: LoginOtpDto): Promise<{
+    loginOtp(input: LoginDriverOtpDto): Promise<{
         email: string;
         userType: UserType;
         id: string;

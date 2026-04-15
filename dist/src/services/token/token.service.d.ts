@@ -24,7 +24,7 @@ export declare class TokenService {
     generateOTPtoken(payload: CreateTokenDto): Promise<ITokenInterface & {
         token: string;
     }>;
-    generateJWTtoken(payload: any): Promise<any>;
+    generateJWTtoken(payload: any): Promise<string>;
     verifyJWTtoken(token: string): Promise<any>;
     private deleteOTPtoken;
 }

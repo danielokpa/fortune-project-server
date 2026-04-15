@@ -3,10 +3,12 @@ import { DriverRepository } from '../repositories/driver.repository';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
 import { AddDriverLicenseDto, UpdateBankAccountDto } from '../dto/kyc.dto';
+import { TripRepository } from 'src/modules/trips/repositories/trip.repository';
 export declare class DriverService {
     private readonly driverRepository;
     private readonly clientDeviceService;
-    constructor(driverRepository: DriverRepository, clientDeviceService: ClientDeviceService);
+    private readonly tripRepository;
+    constructor(driverRepository: DriverRepository, clientDeviceService: ClientDeviceService, tripRepository: TripRepository);
     addDriverLicense(userId: string, reqBody: AddDriverLicenseDto): Promise<AddDriverLicenseDto>;
     updateBankAccount(userId: string, reqBody: UpdateBankAccountDto): Promise<UpdateBankAccountDto>;
     setDriverType(userId: string, isPeppcruiseDriver: boolean): Promise<[number, Driver[]]>;

@@ -4,6 +4,9 @@ export declare class ClientDeviceRepository {
     constructor(clientDeviceModel: typeof ClientDevice);
     findById(id: string): Promise<ClientDevice | null>;
     findByUserId(userId: string): Promise<ClientDevice[]>;
+    findByDriverId(driverId: string): Promise<ClientDevice[]>;
+    findWithFcmByUserId(userId: string): Promise<ClientDevice[]>;
+    findWithFcmByDriverId(driverId: string): Promise<ClientDevice[]>;
     findByIpAddress(ipAddress: string): Promise<ClientDevice[]>;
     findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null>;
     findAll(options?: any): Promise<ClientDevice[]>;

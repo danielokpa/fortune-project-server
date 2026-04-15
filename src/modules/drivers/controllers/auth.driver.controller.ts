@@ -13,12 +13,12 @@ import {
   import {
     ChangePasswordDto,
     ForgotPasswordDto,
-    LoginOtpDto,
+    LoginDriverOtpDto,
     LoginDriverDto,
     ResetPasswordDto,
     SignupEmail,
-    SignupPhone,
-    VerifyOtpDto,
+    SignUpDriverPhoneDto,
+    VerifyDriverOtpDto,
   } from '../dto/auth.driver.dto';
   import { Auth } from '../../auth/decorators/auth.decorator';
   import { AuthGuard } from '../../auth/guards/auth.guard';
@@ -33,7 +33,7 @@ import {
   
     @Post('signup-phone')
     @HttpCode(HttpStatus.OK)
-    async signUpPhoneNo(@Body() input: SignupPhone) {
+    async signUpPhoneNo(@Body() input: SignUpDriverPhoneDto) {
       const data = await this.authService.signUpPhoneNo(input);
       return ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your phoneNo', HttpStatus.OK);
     }
@@ -47,7 +47,7 @@ import {
   
     @Post('verify-otp')
     @HttpCode(HttpStatus.OK)
-    async verifyOtp(@Body() input: VerifyOtpDto) {
+    async verifyOtp(@Body() input: VerifyDriverOtpDto) {
       const data = await this.authService.verifyOtp(input);
       return ResponseUtil.handleResponse(data, 'OTP Validated successfully', HttpStatus.OK);
     }
@@ -68,7 +68,7 @@ import {
   
     @Post('login-with-otp')
     @HttpCode(HttpStatus.OK)
-    async loginOtp(@Body() input: LoginOtpDto) {
+    async loginOtp(@Body() input: LoginDriverOtpDto) {
       const data = await this.authService.loginOtp(input);
       return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
     }

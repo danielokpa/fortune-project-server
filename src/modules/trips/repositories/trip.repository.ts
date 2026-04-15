@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Trip, TripStatus } from '../entities/trip.entity';
 import { Op } from 'sequelize';
+import { VehicleRegistration } from 'src/modules/drivers/entities/vehicle-registration.entity';
 
 @Injectable()
 export class TripRepository {
   constructor(
     @InjectModel(Trip)
     private readonly tripModel: typeof Trip,
+    @InjectModel(VehicleRegistration)
+    private readonly vehicleRegistrationModel: typeof VehicleRegistration,
   ) {}
 
   async create(data: Partial<Trip>): Promise<Trip> {
@@ -20,35 +23,20 @@ export class TripRepository {
     });
   }
 
-  async findDriverActiveTrip(driverId: string): Promise<Trip | null> {
-    return await this.tripModel.findOne({
-      where: {
-        driverId,
-        status: {
-          [Op.in]: [TripStatus.PENDING, TripStatus.ACCEPTED, TripStatus.ON_THE_WAY, TripStatus.ARRIVED],
-        },
-      },
-      include: [
-        {
-          association: 'user',
-          attributes: ['id', 'fullName', 'email', 'phoneNo', 'imageUrl'],
-        },
-        {
-          association: 'driver',
-          attributes: ['id', 'fullName', 'email', 'phoneNo', 'profileImageUrl'],
-          required: false,
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
-  }
 
-  async findUserActiveTrip(userId: string): Promise<Trip | null> {
-    return await this.tripModel.findOne({
+  async findUserActiveTrip(userId: string): Promise<any | null> {
+    const trip = await this.tripModel.findOne({
       where: {
         userId,
         status: {
-          [Op.in]: [TripStatus.PENDING, TripStatus.ACCEPTED, TripStatus.ON_THE_WAY, TripStatus.ARRIVED],
+          [Op.in]: [
+            TripStatus.TRIP_BOOKED,
+            TripStatus.TRIP_ASSIGNED,
+            TripStatus.DRIVER_ACCEPTED,
+            TripStatus.DRIVER_ARRIVED,
+            TripStatus.TRIP_RE_ASSIGN,
+            TripStatus.TRIP_STARTED,
+          ],
         },
       },
       include: [
@@ -64,6 +52,58 @@ export class TripRepository {
       ],
       order: [['createdAt', 'DESC']],
     });
+
+    if (trip) {
+      const vehicleRegistration = await this.vehicleRegistrationModel.findOne({
+        where: { driverId: trip.driverId },
+        attributes: ['id', 'brandOfVehicle', 'color', 'makeOfVehicle', 'plateNo'],
+      });
+
+      return {...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0};
+    }
+
+    return null;
+  }
+
+  async findDriverActiveTrip(driverId: string): Promise<any | null> {
+    const trip = await this.tripModel.findOne({
+      where: {
+        driverId,
+        status: {
+          [Op.in]: [
+            TripStatus.TRIP_BOOKED,
+            TripStatus.TRIP_ASSIGNED,
+            TripStatus.DRIVER_ACCEPTED,
+            TripStatus.DRIVER_ARRIVED,
+            TripStatus.TRIP_RE_ASSIGN,
+            TripStatus.TRIP_STARTED,
+          ],
+        },
+      },
+      include: [
+        {
+          association: 'user',
+          attributes: ['id', 'fullName', 'email', 'phoneNo', 'imageUrl'],
+        },
+        {
+          association: 'driver',
+          attributes: ['id', 'fullName', 'email', 'phoneNo', 'profileImageUrl'],
+          required: false,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    if (trip) {
+      const vehicleRegistration = await this.vehicleRegistrationModel.findOne({
+        where: { driverId: trip.driverId },
+        attributes: ['id', 'brandOfVehicle', 'color', 'makeOfVehicle', 'plateNo'],
+      });
+
+      return {...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0};
+    }
+
+    return null;
   }
 
   async findAll(options?: {
@@ -86,32 +126,6 @@ export class TripRepository {
     });
   }
 
-  async update(id: string, data: Partial<Trip>): Promise<[number, Trip[]]> {
-    return await this.tripModel.update(data, {
-      where: { id },
-      returning: true,
-    });
-  }
 
-  async updateStatus(
-    id: string,
-    status: TripStatus,
-  ): Promise<Trip | null> {
-    const [affectedCount] = await this.tripModel.update(
-      { status },
-      { where: { id } },
-    );
-
-    if (affectedCount > 0) {
-      return await this.findById(id);
-    }
-    return null;
-  }
-
-  async delete(id: string): Promise<number> {
-    return await this.tripModel.destroy({
-      where: { id },
-    });
-  }
 }
 

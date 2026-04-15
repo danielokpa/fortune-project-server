@@ -33,7 +33,7 @@ import { SmsModule } from 'src/services/sms/sms.module';
 import { AuthModule } from '../auth/auth.module';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
 import { TripsModule } from '../trips/trips.module';
-
+import { TripRepository } from '../trips/repositories/trip.repository';
 
 @Module({
   imports: [
@@ -54,6 +54,7 @@ import { TripsModule } from '../trips/trips.module';
     MailModule,
     SmsModule,
     AuthModule,
+    TripsModule,
   ],
   controllers: [
     DriverController,
@@ -75,6 +76,7 @@ import { TripsModule } from '../trips/trips.module';
     Kyc3Repository,
     VehicleRegistrationRepository,
     ClientDeviceService,
+    TripRepository,
   ],
   exports: [
     DriverService,

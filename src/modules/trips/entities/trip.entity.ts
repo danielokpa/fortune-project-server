@@ -23,13 +23,22 @@ export enum PaymentType {
 }
 
 export enum TripStatus {
-    PENDING = 'PENDING',
-    ASSIGNED = 'ASSIGNED',
-    ACCEPTED = 'ACCEPTED',
-    COMPLETED = 'COMPLETED',
-    CANCELLED = 'CANCELLED',
-    ON_THE_WAY = 'ON_THE_WAY',
-    ARRIVED = 'ARRIVED',
+  TRIP_BOOKED = 'TRIP_BOOKED',
+  TRIP_ASSIGNED = 'TRIP_ASSIGNED',
+  DRIVER_ARRIVED = 'DRIVER_ARRIVED',
+  DRIVER_ACCEPTED = 'DRIVER_ACCEPTED',
+  DRIVER_DECLINED = 'DRIVER_DECLINED',
+  TRIP_RE_ASSIGN = 'TRIP_RE_ASSIGN',
+  TRIP_STARTED = 'TRIP_STARTED',
+  TRIP_COMPLETED = 'TRIP_COMPLETED',
+  TRIP_CANCELLED_BY_USER = 'TRIP_CANCELLED_BY_USER',
+  TRIP_CANCELLED_BY_DRIVER = 'TRIP_CANCELLED_BY_DRIVER',
+  TRIP_CANCELLED = 'TRIP_CANCELLED',
+}
+
+export enum TripPaymentStatus {
+  UNPAID = 'UNPAID',
+  PAID = 'PAID',
 }
 
 @Table({
@@ -105,7 +114,7 @@ export class Trip extends Model<Trip> {
     type: DataType.STRING(5000),
     allowNull: true,
   })
-  declare droffOffAddress?: string;
+  declare dropoffAddress?: string;
 
   @Column({
     type: DataType.STRING(5000),
@@ -149,12 +158,19 @@ export class Trip extends Model<Trip> {
   })
   declare dropoffLongitude?: number;
 
-  @Default(TripStatus.PENDING)
+  @Default(TripStatus.TRIP_BOOKED)
   @AllowNull(false)
   @Column({
     type: DataType.ENUM(...Object.values(TripStatus)),
   })
   declare status: TripStatus;
+
+  @Default(TripPaymentStatus.UNPAID)
+  @AllowNull(false)
+  @Column({
+    type: DataType.ENUM(...Object.values(TripPaymentStatus)),
+  })
+  declare paymentStatus: TripPaymentStatus;
 
   @CreatedAt
   @AllowNull(false)

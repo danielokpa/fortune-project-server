@@ -117,7 +117,8 @@ export class UserService {
       return dashboardRes;
       
     }catch(error: unknown){
-      throw new NotFoundException('User not found!')
+      console.log(error);
+      throw new NotFoundException(error)
     }
   }
 

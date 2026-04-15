@@ -1,16 +1,16 @@
 import type { Request as ExpressRequest } from 'express';
-import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginDriverDto, ResetPasswordDto, SignupEmail, SignupPhone, VerifyOtpDto } from '../dto/auth.driver.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginDriverOtpDto, LoginDriverDto, ResetPasswordDto, SignupEmail, SignUpDriverPhoneDto, VerifyDriverOtpDto } from '../dto/auth.driver.dto';
 import { AuthDriverService } from '../services/auth.driver.service';
 import { CreateAccountDto } from '../dto/auth.driver.dto';
 export declare class AuthDriverController {
     private readonly authService;
     constructor(authService: AuthDriverService);
-    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
+    signUpPhoneNo(input: SignUpDriverPhoneDto): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null>>;
-    verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;
+    verifyOtp(input: VerifyDriverOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyDriverOtpDto>>;
     signUp(input: CreateAccountDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IDriverLoginData>>;
     login(input: LoginDriverDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IDriverLoginData>>;
-    loginOtp(input: LoginOtpDto): Promise<import("src/utils/response.utils").ApiResponse<{
+    loginOtp(input: LoginDriverOtpDto): Promise<import("src/utils/response.utils").ApiResponse<{
         email: string;
         userType: import("../../../enums").UserType;
         id: string;

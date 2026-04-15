@@ -9,13 +9,21 @@ export declare enum PaymentType {
     WALLET = "WALLET"
 }
 export declare enum TripStatus {
-    PENDING = "PENDING",
-    ASSIGNED = "ASSIGNED",
-    ACCEPTED = "ACCEPTED",
-    COMPLETED = "COMPLETED",
-    CANCELLED = "CANCELLED",
-    ON_THE_WAY = "ON_THE_WAY",
-    ARRIVED = "ARRIVED"
+    TRIP_BOOKED = "TRIP_BOOKED",
+    TRIP_ASSIGNED = "TRIP_ASSIGNED",
+    DRIVER_ARRIVED = "DRIVER_ARRIVED",
+    DRIVER_ACCEPTED = "DRIVER_ACCEPTED",
+    DRIVER_DECLINED = "DRIVER_DECLINED",
+    TRIP_RE_ASSIGN = "TRIP_RE_ASSIGN",
+    TRIP_STARTED = "TRIP_STARTED",
+    TRIP_COMPLETED = "TRIP_COMPLETED",
+    TRIP_CANCELLED_BY_USER = "TRIP_CANCELLED_BY_USER",
+    TRIP_CANCELLED_BY_DRIVER = "TRIP_CANCELLED_BY_DRIVER",
+    TRIP_CANCELLED = "TRIP_CANCELLED"
+}
+export declare enum TripPaymentStatus {
+    UNPAID = "UNPAID",
+    PAID = "PAID"
 }
 export declare class Trip extends Model<Trip> {
     id: string;
@@ -28,7 +36,7 @@ export declare class Trip extends Model<Trip> {
     endTime?: Date;
     arrivalTime?: Date;
     paymentType?: PaymentType;
-    droffOffAddress?: string;
+    dropoffAddress?: string;
     pickupAddress?: string;
     pickupLocation?: string;
     dropoffLocation?: string;
@@ -37,6 +45,7 @@ export declare class Trip extends Model<Trip> {
     dropoffLatitude?: number;
     dropoffLongitude?: number;
     status: TripStatus;
+    paymentStatus: TripPaymentStatus;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

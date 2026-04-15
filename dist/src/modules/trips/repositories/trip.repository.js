@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const trip_entity_1 = require("../entities/trip.entity");
 const sequelize_2 = require("sequelize");
+const vehicle_registration_entity_1 = require("../../drivers/entities/vehicle-registration.entity");
 let TripRepository = class TripRepository {
     tripModel;
-    constructor(tripModel) {
+    vehicleRegistrationModel;
+    constructor(tripModel, vehicleRegistrationModel) {
         this.tripModel = tripModel;
+        this.vehicleRegistrationModel = vehicleRegistrationModel;
     }
     async create(data) {
         return await this.tripModel.create(data);
@@ -31,11 +34,18 @@ let TripRepository = class TripRepository {
         });
     }
     async findUserActiveTrip(userId) {
-        return await this.tripModel.findOne({
+        const trip = await this.tripModel.findOne({
             where: {
                 userId,
                 status: {
-                    [sequelize_2.Op.in]: [trip_entity_1.TripStatus.PENDING, trip_entity_1.TripStatus.ACCEPTED, trip_entity_1.TripStatus.ON_THE_WAY, trip_entity_1.TripStatus.ARRIVED],
+                    [sequelize_2.Op.in]: [
+                        trip_entity_1.TripStatus.TRIP_BOOKED,
+                        trip_entity_1.TripStatus.TRIP_ASSIGNED,
+                        trip_entity_1.TripStatus.DRIVER_ACCEPTED,
+                        trip_entity_1.TripStatus.DRIVER_ARRIVED,
+                        trip_entity_1.TripStatus.TRIP_RE_ASSIGN,
+                        trip_entity_1.TripStatus.TRIP_STARTED,
+                    ],
                 },
             },
             include: [
@@ -51,6 +61,51 @@ let TripRepository = class TripRepository {
             ],
             order: [['createdAt', 'DESC']],
         });
+        if (trip) {
+            const vehicleRegistration = await this.vehicleRegistrationModel.findOne({
+                where: { driverId: trip.driverId },
+                attributes: ['id', 'brandOfVehicle', 'color', 'makeOfVehicle', 'plateNo'],
+            });
+            return { ...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0 };
+        }
+        return null;
+    }
+    async findDriverActiveTrip(driverId) {
+        const trip = await this.tripModel.findOne({
+            where: {
+                driverId,
+                status: {
+                    [sequelize_2.Op.in]: [
+                        trip_entity_1.TripStatus.TRIP_BOOKED,
+                        trip_entity_1.TripStatus.TRIP_ASSIGNED,
+                        trip_entity_1.TripStatus.DRIVER_ACCEPTED,
+                        trip_entity_1.TripStatus.DRIVER_ARRIVED,
+                        trip_entity_1.TripStatus.TRIP_RE_ASSIGN,
+                        trip_entity_1.TripStatus.TRIP_STARTED,
+                    ],
+                },
+            },
+            include: [
+                {
+                    association: 'user',
+                    attributes: ['id', 'fullName', 'email', 'phoneNo', 'imageUrl'],
+                },
+                {
+                    association: 'driver',
+                    attributes: ['id', 'fullName', 'email', 'phoneNo', 'profileImageUrl'],
+                    required: false,
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+        });
+        if (trip) {
+            const vehicleRegistration = await this.vehicleRegistrationModel.findOne({
+                where: { driverId: trip.driverId },
+                attributes: ['id', 'brandOfVehicle', 'color', 'makeOfVehicle', 'plateNo'],
+            });
+            return { ...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0 };
+        }
+        return null;
     }
     async findAll(options) {
         return await this.tripModel.findAll({
@@ -65,29 +120,12 @@ let TripRepository = class TripRepository {
             order: [['createdAt', 'DESC']],
         });
     }
-    async update(id, data) {
-        return await this.tripModel.update(data, {
-            where: { id },
-            returning: true,
-        });
-    }
-    async updateStatus(id, status) {
-        const [affectedCount] = await this.tripModel.update({ status }, { where: { id } });
-        if (affectedCount > 0) {
-            return await this.findById(id);
-        }
-        return null;
-    }
-    async delete(id) {
-        return await this.tripModel.destroy({
-            where: { id },
-        });
-    }
 };
 exports.TripRepository = TripRepository;
 exports.TripRepository = TripRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, sequelize_1.InjectModel)(trip_entity_1.Trip)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, sequelize_1.InjectModel)(vehicle_registration_entity_1.VehicleRegistration)),
+    __metadata("design:paramtypes", [Object, Object])
 ], TripRepository);
 //# sourceMappingURL=trip.repository.js.map

@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const event_emitter_1 = require("@nestjs/event-emitter");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
@@ -52,6 +53,7 @@ const cng_station_review_entity_1 = require("./modules/cng-conversion/entities/c
 const client_device_entity_1 = require("./modules/client-devices/entities/client-device.entity");
 const entities_4 = require("./services/token/entities");
 const trip_entity_1 = require("./modules/trips/entities/trip.entity");
+const trips_module_1 = require("./modules/trips/trips.module");
 const referred_user_entity_1 = require("./modules/referred-users/entities/referred-user.entity");
 let AppModule = class AppModule {
 };
@@ -59,6 +61,7 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            event_emitter_1.EventEmitterModule.forRoot(),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 load: [app_config_1.default],
@@ -114,6 +117,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             drivers_module_1.DriversModule,
+            trips_module_1.TripsModule,
             countries_module_1.CountriesModule,
             cng_conversion_module_1.CngConversionModule,
             charging_stations_module_1.ChargingStationsModule,

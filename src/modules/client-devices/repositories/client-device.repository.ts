@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Model } from 'sequelize-typescript';
+import { Op } from 'sequelize';
 import { ClientDevice } from '../entities/client-device.entity';
 
 @Injectable()
@@ -17,6 +17,31 @@ export class ClientDeviceRepository {
   async findByUserId(userId: string): Promise<ClientDevice[]> {
     return await this.clientDeviceModel.findAll({
       where: { userId },
+    });
+  }
+
+  async findByDriverId(driverId: string): Promise<ClientDevice[]> {
+    return await this.clientDeviceModel.findAll({
+      where: { driverId },
+    });
+  }
+
+  /** Devices with an FCM token set (non-null). */
+  async findWithFcmByUserId(userId: string): Promise<ClientDevice[]> {
+    return await this.clientDeviceModel.findAll({
+      where: {
+        userId,
+        deviceFCMToken: { [Op.ne]: null },
+      },
+    });
+  }
+
+  async findWithFcmByDriverId(driverId: string): Promise<ClientDevice[]> {
+    return await this.clientDeviceModel.findAll({
+      where: {
+        driverId,
+        deviceFCMToken: { [Op.ne]: null },
+      },
     });
   }
 

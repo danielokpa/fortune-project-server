@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Trip = exports.TripStatus = exports.PaymentType = void 0;
+exports.Trip = exports.TripPaymentStatus = exports.TripStatus = exports.PaymentType = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const user_entity_1 = require("../../users/entities/user.entity");
 const driver_entity_1 = require("../../drivers/entities/driver.entity");
@@ -23,14 +23,23 @@ var PaymentType;
 })(PaymentType || (exports.PaymentType = PaymentType = {}));
 var TripStatus;
 (function (TripStatus) {
-    TripStatus["PENDING"] = "PENDING";
-    TripStatus["ASSIGNED"] = "ASSIGNED";
-    TripStatus["ACCEPTED"] = "ACCEPTED";
-    TripStatus["COMPLETED"] = "COMPLETED";
-    TripStatus["CANCELLED"] = "CANCELLED";
-    TripStatus["ON_THE_WAY"] = "ON_THE_WAY";
-    TripStatus["ARRIVED"] = "ARRIVED";
+    TripStatus["TRIP_BOOKED"] = "TRIP_BOOKED";
+    TripStatus["TRIP_ASSIGNED"] = "TRIP_ASSIGNED";
+    TripStatus["DRIVER_ARRIVED"] = "DRIVER_ARRIVED";
+    TripStatus["DRIVER_ACCEPTED"] = "DRIVER_ACCEPTED";
+    TripStatus["DRIVER_DECLINED"] = "DRIVER_DECLINED";
+    TripStatus["TRIP_RE_ASSIGN"] = "TRIP_RE_ASSIGN";
+    TripStatus["TRIP_STARTED"] = "TRIP_STARTED";
+    TripStatus["TRIP_COMPLETED"] = "TRIP_COMPLETED";
+    TripStatus["TRIP_CANCELLED_BY_USER"] = "TRIP_CANCELLED_BY_USER";
+    TripStatus["TRIP_CANCELLED_BY_DRIVER"] = "TRIP_CANCELLED_BY_DRIVER";
+    TripStatus["TRIP_CANCELLED"] = "TRIP_CANCELLED";
 })(TripStatus || (exports.TripStatus = TripStatus = {}));
+var TripPaymentStatus;
+(function (TripPaymentStatus) {
+    TripPaymentStatus["UNPAID"] = "UNPAID";
+    TripPaymentStatus["PAID"] = "PAID";
+})(TripPaymentStatus || (exports.TripPaymentStatus = TripPaymentStatus = {}));
 let Trip = class Trip extends sequelize_typescript_1.Model {
 };
 exports.Trip = Trip;
@@ -108,7 +117,7 @@ __decorate([
         allowNull: true,
     }),
     __metadata("design:type", String)
-], Trip.prototype, "droffOffAddress", void 0);
+], Trip.prototype, "dropoffAddress", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING(5000),
@@ -159,13 +168,21 @@ __decorate([
     __metadata("design:type", Number)
 ], Trip.prototype, "dropoffLongitude", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Default)(TripStatus.PENDING),
+    (0, sequelize_typescript_1.Default)(TripStatus.TRIP_BOOKED),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.ENUM(...Object.values(TripStatus)),
     }),
     __metadata("design:type", String)
 ], Trip.prototype, "status", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(TripPaymentStatus.UNPAID),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM(...Object.values(TripPaymentStatus)),
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "paymentStatus", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.AllowNull)(false),

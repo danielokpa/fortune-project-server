@@ -1,10 +1,13 @@
 import { Trip, TripStatus } from '../entities/trip.entity';
+import { VehicleRegistration } from 'src/modules/drivers/entities/vehicle-registration.entity';
 export declare class TripRepository {
     private readonly tripModel;
-    constructor(tripModel: typeof Trip);
+    private readonly vehicleRegistrationModel;
+    constructor(tripModel: typeof Trip, vehicleRegistrationModel: typeof VehicleRegistration);
     create(data: Partial<Trip>): Promise<Trip>;
     findById(id: string): Promise<Trip | null>;
-    findUserActiveTrip(userId: string): Promise<Trip | null>;
+    findUserActiveTrip(userId: string): Promise<any | null>;
+    findDriverActiveTrip(driverId: string): Promise<any | null>;
     findAll(options?: {
         limit?: number;
         offset?: number;
@@ -12,7 +15,4 @@ export declare class TripRepository {
         driverId?: string;
         status?: TripStatus;
     }): Promise<Trip[]>;
-    update(id: string, data: Partial<Trip>): Promise<[number, Trip[]]>;
-    updateStatus(id: string, status: TripStatus): Promise<Trip | null>;
-    delete(id: string): Promise<number>;
 }

@@ -17,13 +17,13 @@ import {
   import {
     ChangePasswordDto,
     ForgotPasswordDto,
-    LoginOtpDto,
+    LoginDriverOtpDto,
     LoginDriverDto,
     ResetPasswordDto,
     SignupEmail,
-    SignupPhone,
+    SignUpDriverPhoneDto,
     CreateAccountDto,
-    VerifyOtpDto,
+    VerifyDriverOtpDto,
   } from '../dto/auth.driver.dto';
   import { TokenSubject, TokenType } from 'src/enums/token.enum';
   import moment from 'moment';
@@ -82,7 +82,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       }
     }
   
-    async signUpPhoneNo(input: SignupPhone){
+    async signUpPhoneNo(input: SignUpDriverPhoneDto){
       const { country, phoneNo } = input;
 
       const existingCountry = await this.countryService.findById(country)
@@ -129,7 +129,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       return null;
     }
 
-    async verifyOtp(input: VerifyOtpDto) {
+    async verifyOtp(input: VerifyDriverOtpDto) {
 
       const { token, subject, email, phoneNo, country } = input;
 
@@ -344,7 +344,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       
     }
   
-    async loginOtp(input: LoginOtpDto) {
+    async loginOtp(input: LoginDriverOtpDto) {
       const { identity, otp, password, deviceInfo, country } = input;
 
       let user: Driver | null = null;

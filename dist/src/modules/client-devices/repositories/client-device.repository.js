@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientDeviceRepository = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
+const sequelize_2 = require("sequelize");
 const client_device_entity_1 = require("../entities/client-device.entity");
 let ClientDeviceRepository = class ClientDeviceRepository {
     clientDeviceModel;
@@ -27,6 +28,27 @@ let ClientDeviceRepository = class ClientDeviceRepository {
     async findByUserId(userId) {
         return await this.clientDeviceModel.findAll({
             where: { userId },
+        });
+    }
+    async findByDriverId(driverId) {
+        return await this.clientDeviceModel.findAll({
+            where: { driverId },
+        });
+    }
+    async findWithFcmByUserId(userId) {
+        return await this.clientDeviceModel.findAll({
+            where: {
+                userId,
+                deviceFCMToken: { [sequelize_2.Op.ne]: null },
+            },
+        });
+    }
+    async findWithFcmByDriverId(driverId) {
+        return await this.clientDeviceModel.findAll({
+            where: {
+                driverId,
+                deviceFCMToken: { [sequelize_2.Op.ne]: null },
+            },
         });
     }
     async findByIpAddress(ipAddress) {
