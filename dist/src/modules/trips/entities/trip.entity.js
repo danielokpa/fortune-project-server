@@ -76,12 +76,27 @@ __decorate([
     __metadata("design:type", driver_entity_1.Driver)
 ], Trip.prototype, "driver", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DECIMAL(10, 2),
+        allowNull: true,
+    }),
+    __metadata("design:type", Number)
+], Trip.prototype, "tax", void 0);
+__decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.DECIMAL(10, 2),
     }),
     __metadata("design:type", Number)
 ], Trip.prototype, "estimatedFee", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DECIMAL(10, 2),
+    }),
+    __metadata("design:type", Number)
+], Trip.prototype, "finalFee", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)({
@@ -102,7 +117,7 @@ __decorate([
         type: sequelize_typescript_1.DataType.DATE,
     }),
     __metadata("design:type", Date)
-], Trip.prototype, "arrivalTime", void 0);
+], Trip.prototype, "driverArrivalTime", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(PaymentType.CASH),
     (0, sequelize_typescript_1.AllowNull)(true),
@@ -141,6 +156,48 @@ __decorate([
 ], Trip.prototype, "dropoffLocation", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(1000),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "stopLocation", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DECIMAL(9, 6),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "stopLongitude", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DECIMAL(9, 6),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "stopLatitude", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DATE,
+        allowNull: true,
+    }),
+    __metadata("design:type", Date)
+], Trip.prototype, "stopCompletedTime", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DECIMAL(9, 6),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "distanceToPickup", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DECIMAL(9, 6),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "distanceCovered", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.DECIMAL(9, 6),
         allowNull: true,
     }),
@@ -168,14 +225,6 @@ __decorate([
     __metadata("design:type", Number)
 ], Trip.prototype, "dropoffLongitude", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Default)(TripStatus.TRIP_BOOKED),
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.ENUM(...Object.values(TripStatus)),
-    }),
-    __metadata("design:type", String)
-], Trip.prototype, "status", void 0);
-__decorate([
     (0, sequelize_typescript_1.Default)(TripPaymentStatus.UNPAID),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
@@ -184,6 +233,14 @@ __decorate([
     __metadata("design:type", String)
 ], Trip.prototype, "paymentStatus", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Default)(TripStatus.TRIP_BOOKED),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM(...Object.values(TripStatus)),
+    }),
+    __metadata("design:type", String)
+], Trip.prototype, "status", void 0);
+__decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
@@ -191,6 +248,20 @@ __decorate([
     }),
     __metadata("design:type", Date)
 ], Trip.prototype, "createdAt", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DATE,
+        allowNull: true,
+    }),
+    __metadata("design:type", Date)
+], Trip.prototype, "cancelledAt", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DATE,
+    }),
+    __metadata("design:type", Date)
+], Trip.prototype, "completedAt", void 0);
 __decorate([
     sequelize_typescript_1.UpdatedAt,
     (0, sequelize_typescript_1.Column)({
