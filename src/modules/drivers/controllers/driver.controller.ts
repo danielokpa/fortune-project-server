@@ -18,7 +18,7 @@ import { AddDriverLicenseDto, UpdateBankAccountDto, ValidateBankAccountDto } fro
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('drivers')
 export class DriverController {
-  constructor(private readonly driverService: DriverService) {}
+  constructor(private readonly driverService: DriverService) { }
 
   @Get()
   @Roles(UserType.DRIVER)
@@ -28,7 +28,7 @@ export class DriverController {
   @ApiResponse({ status: 404, description: 'Driver not found' })
   async fetchDriver(
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const userId = Validators.validateUuid(req.user.userId);
     const data = await this.driverService.fetchDriver(userId);
     return ResponseUtil.handleResponse(
@@ -45,14 +45,16 @@ export class DriverController {
   async dashboard(
     @Body() reqBody: DashboardDto,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const userId = Validators.validateUuid(req.user.userId);
     const ipAddress = req.ip;
+    const userToken = req.headers.authorization?.split(' ')[1] || '';
+
     const data = await this.driverService.dashboard({
       ipAddress: ipAddress || '',
       name: reqBody.name || '',
       deviceFCMToken: reqBody.deviceFCMToken,
-    }, userId);
+    }, userId, userToken);
     return ResponseUtil.handleResponse(
       data,
       'Driver dashboard data retrieved successfully',
@@ -67,7 +69,7 @@ export class DriverController {
   async setDriverType(
     @Body() reqBody: { isPeppcruiseDriver: boolean },
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const userId = Validators.validateUuid(req.user.userId);
     const data = await this.driverService.setDriverType(userId, reqBody.isPeppcruiseDriver);
     return ResponseUtil.handleResponse(
@@ -75,7 +77,7 @@ export class DriverController {
       'Request successfull',
       HttpStatus.OK,
     );
-  } 
+  }
 
   @Get('bank-list')
   @Roles(UserType.DRIVER)
@@ -83,7 +85,7 @@ export class DriverController {
   @ApiResponse({ status: 200, description: 'Banks retrieved successfully' })
   async getBankAccountList(
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const data = await monifyAPI.fetchBanks();
     return ResponseUtil.handleResponse(
       data,
@@ -99,7 +101,7 @@ export class DriverController {
   async validateBankAccount(
     @Body() reqBody: ValidateBankAccountDto,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const data = await monifyAPI.validateAccount({ bankCode: reqBody.bankCode, accountNumber: reqBody.accountNo });
     return ResponseUtil.handleResponse(
       data,
@@ -115,9 +117,10 @@ export class DriverController {
   async createBankAccount(
     @Body() reqBody: UpdateBankAccountDto,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const userId = Validators.validateUuid(req.user.userId);
-    const data = await this.driverService.updateBankAccount(userId, reqBody);
+    const userToken = req.headers.authorization?.split(' ')[1] || '';
+    const data = await this.driverService.updateBankAccount(userId, reqBody, userToken);
     return ResponseUtil.handleResponse(
       data,
       'Bank account updated successfully',
@@ -132,7 +135,7 @@ export class DriverController {
   async driverLicense(
     @Body() reqBody: AddDriverLicenseDto,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ){
+  ) {
     const userId = Validators.validateUuid(req.user.userId);
     const data = await this.driverService.addDriverLicense(userId, reqBody);
     return ResponseUtil.handleResponse(

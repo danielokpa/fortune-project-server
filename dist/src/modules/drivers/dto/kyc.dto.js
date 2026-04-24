@@ -268,6 +268,7 @@ class UpdateBankAccountDto {
     accountNo;
     accountName;
     bankName;
+    bvn;
 }
 exports.UpdateBankAccountDto = UpdateBankAccountDto;
 __decorate([
@@ -306,6 +307,11 @@ __decorate([
     (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], UpdateBankAccountDto.prototype, "bankName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateBankAccountDto.prototype, "bvn", void 0);
 class AddDriverLicenseDto {
     licenseImageUrl;
 }

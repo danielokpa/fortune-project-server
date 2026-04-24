@@ -8,21 +8,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var DriverService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DriverService = void 0;
 const common_1 = require("@nestjs/common");
+const event_emitter_1 = require("@nestjs/event-emitter");
 const driver_repository_1 = require("../repositories/driver.repository");
 const client_device_service_1 = require("../../client-devices/services/client-device.service");
 const trip_repository_1 = require("../../trips/repositories/trip.repository");
-let DriverService = class DriverService {
+const auth_driver_service_1 = require("./auth.driver.service");
+let DriverService = DriverService_1 = class DriverService {
     driverRepository;
     clientDeviceService;
     tripRepository;
-    constructor(driverRepository, clientDeviceService, tripRepository) {
+    eventEmitter;
+    authDriverService;
+    constructor(driverRepository, clientDeviceService, tripRepository, eventEmitter, authDriverService) {
         this.driverRepository = driverRepository;
         this.clientDeviceService = clientDeviceService;
         this.tripRepository = tripRepository;
+        this.eventEmitter = eventEmitter;
+        this.authDriverService = authDriverService;
     }
+    logger = new common_1.Logger(DriverService_1.name);
     async addDriverLicense(userId, reqBody) {
         try {
             const driver = await this.driverRepository.update(userId, {
@@ -37,18 +45,42 @@ let DriverService = class DriverService {
             throw new common_1.BadRequestException(error);
         }
     }
-    async updateBankAccount(userId, reqBody) {
+    async updateBankAccount(userId, reqBody, userToken) {
         try {
-            const driver = await this.driverRepository.update(userId, {
-                accountName: reqBody.accountName,
-                accountNo: reqBody.accountNo,
-                bankName: reqBody.bankName,
-                bankCode: reqBody.bankCode,
-            });
+            const driver = await this.driverRepository.findById(userId);
             if (!driver) {
                 throw new common_1.NotFoundException('Driver not found!');
             }
-            return reqBody;
+            if (reqBody.bvn) {
+                const virtualAccount = await this.authDriverService.fetchOrCreateVirtualAccount({
+                    token: userToken,
+                    driverId: userId,
+                    bvn: reqBody.bvn
+                });
+                if (virtualAccount) {
+                    const updatedDriver = await this.driverRepository.update(userId, {
+                        accountName: reqBody.accountName,
+                        accountNo: reqBody.accountNo,
+                        bankName: reqBody.bankName,
+                        bankCode: reqBody.bankCode,
+                        bvn: reqBody.bvn
+                    });
+                    return reqBody;
+                }
+                else {
+                    throw new common_1.BadRequestException('Driver account already provided');
+                }
+            }
+            else {
+                const updatedDriver = await this.driverRepository.update(userId, {
+                    accountName: reqBody.accountName,
+                    accountNo: reqBody.accountNo,
+                    bankName: reqBody.bankName,
+                    bankCode: reqBody.bankCode,
+                    bvn: reqBody.bvn
+                });
+                return reqBody;
+            }
         }
         catch (error) {
             throw new common_1.BadRequestException(error);
@@ -61,10 +93,10 @@ let DriverService = class DriverService {
         }
         return driver;
     }
-    async dashboard(data, userId) {
+    async dashboard(data, userId, userToken) {
         try {
             const { deviceFCMToken, ipAddress, name } = data;
-            const user = await this.driverRepository.findById(userId);
+            const user = await this.driverRepository.fetchDriver(userId);
             if (!user) {
                 throw new common_1.NotFoundException('User not found!');
             }
@@ -124,10 +156,12 @@ let DriverService = class DriverService {
     }
 };
 exports.DriverService = DriverService;
-exports.DriverService = DriverService = __decorate([
+exports.DriverService = DriverService = DriverService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [driver_repository_1.DriverRepository,
         client_device_service_1.ClientDeviceService,
-        trip_repository_1.TripRepository])
+        trip_repository_1.TripRepository,
+        event_emitter_1.EventEmitter2,
+        auth_driver_service_1.AuthDriverService])
 ], DriverService);
 //# sourceMappingURL=driver.service.js.map

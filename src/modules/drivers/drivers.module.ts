@@ -34,6 +34,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
 import { TripsModule } from '../trips/trips.module';
 import { TripRepository } from '../trips/repositories/trip.repository';
+import { AxiosModule } from 'src/services/axios/axios.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { TripRepository } from '../trips/repositories/trip.repository';
     SmsModule,
     AuthModule,
     TripsModule,
+    AxiosModule,
   ],
   controllers: [
     DriverController,

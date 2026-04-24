@@ -11,7 +11,7 @@ export class TripRepository {
     private readonly tripModel: typeof Trip,
     @InjectModel(VehicleRegistration)
     private readonly vehicleRegistrationModel: typeof VehicleRegistration,
-  ) {}
+  ) { }
 
   async create(data: Partial<Trip>): Promise<Trip> {
     return await this.tripModel.create(data as any);
@@ -59,7 +59,7 @@ export class TripRepository {
         attributes: ['id', 'brandOfVehicle', 'color', 'makeOfVehicle', 'plateNo'],
       });
 
-      return {...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0};
+      return { ...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0 };
     }
 
     return null;
@@ -74,7 +74,7 @@ export class TripRepository {
             TripStatus.TRIP_BOOKED,
             TripStatus.TRIP_ASSIGNED,
             TripStatus.DRIVER_ACCEPTED,
-            TripStatus.DRIVER_ARRIVED,
+            // TripStatus.DRIVER_ARRIVED,
             TripStatus.TRIP_RE_ASSIGN,
             TripStatus.TRIP_STARTED,
           ],
@@ -100,7 +100,7 @@ export class TripRepository {
         attributes: ['id', 'brandOfVehicle', 'color', 'makeOfVehicle', 'plateNo'],
       });
 
-      return {...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0};
+      return { ...trip.toJSON(), vehicleRegistration: vehicleRegistration?.toJSON(), driverRating: 0, userRating: 0 };
     }
 
     return null;

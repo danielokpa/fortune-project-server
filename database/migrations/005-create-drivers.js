@@ -135,6 +135,7 @@ module.exports = {
     await queryInterface.addIndex('drivers', ['verificationStatus']);
     await queryInterface.addIndex('drivers', ['isAvailable']);
     await queryInterface.addIndex('drivers', ['isActive']);
+    await queryInterface.addIndex('drivers', ['id']);
     await queryInterface.addIndex('drivers', ['driverShift']);
     await queryInterface.addIndex('drivers', ['isPeppcruiseDriver']);
     await queryInterface.addIndex('drivers', ['userType']);

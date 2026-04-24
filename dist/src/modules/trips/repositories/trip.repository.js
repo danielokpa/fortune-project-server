@@ -79,7 +79,6 @@ let TripRepository = class TripRepository {
                         trip_entity_1.TripStatus.TRIP_BOOKED,
                         trip_entity_1.TripStatus.TRIP_ASSIGNED,
                         trip_entity_1.TripStatus.DRIVER_ACCEPTED,
-                        trip_entity_1.TripStatus.DRIVER_ARRIVED,
                         trip_entity_1.TripStatus.TRIP_RE_ASSIGN,
                         trip_entity_1.TripStatus.TRIP_STARTED,
                     ],

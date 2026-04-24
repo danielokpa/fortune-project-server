@@ -38,11 +38,12 @@ let DriverController = class DriverController {
     async dashboard(reqBody, req) {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
         const ipAddress = req.ip;
+        const userToken = req.headers.authorization?.split(' ')[1] || '';
         const data = await this.driverService.dashboard({
             ipAddress: ipAddress || '',
             name: reqBody.name || '',
             deviceFCMToken: reqBody.deviceFCMToken,
-        }, userId);
+        }, userId, userToken);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Driver dashboard data retrieved successfully', common_1.HttpStatus.OK);
     }
     async setDriverType(reqBody, req) {
@@ -60,7 +61,8 @@ let DriverController = class DriverController {
     }
     async createBankAccount(reqBody, req) {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
-        const data = await this.driverService.updateBankAccount(userId, reqBody);
+        const userToken = req.headers.authorization?.split(' ')[1] || '';
+        const data = await this.driverService.updateBankAccount(userId, reqBody, userToken);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Bank account updated successfully', common_1.HttpStatus.OK);
     }
     async driverLicense(reqBody, req) {

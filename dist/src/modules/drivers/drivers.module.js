@@ -43,6 +43,7 @@ const auth_module_1 = require("../auth/auth.module");
 const client_device_service_1 = require("../client-devices/services/client-device.service");
 const trips_module_1 = require("../trips/trips.module");
 const trip_repository_1 = require("../trips/repositories/trip.repository");
+const axios_module_1 = require("../../services/axios/axios.module");
 let DriversModule = class DriversModule {
 };
 exports.DriversModule = DriversModule;
@@ -67,6 +68,7 @@ exports.DriversModule = DriversModule = __decorate([
             sms_module_1.SmsModule,
             auth_module_1.AuthModule,
             trips_module_1.TripsModule,
+            axios_module_1.AxiosModule,
         ],
         controllers: [
             driver_controller_1.DriverController,

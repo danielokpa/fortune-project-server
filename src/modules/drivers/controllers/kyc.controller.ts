@@ -29,8 +29,8 @@ import { ResponseUtil } from 'src/utils/response.utils';
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('drivers/kyc')
 export class KycController {
-  
-  constructor(private readonly kycService: KycService) {}
+
+  constructor(private readonly kycService: KycService) { }
 
   @Get()
   @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
@@ -41,7 +41,7 @@ export class KycController {
   })
   async getAllKycByDriver(
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
-  ){
+  ) {
     const data = await this.kycService.getAllKycByDriverId(req.user.userId);
     return ResponseUtil.success(data, 'All KYC retrieved successfully', HttpStatus.OK);
   }
@@ -50,7 +50,7 @@ export class KycController {
   @Roles(UserType.DRIVER)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create or update KYC1 personal information' })
-  @ApiResponse({status: 201, description: 'KYC1 personal information created/updated successfully'})
+  @ApiResponse({ status: 201, description: 'KYC1 personal information created/updated successfully' })
   async createKyc1(
     @Body() kycData: CreateKyc1Dto,
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
@@ -66,7 +66,7 @@ export class KycController {
     status: 200,
     description: 'KYC1 personal information retrieved successfully',
   })
-  async getKyc1PersonalInfo(@Req() req: ExpressRequest & { user: JwtAuthPayload }){
+  async getKyc1PersonalInfo(@Req() req: ExpressRequest & { user: JwtAuthPayload }) {
     const data = await this.kycService.fetchKyc1ByDriverId(req.user.userId);
     return ResponseUtil.success(data, 'KYC1 personal information retrieved successfully', HttpStatus.OK);
   }
@@ -83,7 +83,7 @@ export class KycController {
     @Body() kycData: CreateKyc2Dto,
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
   ) {
-    const data = await this.kycService.createKyc2(req.user.userId, kycData);
+    const data = await this.kycService.createKyc2(req.user.userId, kycData,);
     return ResponseUtil.handleResponse(data, 'KYC2 information created successfully', HttpStatus.CREATED);
   }
 
@@ -96,7 +96,7 @@ export class KycController {
   })
   async getKyc2IdInformation(
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
-  ){
+  ) {
     const data = await this.kycService.fetchKyc2ByDriverId(req.user.userId);
     return ResponseUtil.success(data, 'KYC2 information retrieved successfully', HttpStatus.OK);
   }
@@ -126,10 +126,10 @@ export class KycController {
   })
   async getKyc3AddressInformation(
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
-  ){
+  ) {
     const data = await this.kycService.fetchKyc3ByDriverId(req.user.userId);
     return ResponseUtil.success(data, 'KYC3 residential information retrieved successfully', HttpStatus.OK);
   }
- 
+
 }
 

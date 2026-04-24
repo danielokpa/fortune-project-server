@@ -20,7 +20,7 @@ export class KycService {
     private readonly driverRepository: DriverRepository,
     private readonly countryRepository: CountryRepository,
     private readonly stateService: StateService,
-  ) {}
+  ) { }
 
   async createKyc1(
     driverId: string,
@@ -39,7 +39,7 @@ export class KycService {
     if (existingKyc1) {
       return existingKyc1;
     }
-    
+
     const kyc1 = await this.kyc1Repository.create({
       ...kycData,
       driverId,
@@ -52,7 +52,7 @@ export class KycService {
         kycCompleted: KYC_COMPLETED.PERSONAL_INFORMATION
       });
     }
-    
+
     return kyc1;
   }
 

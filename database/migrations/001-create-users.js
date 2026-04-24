@@ -70,7 +70,7 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('users', ['email', 'phoneNo', 'fullName']);
+    await queryInterface.addIndex('users', ['email', 'phoneNo', 'fullName', 'id']);
   },
 
   down: async (queryInterface) => {

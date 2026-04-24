@@ -11,9 +11,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var AuthDriverService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthDriverService = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const axios_service_1 = require("../../../services/axios/axios.service");
 const express_1 = require("express");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
 const email_event_service_1 = require("../../../services/mail/email-event.service");
@@ -29,21 +33,28 @@ const client_device_service_1 = require("../../client-devices/services/client-de
 const validators_utils_1 = require("../../../utils/validators.utils");
 const utils_1 = require("../../../utils/utils");
 const kyc_enums_1 = require("../../../enums/kyc.enums");
-let AuthDriverService = class AuthDriverService {
+let AuthDriverService = AuthDriverService_1 = class AuthDriverService {
     driverRepository;
     tokenService;
     emailEventService;
     smsEventService;
     countryService;
     clientDeviceService;
-    constructor(driverRepository, tokenService, emailEventService, smsEventService, countryService, clientDeviceService) {
+    configService;
+    eventEmitter;
+    axiosService;
+    constructor(driverRepository, tokenService, emailEventService, smsEventService, countryService, clientDeviceService, configService, eventEmitter, axiosService) {
         this.driverRepository = driverRepository;
         this.tokenService = tokenService;
         this.emailEventService = emailEventService;
         this.smsEventService = smsEventService;
         this.countryService = countryService;
         this.clientDeviceService = clientDeviceService;
+        this.configService = configService;
+        this.eventEmitter = eventEmitter;
+        this.axiosService = axiosService;
     }
+    logger = new common_1.Logger(AuthDriverService_1.name);
     async deleteUserAccount(identity, password) {
         try {
             const user = await this.driverRepository.findByIdentity(identity);
@@ -380,6 +391,49 @@ let AuthDriverService = class AuthDriverService {
         await this.emailEventService.emitPasswordChangedEmail(user.email, user.fullName, changedAt);
         return null;
     }
+    async fetchOrCreateVirtualAccount(user) {
+        try {
+            const driver = user;
+            if (!driver) {
+                throw new common_1.NotFoundException('Driver not found');
+            }
+            const bvn = driver.bvn;
+            this.logger.log(`Driver ${driver.driverId} has BVN: ${bvn}`);
+            if (!bvn) {
+                this.logger.warn(`No BVN found for driver ${driver.driverId}. Cannot create virtual account.`);
+                return;
+            }
+            const paymentBaseUrl = this.configService.get('PAYMENT_SERVICE_URL') || process.env.PAYMENT_SERVICE_URL || '';
+            if (!paymentBaseUrl) {
+                this.logger.error('PAYMENT_SERVICE_URL not configured');
+                return;
+            }
+            const productKey = this.configService.get('app.apiKey');
+            this.logger.log(`Calling payment API for driver ${driver.driverId} with BVN: ${driver.bvn}`);
+            const response = await this.axiosService.post(`${paymentBaseUrl}/api/v1/payment/virtual-account`, { bvn: bvn.toString() }, {
+                headers: {
+                    'x-product-key': productKey,
+                    'Authorization': `Bearer ${driver.token}`,
+                },
+            });
+            if (response.data && response.data.status) {
+                this.logger.log(`Successfully created virtual account for driver ${driver.driverId}`);
+                return response.data;
+            }
+            else {
+                this.logger.error(`Payment API failed: ${JSON.stringify(response.data)}`);
+                throw new common_1.BadRequestException('Failed to create virtual account via payment service');
+            }
+        }
+        catch (error) {
+            this.logger.error(`Error fetching or creating virtual account: ${error.message}`);
+            if (error instanceof common_1.NotFoundException || error instanceof common_1.BadRequestException) {
+                throw error;
+            }
+        }
+    }
+    async handleDashboardAccessed(payload) {
+    }
     async checkEmailExist(email) {
         return await this.driverRepository.findByEmail(email);
     }
@@ -393,13 +447,22 @@ let AuthDriverService = class AuthDriverService {
     }
 };
 exports.AuthDriverService = AuthDriverService;
-exports.AuthDriverService = AuthDriverService = __decorate([
+__decorate([
+    (0, event_emitter_1.OnEvent)('driver.dashboard.accessed'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthDriverService.prototype, "handleDashboardAccessed", null);
+exports.AuthDriverService = AuthDriverService = AuthDriverService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [driver_repository_1.DriverRepository,
         token_service_1.TokenService,
         email_event_service_1.EmailEventService,
         sms_event_service_1.SmsEventService,
         country_service_1.CountryService,
-        client_device_service_1.ClientDeviceService])
+        client_device_service_1.ClientDeviceService,
+        config_1.ConfigService,
+        event_emitter_1.EventEmitter2,
+        axios_service_1.AxiosService])
 ], AuthDriverService);
 //# sourceMappingURL=auth.driver.service.js.map

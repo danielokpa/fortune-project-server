@@ -253,6 +253,10 @@ export class UpdateBankAccountDto {
   @IsString()
   @MaxLength(150)
   bankName: string;
+
+  @IsString()
+  @IsOptional()
+  bvn?: string;
 }
 
 export class AddDriverLicenseDto {

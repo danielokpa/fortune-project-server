@@ -36,6 +36,7 @@ export declare class UpdateBankAccountDto {
     accountNo: string;
     accountName: string;
     bankName: string;
+    bvn?: string;
 }
 export declare class AddDriverLicenseDto {
     licenseImageUrl: string;
