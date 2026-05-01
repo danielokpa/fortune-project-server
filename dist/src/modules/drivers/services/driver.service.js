@@ -118,7 +118,8 @@ let DriverService = DriverService_1 = class DriverService {
                 email: user.email,
                 phoneNo: user.phoneNo,
                 userId: user.id,
-                activeTrip: await this.tripRepository.findDriverActiveTrip(userId)
+                activeTrip: await this.tripRepository.findDriverActiveTrip(userId),
+                piWalletAddress: "9384JENSHJ4847898477494847G4"
             };
             return dashboardRes;
         }

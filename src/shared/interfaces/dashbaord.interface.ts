@@ -9,7 +9,8 @@ export interface IDashboard {
     phoneNo: string;
     paymentTypes: IPaymentType[];
     activeTrip: Trip | null;
-  }
+    piWalletAddress?: string;
+}
 
 export interface IPaymentType {
     type: PAYMENT_TYPE;

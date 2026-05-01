@@ -12,38 +12,38 @@ import { TripRepository } from 'src/modules/trips/repositories/trip.repository';
 
 @Injectable()
 export class UserService {
-  
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly clientDeviceService: ClientDeviceService,
     private readonly configService: ConfigService,
     private readonly tripRepository: TripRepository,
-  ) {}  
+  ) { }
 
 
   async fetchUser(id: string): Promise<User | null> {
-    try{
+    try {
       const user = await this.userRepository.fetchUser(id)
-      if (!user){
+      if (!user) {
         throw new NotFoundException('User not found!')
       }
       return user;
-    }catch(error: unknown){
+    } catch (error: unknown) {
       throw new NotFoundException('User not found!')
     }
   }
 
   async findByIdentity(identity: string): Promise<User | null> {
-    try{
+    try {
       const user = await this.userRepository.findByIdentity(identity)
-      if (!user){
+      if (!user) {
         throw new NotFoundException('User not found!')
       }
       return user;
-    }catch(error: unknown){
+    } catch (error: unknown) {
       throw new NotFoundException('User not found!')
     }
-    
+
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -67,16 +67,16 @@ export class UserService {
   }
 
   async dashboard(data: IDashboardInput, userId: string): Promise<IDashboard> {
-    try{
+    try {
       const { deviceFCMToken, ipAddress, name } = data;
 
       const user = await this.userRepository.fetchUser(userId);
-      if (!user){
+      if (!user) {
         throw new NotFoundException('User not found!')
       }
 
       const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(userId, deviceFCMToken);
-      if (clientDevice == null){
+      if (clientDevice == null) {
         await this.clientDeviceService.registerDevice({
           userId: userId,
           deviceFCMToken: deviceFCMToken,
@@ -89,7 +89,7 @@ export class UserService {
         // throw new UnauthorizedException("A new client device token was detected");
       }
 
-      const dashboardRes : IDashboard = {
+      const dashboardRes: IDashboard = {
         fullName: user.fullName,
         email: user.email,
         phoneNo: user.phoneNo,
@@ -109,14 +109,20 @@ export class UserService {
             type: PAYMENT_TYPE.PI_COIN,
             label: 'Pi',
             amount: 0
+          },
+          {
+            type: PAYMENT_TYPE.BANK_TRANSFER,
+            label: 'Bank Transfer',
+            amount: 0
           }
         ],
-        activeTrip: await this.tripRepository.findUserActiveTrip(userId)
+        activeTrip: await this.tripRepository.findUserActiveTrip(userId),
+        piWalletAddress: "9384JENSHJ4847898477494847G4"
       }
 
       return dashboardRes;
-      
-    }catch(error: unknown){
+
+    } catch (error: unknown) {
       console.log(error);
       throw new NotFoundException(error)
     }

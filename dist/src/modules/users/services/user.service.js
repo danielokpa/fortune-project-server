@@ -106,9 +106,15 @@ let UserService = class UserService {
                         type: payment_enums_1.PAYMENT_TYPE.PI_COIN,
                         label: 'Pi',
                         amount: 0
+                    },
+                    {
+                        type: payment_enums_1.PAYMENT_TYPE.BANK_TRANSFER,
+                        label: 'Bank Transfer',
+                        amount: 0
                     }
                 ],
-                activeTrip: await this.tripRepository.findUserActiveTrip(userId)
+                activeTrip: await this.tripRepository.findUserActiveTrip(userId),
+                piWalletAddress: "9384JENSHJ4847898477494847G4"
             };
             return dashboardRes;
         }

@@ -69,6 +69,7 @@ export class DriverService {
 
         }
       } else {
+
         const updatedDriver = await this.driverRepository.update(userId, {
           accountName: reqBody.accountName,
           accountNo: reqBody.accountNo,
@@ -124,7 +125,8 @@ export class DriverService {
         email: user.email,
         phoneNo: user.phoneNo,
         userId: user.id,
-        activeTrip: await this.tripRepository.findDriverActiveTrip(userId)
+        activeTrip: await this.tripRepository.findDriverActiveTrip(userId),
+        piWalletAddress: "9384JENSHJ4847898477494847G4"
       }
       return dashboardRes;
     } catch (error: unknown) {
