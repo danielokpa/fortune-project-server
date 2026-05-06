@@ -11,7 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { DriversModule } from './modules/drivers/drivers.module';
 import { CountriesModule } from './modules/countries/countries.module';
-import { CngConversionModule } from './modules/cng-conversion/cng-conversion.module';
+import { CngConversionModule } from './modules/cng/cng-conversion.module';
 import { ChargingStationsModule } from './modules/charging-stations/charging-stations.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { TokenModule } from './services/token/token.module';
@@ -29,22 +29,24 @@ import { kyc3ResidentialInformation } from './modules/drivers/entities/kyc3-resi
 import { Vehicle } from './modules/drivers/entities/vehicle.entity';
 import { PeppDriverVehicles } from './modules/drivers/entities/pepp-driver-vehicles.entity';
 import { Country, State, LGA } from './modules/countries/entities';
-import { CngConversion } from './modules/cng-conversion/entities/cng-conversion.entity';
-import { CngStation } from './modules/cng-conversion/entities/cng-station.entity';
-import { UserCngStation } from './modules/cng-conversion/entities/user-cng-station.entity';
+import { UserCngConversion } from './modules/cng/entities/user.cng-conversion.entity';
+import { CngConversionStation } from './modules/cng/entities/cng-conversion.stations.entity';
+import { CngStation } from './modules/cng/entities/cng-station.entity';
+import { UserCngStation } from './modules/cng/entities/user.cng-station.entity';
 import { ChargingStation } from './modules/charging-stations/entities/charging-station.entity';
 import { UserChargingStation } from './modules/charging-stations/entities/user-charging-station.entity';
 import { ChargingStationFavorite } from './modules/charging-stations/entities/charging-station-favorite.entity';
 import { ChargingStationRating } from './modules/charging-stations/entities/charging-station-rating.entity';
 import { ChargingStationReview } from './modules/charging-stations/entities/charging-station-review.entity';
-import { CngStationFavorite } from './modules/cng-conversion/entities/cng-station-favorite.entity';
-import { CngStationRating } from './modules/cng-conversion/entities/cng-station-rating.entity';
-import { CngStationReview } from './modules/cng-conversion/entities/cng-station-review.entity';
+import { CngStationFavorite } from './modules/cng/entities/cng-station-favorite.entity';
+import { CngStationRating } from './modules/cng/entities/cng-station-rating.entity';
+import { CngStationReview } from './modules/cng/entities/cng-station-review.entity';
 import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
 import { Trip } from './modules/trips/entities/trip.entity';
 import { TripsModule } from './modules/trips/trips.module';
 import { ReferredUser } from './modules/referred-users/entities/referred-user.entity';
+import { CivilServantInstallmentPaymentProof } from './modules/cng/entities/civil-servant-installment-verification.entity';
 
 
 @Module({
@@ -74,12 +76,14 @@ import { ReferredUser } from './modules/referred-users/entities/referred-user.en
         Country,
         State,
         LGA,
-        CngConversion,
+        CngConversionStation,
+        UserCngConversion,
         CngStation,
         UserCngStation,
         CngStationFavorite,
         CngStationRating,
         CngStationReview,
+        CivilServantInstallmentPaymentProof,
         ChargingStation,
         UserChargingStation,
         ChargingStationFavorite,

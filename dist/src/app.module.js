@@ -22,7 +22,7 @@ const auth_module_1 = require("./modules/auth/auth.module");
 const users_module_1 = require("./modules/users/users.module");
 const drivers_module_1 = require("./modules/drivers/drivers.module");
 const countries_module_1 = require("./modules/countries/countries.module");
-const cng_conversion_module_1 = require("./modules/cng-conversion/cng-conversion.module");
+const cng_conversion_module_1 = require("./modules/cng/cng-conversion.module");
 const charging_stations_module_1 = require("./modules/charging-stations/charging-stations.module");
 const client_devices_module_1 = require("./modules/client-devices/client-devices.module");
 const token_module_1 = require("./services/token/token.module");
@@ -39,22 +39,24 @@ const kyc3_residential_Information_entity_1 = require("./modules/drivers/entitie
 const vehicle_entity_1 = require("./modules/drivers/entities/vehicle.entity");
 const pepp_driver_vehicles_entity_1 = require("./modules/drivers/entities/pepp-driver-vehicles.entity");
 const entities_3 = require("./modules/countries/entities");
-const cng_conversion_entity_1 = require("./modules/cng-conversion/entities/cng-conversion.entity");
-const cng_station_entity_1 = require("./modules/cng-conversion/entities/cng-station.entity");
-const user_cng_station_entity_1 = require("./modules/cng-conversion/entities/user-cng-station.entity");
+const user_cng_conversion_entity_1 = require("./modules/cng/entities/user.cng-conversion.entity");
+const cng_conversion_stations_entity_1 = require("./modules/cng/entities/cng-conversion.stations.entity");
+const cng_station_entity_1 = require("./modules/cng/entities/cng-station.entity");
+const user_cng_station_entity_1 = require("./modules/cng/entities/user.cng-station.entity");
 const charging_station_entity_1 = require("./modules/charging-stations/entities/charging-station.entity");
 const user_charging_station_entity_1 = require("./modules/charging-stations/entities/user-charging-station.entity");
 const charging_station_favorite_entity_1 = require("./modules/charging-stations/entities/charging-station-favorite.entity");
 const charging_station_rating_entity_1 = require("./modules/charging-stations/entities/charging-station-rating.entity");
 const charging_station_review_entity_1 = require("./modules/charging-stations/entities/charging-station-review.entity");
-const cng_station_favorite_entity_1 = require("./modules/cng-conversion/entities/cng-station-favorite.entity");
-const cng_station_rating_entity_1 = require("./modules/cng-conversion/entities/cng-station-rating.entity");
-const cng_station_review_entity_1 = require("./modules/cng-conversion/entities/cng-station-review.entity");
+const cng_station_favorite_entity_1 = require("./modules/cng/entities/cng-station-favorite.entity");
+const cng_station_rating_entity_1 = require("./modules/cng/entities/cng-station-rating.entity");
+const cng_station_review_entity_1 = require("./modules/cng/entities/cng-station-review.entity");
 const client_device_entity_1 = require("./modules/client-devices/entities/client-device.entity");
 const entities_4 = require("./services/token/entities");
 const trip_entity_1 = require("./modules/trips/entities/trip.entity");
 const trips_module_1 = require("./modules/trips/trips.module");
 const referred_user_entity_1 = require("./modules/referred-users/entities/referred-user.entity");
+const civil_servant_installment_verification_entity_1 = require("./modules/cng/entities/civil-servant-installment-verification.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -86,12 +88,14 @@ exports.AppModule = AppModule = __decorate([
                     entities_3.Country,
                     entities_3.State,
                     entities_3.LGA,
-                    cng_conversion_entity_1.CngConversion,
+                    cng_conversion_stations_entity_1.CngConversionStation,
+                    user_cng_conversion_entity_1.UserCngConversion,
                     cng_station_entity_1.CngStation,
                     user_cng_station_entity_1.UserCngStation,
                     cng_station_favorite_entity_1.CngStationFavorite,
                     cng_station_rating_entity_1.CngStationRating,
                     cng_station_review_entity_1.CngStationReview,
+                    civil_servant_installment_verification_entity_1.CivilServantInstallmentPaymentProof,
                     charging_station_entity_1.ChargingStation,
                     user_charging_station_entity_1.UserChargingStation,
                     charging_station_favorite_entity_1.ChargingStationFavorite,

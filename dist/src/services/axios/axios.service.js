@@ -24,6 +24,7 @@ let AxiosService = class AxiosService {
             return await (0, rxjs_1.lastValueFrom)(response);
         }
         catch (error) {
+            console.log(error);
             this.handleError(error, 'Error making POST request');
         }
     }

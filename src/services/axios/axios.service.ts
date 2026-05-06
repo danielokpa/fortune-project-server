@@ -16,6 +16,7 @@ export class AxiosService {
       const response = this.httpService.post(url, data, config);
       return await lastValueFrom(response);
     } catch (error) {
+      console.log(error);
       this.handleError(error, 'Error making POST request');
     }
   }
