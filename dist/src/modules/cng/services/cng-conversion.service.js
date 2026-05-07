@@ -201,33 +201,51 @@ let CngConversionService = class CngConversionService {
         }
     }
     async updateInspectionForUser(userId, dto) {
-        const hasAnyField = dto.exteriorInspectionImages !== undefined ||
-            dto.interiorInspectionImages !== undefined ||
-            dto.engineImages !== undefined ||
-            dto.keyAreasImages !== undefined;
-        if (!hasAnyField) {
-            throw new common_1.BadRequestException('No fields provided to update');
+        try {
+            const hasAnyField = dto.exteriorInspectionImages !== undefined ||
+                dto.interiorInspectionImages !== undefined ||
+                dto.engineImages !== undefined ||
+                dto.keyAreasImages !== undefined;
+            if (!hasAnyField) {
+                throw new common_1.BadRequestException('No fields provided to update');
+            }
+            const patch = {};
+            if (dto.exteriorInspectionImages !== undefined) {
+                patch.exteriorInspectionImages = dto.exteriorInspectionImages;
+            }
+            if (dto.interiorInspectionImages !== undefined) {
+                patch.interiorInspectionImages = dto.interiorInspectionImages;
+            }
+            if (dto.engineImages !== undefined) {
+                patch.engineImages = dto.engineImages;
+            }
+            if (dto.keyAreasImages !== undefined) {
+                patch.keyAreasImages = dto.keyAreasImages;
+            }
+            patch.hasCompletedOnlineInspection = true;
+            patch.status = user_cng_conversion_status_enum_1.UserCngConversionStatus.REQUEST_SUBMITTED;
+            const existing = await this.cngConversionRepository.findByIdForUser(dto.conversionId, userId);
+            if (!existing || existing.status === user_cng_conversion_status_enum_1.UserCngConversionStatus.PAYMENT_COMPLETED) {
+                throw new common_1.NotFoundException('CNG conversion request not found or payment completed');
+            }
+            if (existing.hasCompletedOnlineInspection) {
+                throw new common_1.BadRequestException('CNG conversion has completed online inspection');
+            }
+            const [count] = await this.cngConversionRepository.updateForUser(dto.conversionId, userId, patch);
+            if (!count) {
+                const existing = await this.cngConversionRepository.findByIdForUser(dto.conversionId, userId);
+                if (!existing) {
+                    throw new common_1.NotFoundException('CNG conversion request not found');
+                }
+            }
+            return dto;
         }
-        const patch = {};
-        if (dto.exteriorInspectionImages !== undefined) {
-            patch.exteriorInspectionImages = dto.exteriorInspectionImages;
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : String(error));
         }
-        if (dto.interiorInspectionImages !== undefined) {
-            patch.interiorInspectionImages = dto.interiorInspectionImages;
-        }
-        if (dto.engineImages !== undefined) {
-            patch.engineImages = dto.engineImages;
-        }
-        if (dto.keyAreasImages !== undefined) {
-            patch.keyAreasImages = dto.keyAreasImages;
-        }
-        patch.hasCompletedOnlineInspection = true;
-        patch.status = user_cng_conversion_status_enum_1.UserCngConversionStatus.REQUEST_SUBMITTED;
-        const [count] = await this.cngConversionRepository.updateForUser(dto.conversionId, userId, patch);
-        if (!count) {
-            throw new common_1.NotFoundException('CNG conversion request not found');
-        }
-        return dto;
     }
     async update(id, cngConversionData) {
         return await this.cngConversionRepository.update(id, cngConversionData);

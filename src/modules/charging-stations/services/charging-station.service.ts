@@ -7,7 +7,10 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { ChargingStation } from '../entities/charging-station.entity';
 import { ChargingStationFavorite } from '../entities/charging-station-favorite.entity';
-import { ChargingStationRepository } from '../repositories/charging-station.repository';
+import {
+  ChargingStationRepository,
+  ChargingStationDetail,
+} from '../repositories/charging-station.repository';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
 import {
@@ -36,12 +39,19 @@ export class ChargingStationService {
   /**
    * Add default image URL to station if not present
    */
-  private addDefaultImage(station: ChargingStation): ChargingStation {
-    const stationData = station.toJSON ? station.toJSON() : station;
+  private addDefaultImage<T extends { stationImage?: string | null }>(
+    station: T,
+  ): T {
+    const withJson = station as T & { toJSON?: () => Record<string, unknown> };
+    const stationData =
+      typeof withJson.toJSON === 'function'
+        ? withJson.toJSON()
+        : { ...(station as Record<string, unknown>) };
+    const raw = (stationData.stationImage as string | null | undefined) ?? 'default.png';
     return {
       ...stationData,
-      stationImage: this.DEFAULT_IMAGE_URL + stationData.stationImage,
-    } as ChargingStation;
+      stationImage: this.DEFAULT_IMAGE_URL + raw,
+    } as T;
   }
 
   /**
@@ -288,11 +298,11 @@ export class ChargingStationService {
    * If coordinates are provided, distance will be calculated and included in the response
    */
   async findById(
-    id: string, 
+    id: string,
     userId?: string,
     latitude?: number,
     longitude?: number,
-  ): Promise<ChargingStation> {
+  ): Promise<ChargingStationDetail> {
     try {
       const station = await this.chargingStationRepository.findById(
         id, 

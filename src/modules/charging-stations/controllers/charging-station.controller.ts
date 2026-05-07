@@ -208,23 +208,10 @@ export class ChargingStationController {
     UserType.DRIVER,
   )
   @UseGuards(AuthGuard)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get a charging station by ID',
-    description: 'If latitude and longitude are provided, distance will be calculated and included in the response.',
-  })
-  @ApiQuery({ 
-    name: 'latitude', 
-    required: false, 
-    type: Number, 
-    example: 6.5244,
-    description: 'User\'s current latitude for distance calculation',
-  })
-  @ApiQuery({ 
-    name: 'longitude', 
-    required: false, 
-    type: Number, 
-    example: 3.3792,
-    description: 'User\'s current longitude for distance calculation',
+    description:
+      'Returns station details with optional linked virtual account (accountName, bankName, accountNumber) when a row exists in virtual_accounts for this station id (userId = station id), so users can fund purchases via bank transfer. If latitude and longitude are provided, distance (km) is included.',
   })
   @ApiResponse({
     status: 200,

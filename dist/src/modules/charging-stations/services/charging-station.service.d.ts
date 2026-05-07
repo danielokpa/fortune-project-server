@@ -1,6 +1,6 @@
 import { ChargingStation } from '../entities/charging-station.entity';
 import { ChargingStationFavorite } from '../entities/charging-station-favorite.entity';
-import { ChargingStationRepository } from '../repositories/charging-station.repository';
+import { ChargingStationRepository, ChargingStationDetail } from '../repositories/charging-station.repository';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
 import { CreateChargingStationDto, UpdateChargingStationDto, FindNearbyStationsDto, FindChargingStationsDto, SearchChargingStationsDto } from '../dto/charging-station.dto';
@@ -48,7 +48,7 @@ export declare class ChargingStationService {
         limit: number;
         totalPages: number;
     }>;
-    findById(id: string, userId?: string, latitude?: number, longitude?: number): Promise<ChargingStation>;
+    findById(id: string, userId?: string, latitude?: number, longitude?: number): Promise<ChargingStationDetail>;
     update(id: string, updateDto: UpdateChargingStationDto): Promise<ChargingStation>;
     delete(id: string): Promise<void>;
     search(searchDto: SearchChargingStationsDto, userId?: string): Promise<{

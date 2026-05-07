@@ -34,10 +34,14 @@ let ChargingStationService = ChargingStationService_1 = class ChargingStationSer
         this.driverModel = driverModel;
     }
     addDefaultImage(station) {
-        const stationData = station.toJSON ? station.toJSON() : station;
+        const withJson = station;
+        const stationData = typeof withJson.toJSON === 'function'
+            ? withJson.toJSON()
+            : { ...station };
+        const raw = stationData.stationImage ?? 'default.png';
         return {
             ...stationData,
-            stationImage: this.DEFAULT_IMAGE_URL + stationData.stationImage,
+            stationImage: this.DEFAULT_IMAGE_URL + raw,
         };
     }
     addDefaultImages(stations) {

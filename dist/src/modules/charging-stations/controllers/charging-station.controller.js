@@ -177,21 +177,7 @@ __decorate([
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     (0, swagger_1.ApiOperation)({
         summary: 'Get a charging station by ID',
-        description: 'If latitude and longitude are provided, distance will be calculated and included in the response.',
-    }),
-    (0, swagger_1.ApiQuery)({
-        name: 'latitude',
-        required: false,
-        type: Number,
-        example: 6.5244,
-        description: 'User\'s current latitude for distance calculation',
-    }),
-    (0, swagger_1.ApiQuery)({
-        name: 'longitude',
-        required: false,
-        type: Number,
-        example: 3.3792,
-        description: 'User\'s current longitude for distance calculation',
+        description: 'Returns station details with optional linked virtual account (accountName, bankName, accountNumber) when a row exists in virtual_accounts for this station id (userId = station id), so users can fund purchases via bank transfer. If latitude and longitude are provided, distance (km) is included.',
     }),
     (0, swagger_1.ApiResponse)({
         status: 200,

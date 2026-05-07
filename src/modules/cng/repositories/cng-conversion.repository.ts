@@ -200,10 +200,11 @@ export class UserCngConversionRepository {
     userId: string,
     cngConversionData: Partial<UserCngConversion>,
   ): Promise<[number, UserCngConversion[]]> {
-    return await this.cngConversionModel.update(cngConversionData, {
-      where: { id, userId },
+    const data = await this.cngConversionModel.update(cngConversionData, {
+      where: { id: id, userId: userId },
       returning: true,
     });
+    return data;
   }
 
   async delete(id: string): Promise<number> {

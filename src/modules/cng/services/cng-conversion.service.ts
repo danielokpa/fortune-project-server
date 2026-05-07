@@ -304,43 +304,69 @@ export class CngConversionService {
     userId: string,
     dto: UpdateUserCngConversionInspectionDto,
   ): Promise<any> {
+    try {
+      const hasAnyField =
+        dto.exteriorInspectionImages !== undefined ||
+        dto.interiorInspectionImages !== undefined ||
+        dto.engineImages !== undefined ||
+        dto.keyAreasImages !== undefined;
 
-    const hasAnyField =
-      dto.exteriorInspectionImages !== undefined ||
-      dto.interiorInspectionImages !== undefined ||
-      dto.engineImages !== undefined ||
-      dto.keyAreasImages !== undefined;
-      
-    if (!hasAnyField) {
-      throw new BadRequestException('No fields provided to update');
-    }
+      if (!hasAnyField) {
+        throw new BadRequestException('No fields provided to update');
+      }
 
-    const patch: Partial<UserCngConversion> = {};
-    if (dto.exteriorInspectionImages !== undefined) {
-      patch.exteriorInspectionImages = dto.exteriorInspectionImages;
-    }
-    if (dto.interiorInspectionImages !== undefined) {
-      patch.interiorInspectionImages = dto.interiorInspectionImages;
-    }
-    if (dto.engineImages !== undefined) {
-      patch.engineImages = dto.engineImages;
-    }
-    if (dto.keyAreasImages !== undefined) {
-      patch.keyAreasImages = dto.keyAreasImages;
-    }
-    patch.hasCompletedOnlineInspection = true;
-    patch.status = UserCngConversionStatus.REQUEST_SUBMITTED;
-    const [count] = await this.cngConversionRepository.updateForUser(
-      dto.conversionId,
-      userId,
-      patch,
-    );
+      const patch: Partial<UserCngConversion> = {};
+      if (dto.exteriorInspectionImages !== undefined) {
+        patch.exteriorInspectionImages = dto.exteriorInspectionImages;
+      }
+      if (dto.interiorInspectionImages !== undefined) {
+        patch.interiorInspectionImages = dto.interiorInspectionImages;
+      }
+      if (dto.engineImages !== undefined) {
+        patch.engineImages = dto.engineImages;
+      }
+      if (dto.keyAreasImages !== undefined) {
+        patch.keyAreasImages = dto.keyAreasImages;
+      }
+      patch.hasCompletedOnlineInspection = true;
+      patch.status = UserCngConversionStatus.REQUEST_SUBMITTED;
 
-    if (!count) {
-      throw new NotFoundException('CNG conversion request not found');
-    }
+      const existing = await this.cngConversionRepository.findByIdForUser(
+        dto.conversionId,
+        userId,
+      );
+      if (!existing || existing.status === UserCngConversionStatus.PAYMENT_COMPLETED) {
+        throw new NotFoundException('CNG conversion request not found or payment completed');
+      }
 
-    return dto;
+      if (existing.hasCompletedOnlineInspection) {
+        throw new BadRequestException('CNG conversion has completed online inspection');
+      }
+
+      const [count] = await this.cngConversionRepository.updateForUser(
+        dto.conversionId,
+        userId,
+        patch,
+      );
+      if (!count) {
+        const existing = await this.cngConversionRepository.findByIdForUser(
+          dto.conversionId,
+          userId,
+        );
+        if (!existing) {
+          throw new NotFoundException('CNG conversion request not found');
+        }
+      }
+
+      return dto;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        error instanceof Error ? error.message : String(error),
+      );
+    }
   }
 
   async update(id: string, cngConversionData: Partial<UserCngConversion>): Promise<[number, UserCngConversion[]]> {

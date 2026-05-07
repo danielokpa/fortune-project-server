@@ -35,22 +35,93 @@ let ChargingStationRepository = class ChargingStationRepository {
         const count = await this.chargingStationModel.count(options);
         return typeof count === 'number' ? count : count.length || 0;
     }
-    async findById(id, userId, latitude, longitude) {
-        let findOptions = {};
-        if (latitude !== undefined && longitude !== undefined) {
-            const distanceExpression = (0, sequelize_2.literal)(`(ST_Distance_Sphere(
-          ST_GeomFromText(CONCAT('POINT(', longitude, ' ', latitude, ')'), 4326),
-          ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)
-        ) / 1000)`);
-            findOptions.attributes = {
-                include: [
-                    [distanceExpression, 'distance'],
-                ],
-            };
+    async findByIdWithVirtualAccountRaw(id) {
+        const sequelize = this.chargingStationModel.sequelize;
+        if (!sequelize) {
+            throw new Error('Sequelize instance not available');
         }
-        const station = await this.chargingStationModel.findByPk(id, findOptions);
-        if (!station)
+        console.log("fetching virtual account for station", id);
+        const sql = `
+      SELECT
+        cs.\`id\`,
+        cs.\`name\`,
+        cs.\`state\`,
+        cs.\`country\`,
+        cs.\`address\`,
+        cs.\`contactPhone\`,
+        cs.\`openingTime\`,
+        cs.\`closingTime\`,
+        cs.\`amountPerUnit\`,
+        cs.\`currency\`,
+        cs.\`amountPerUnitType\`,
+        cs.\`contactEmail\`,
+        cs.\`isActive\`,
+        cs.\`longitude\`,
+        cs.\`latitude\`,
+        cs.\`stationImage\`,
+        cs.\`createdAt\`,
+        cs.\`updatedAt\`,
+        va.\`accountName\` AS va_accountName,
+        va.\`bankName\` AS va_bankName,
+        va.\`accountNumber\` AS va_accountNumber
+      FROM \`charging_stations\` AS cs
+      LEFT JOIN \`virtual_accounts\` AS va ON va.\`userId\` = cs.\`id\`
+      WHERE cs.\`id\` = :id AND cs.\`deletedAt\` IS NULL
+      LIMIT 1
+    `;
+        const rows = await sequelize.query(sql, {
+            replacements: { id },
+            type: sequelize_2.QueryTypes.SELECT,
+        });
+        const row = rows[0];
+        if (!row) {
             return null;
+        }
+        const vaAccountNumber = row.va_accountNumber;
+        console.log('vaAccountNumber', vaAccountNumber);
+        const virtualAccount = vaAccountNumber != null && String(vaAccountNumber).length > 0
+            ? {
+                accountName: String(row.va_accountName ?? ''),
+                bankName: String(row.va_bankName ?? ''),
+                accountNumber: String(vaAccountNumber),
+            }
+            : null;
+        const { va_accountName: _a, va_bankName: _b, va_accountNumber: _c, ...centerFields } = row;
+        return {
+            ...centerFields,
+            virtualAccount,
+        };
+    }
+    async findById(id, userId, latitude, longitude) {
+        const base = await this.findByIdWithVirtualAccountRaw(id);
+        if (!base)
+            return null;
+        let distance;
+        if (latitude !== undefined && longitude !== undefined) {
+            const sequelize = this.chargingStationModel.sequelize;
+            if (!sequelize) {
+                throw new Error('Sequelize instance not available');
+            }
+            const userPoint = `POINT(${longitude} ${latitude})`;
+            const distRows = await sequelize.query(`
+        SELECT (ST_Distance_Sphere(
+          ST_GeomFromText(CONCAT('POINT(', cs.longitude, ' ', cs.latitude, ')'), 4326),
+          ST_GeomFromText(:userPoint, 4326)
+        ) / 1000) AS distance
+        FROM \`charging_stations\` AS cs
+        WHERE cs.\`id\` = :id AND cs.\`deletedAt\` IS NULL
+        LIMIT 1
+      `, {
+                replacements: { id, userPoint },
+                type: sequelize_2.QueryTypes.SELECT,
+            });
+            const d = distRows[0]?.distance;
+            if (d !== undefined && d !== null) {
+                distance =
+                    typeof d === 'number' ? d : parseFloat(String(d));
+            }
+        }
+        const { virtualAccount, ...stationFields } = base;
         const [isFavorite, ratingData, totalReviews] = await Promise.all([
             userId
                 ? this.chargingStationFavoriteModel.findOne({
@@ -72,17 +143,17 @@ let ChargingStationRepository = class ChargingStationRepository {
             ? parseFloat(ratingResult.averageRating)
             : 0;
         const totalRatings = ratingResult?.totalRatings
-            ? parseInt(ratingResult.totalRatings)
+            ? parseInt(ratingResult.totalRatings, 10)
             : 0;
-        const stationData = station.toJSON ? station.toJSON() : station;
-        const { userChargingStations, ...stationWithoutRelations } = stationData;
         return {
-            ...stationWithoutRelations,
+            ...stationFields,
+            virtualAccount,
             isFavorite: !!isFavorite,
             rating: averageRating,
             reviews: totalReviews,
             totalRatings,
             totalReviews,
+            ...(distance !== undefined ? { distance } : {}),
         };
     }
     async findAll(options, userId) {

@@ -142,10 +142,11 @@ let UserCngConversionRepository = class UserCngConversionRepository {
         });
     }
     async updateForUser(id, userId, cngConversionData) {
-        return await this.cngConversionModel.update(cngConversionData, {
-            where: { id, userId },
+        const data = await this.cngConversionModel.update(cngConversionData, {
+            where: { id: id, userId: userId },
             returning: true,
         });
+        return data;
     }
     async delete(id) {
         return await this.cngConversionModel.destroy({
