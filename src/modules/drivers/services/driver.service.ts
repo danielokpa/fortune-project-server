@@ -124,6 +124,7 @@ export class DriverService {
         fullName: user.fullName,
         email: user.email,
         phoneNo: user.phoneNo,
+        rating: 0,
         userId: user.id,
         activeTrip: await this.tripRepository.findDriverActiveTrip(userId),
         piWalletAddress: "9384JENSHJ4847898477494847G4"

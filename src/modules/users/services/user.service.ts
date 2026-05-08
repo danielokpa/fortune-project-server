@@ -94,6 +94,7 @@ export class UserService {
         email: user.email,
         phoneNo: user.phoneNo,
         userId: user.id,
+        rating: 0,
         paymentTypes: [
           {
             type: PAYMENT_TYPE.CASH,

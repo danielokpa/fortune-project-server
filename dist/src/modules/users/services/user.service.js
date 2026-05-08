@@ -91,6 +91,7 @@ let UserService = class UserService {
                 email: user.email,
                 phoneNo: user.phoneNo,
                 userId: user.id,
+                rating: 0,
                 paymentTypes: [
                     {
                         type: payment_enums_1.PAYMENT_TYPE.CASH,

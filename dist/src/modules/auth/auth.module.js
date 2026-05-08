@@ -13,7 +13,9 @@ const mail_module_1 = require("../../services/mail/mail.module");
 const token_module_1 = require("../../services/token/token.module");
 const user_entity_1 = require("../users/entities/user.entity");
 const auth_controller_1 = require("./controllers/auth.controller");
+const oauth_controller_1 = require("./controllers/oauth.controller");
 const auth_service_1 = require("./auth.service");
+const oauth_service_1 = require("./services/oauth.service");
 const user_repository_1 = require("../users/repositories/user.repository");
 const countries_module_1 = require("../countries/countries.module");
 const users_module_1 = require("../users/users.module");
@@ -37,8 +39,15 @@ exports.AuthModule = AuthModule = __decorate([
             users_module_1.UsersModule,
             client_devices_module_1.ClientDevicesModule,
         ],
-        providers: [auth_service_1.AuthService, user_repository_1.UserRepository, passcode_service_1.PasscodeService, passcode_repository_1.PasscodeRepository, driver_repository_1.DriverRepository],
-        controllers: [auth_controller_1.AuthController, passcode_controller_1.PasscodeController],
+        providers: [
+            auth_service_1.AuthService,
+            oauth_service_1.OAuthService,
+            user_repository_1.UserRepository,
+            passcode_service_1.PasscodeService,
+            passcode_repository_1.PasscodeRepository,
+            driver_repository_1.DriverRepository,
+        ],
+        controllers: [auth_controller_1.AuthController, oauth_controller_1.OAuthController, passcode_controller_1.PasscodeController],
         exports: [passcode_service_1.PasscodeService, passcode_repository_1.PasscodeRepository],
     })
 ], AuthModule);

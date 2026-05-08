@@ -1,143 +1,98 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    HttpCode,
-    HttpStatus,
-    Patch,
-    Post,
-    Request,
-    UseGuards,
-  } from '@nestjs/common';
-  import type { Request as ExpressRequest } from 'express';
-  import { AuthService } from '../auth.service';
-  import {
-    ChangePasswordDto,
-    ForgotPasswordDto,
-    LoginOtpDto,
-    LoginUserDto,
-    LoginUserSocialDto,
-    ResetPasswordDto,
-    SignupEmail,
-    SignupPhone,
-    SignUpSocialUserDto,
-    SignUpUserDto,
-    VerifyOtpDto,
-  } from '../dto/auth.dto';
-  import { Auth } from '../decorators/auth.decorator';
-  import { AuthGuard } from '../guards/auth.guard';
-  import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-  import { ResponseUtil } from 'src/utils/response.utils';
-  
-  @Controller('auth/oauth')
-  export class AuthController {
-    constructor(private readonly authService: AuthService) {}
-  
-    @Post('signup-phone')
-    @HttpCode(HttpStatus.OK)
-    async signUpPhoneNo(@Body() input: SignupPhone) {
-      const data = await this.authService.signUpPhoneNo(input);
-      return ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your phoneNo', HttpStatus.OK);
-    }
-  
-    @Post('signup-email')
-    @HttpCode(HttpStatus.OK)
-    async signUpEmail(@Body() input: SignupEmail) {
-      const data = await this.authService.signUpEmail(input);
-      return ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your email', HttpStatus.OK);
-    }
-  
-    @Post('verify-otp')
-    @HttpCode(HttpStatus.OK)
-    async verifyOtp(@Body() input: VerifyOtpDto) {
-      const data = await this.authService.verifyOtp(input);
-      return ResponseUtil.handleResponse(data, 'OTP Validated successfully', HttpStatus.OK);
-    }
-  
-    @Post('verify-password-reset-otp')
-    @HttpCode(HttpStatus.OK)
-    async verifyPasswordResetOtp(@Body() input: VerifyOtpDto) {
-      const data = await this.authService.verifyPasswordResetOtp(input);
-      return ResponseUtil.handleResponse(data, 'Password reset OTP Validated successfully', HttpStatus.OK);
-    }
-  
-    @Post('sign-up')
-    @HttpCode(HttpStatus.CREATED)
-    async signUp(@Body() input: SignUpUserDto) {
-      const data = await this.authService.signUp(input);
-      return ResponseUtil.handleResponse(data, 'User created successfully', HttpStatus.CREATED);
-    }
-  
-    @Post('sign-up-social')
-    @HttpCode(HttpStatus.CREATED)
-    async signUpGoogle(@Body() input: SignUpSocialUserDto) {
-      const data = await this.authService.signUpSocial(input);
-      return ResponseUtil.handleResponse(data, 'User created successfully', HttpStatus.CREATED);
-    }
-  
-    @Post('login-social')
-    @HttpCode(HttpStatus.OK)
-    async loginSocial(@Body() input: LoginUserSocialDto) {
-      const data = await this.authService.loginSocial(input);
-      return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
-    }
-  
-    @Post('login')
-    @HttpCode(HttpStatus.OK)
-    async login(@Body() input: LoginUserDto) {
-      const data = await this.authService.login(input);
-      return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
-    }
-  
-    @Post('login-with-otp')
-    @HttpCode(HttpStatus.OK)
-    async loginOtp(@Body() input: LoginOtpDto) {
-      const data = await this.authService.loginOtp(input);
-      return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
-    }
-  
-    @Post('forgot-password')
-    @HttpCode(HttpStatus.OK)
-    async forgotPassword(
-      @Body() input: ForgotPasswordDto,
-      @Request() req: ExpressRequest,
-    ) {
-      const data = await this.authService.forgotPassword(input);
-      return ResponseUtil.handleResponse(data, 'Reset OTP has been sent to your email', HttpStatus.OK);
-    }
-  
-    @Patch('reset-password')
-    @HttpCode(HttpStatus.OK)
-    async resetPassword(@Body() input: ResetPasswordDto) {
-      const data = await this.authService.resetPassword(input);
-      return ResponseUtil.handleResponse(data, 'Password reset successful', HttpStatus.OK);
-    }
-  
-    @Auth()
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    @Patch('change-password')
-    @HttpCode(HttpStatus.OK)
-    async changePassword(
-      @Body() input: ChangePasswordDto,
-      @Request() req: ExpressRequest & { user: any },
-    ) {
-      const data = await this.authService.changePassword(input, req.user);
-      return ResponseUtil.handleResponse(data, 'Password changed successfully', HttpStatus.OK);
-    }
-  
-    @Auth()
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    @Post('logout')
-    @HttpCode(HttpStatus.OK)
-    async logout(
-      @Body() input: {deviceToken},
-      @Request() req: ExpressRequest & { user: any },
-    ) {
-      const data = await this.authService.logout(input, req.user);
-      return ResponseUtil.handleResponse(data, 'Password changed successfully', HttpStatus.OK);
-    }
-  
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+} from '@nestjs/common';
+import type { Request } from 'express';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ResponseUtil } from 'src/utils/response.utils';
+import {
+  AppleOAuthLoginDto,
+  AppleOAuthSignUpDto,
+  GoogleOAuthLoginDto,
+  GoogleOAuthSignUpDto,
+} from '../dto/oauth.dto';
+import { OAuthService } from '../services/oauth.service';
 
-  }
+@ApiTags('Auth — OAuth')
+@Controller('auth/oauth')
+export class OAuthController {
+  constructor(private readonly oauthService: OAuthService) {}
+
+  // @Post('signup/google')
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiOperation({
+  //   summary: 'Sign up with Google',
+  //   description:
+  //     'Verifies the Google ID token server-side, completes phone OTP verification, creates a USER with loginType GOOGLE, and stores a hash of the provider token in the password field (same pattern as existing social sign-up). Requires GOOGLE_OAUTH_CLIENT_ID.',
+  // })
+  // @ApiResponse({ status: HttpStatus.CREATED })
+  // async signUpGoogle(@Body() input: GoogleOAuthSignUpDto) {
+  //   const data = await this.oauthService.signUpWithGoogle(input);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User created successfully',
+  //     HttpStatus.CREATED,
+  //   );
+  // }
+
+  // @Post('signup/apple')
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiOperation({
+  //   summary: 'Sign up with Apple',
+  //   description:
+  //     'Verifies the Apple identity token server-side, completes phone OTP verification, creates a USER with loginType APPLE, and stores a hash of the provider token in the password field. Requires APPLE_OAUTH_CLIENT_ID (Apple Services ID).',
+  // })
+  // @ApiResponse({ status: HttpStatus.CREATED })
+  // async signUpApple(@Body() input: AppleOAuthSignUpDto) {
+  //   const data = await this.oauthService.signUpWithApple(input);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User created successfully',
+  //     HttpStatus.CREATED,
+  //   );
+  // }
+
+  // @Post('login/google')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({
+  //   summary: 'Sign in with Google',
+  //   description:
+  //     'Verifies the Google ID token (JWKS), loads the user by email (loginType GOOGLE), applies the same new-device flow as `login-social` when `x-client-device-token` is sent, and returns an app JWT.',
+  // })
+  // @ApiResponse({ status: HttpStatus.OK })
+  // async loginGoogle(
+  //   @Body() input: GoogleOAuthLoginDto,
+  //   @Req() req: Request,
+  // ) {
+  //   const data = await this.oauthService.loginWithGoogle(input, req);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Login Successful',
+  //     HttpStatus.OK,
+  //   );
+  // }
+
+  // @Post('login/apple')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({
+  //   summary: 'Sign in with Apple',
+  //   description:
+  //     'Verifies the Apple identity token (JWKS), loads the user by email (loginType APPLE), optional `email` when Apple omits it on the token; same new-device behavior as other social login.',
+  // })
+  // @ApiResponse({ status: HttpStatus.OK })
+  // async loginApple(
+  //   @Body() input: AppleOAuthLoginDto,
+  //   @Req() req: Request,
+  // ) {
+  //   const data = await this.oauthService.loginWithApple(input, req);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Login Successful',
+  //     HttpStatus.OK,
+  //   );
+  // }
+}

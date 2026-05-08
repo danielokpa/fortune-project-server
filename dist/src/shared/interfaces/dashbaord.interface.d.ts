@@ -8,6 +8,7 @@ export interface IDashboard {
     paymentTypes: IPaymentType[];
     activeTrip: Trip | null;
     piWalletAddress?: string;
+    rating?: number;
 }
 export interface IPaymentType {
     type: PAYMENT_TYPE;

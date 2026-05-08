@@ -10,6 +10,7 @@ export interface IDashboard {
     paymentTypes: IPaymentType[];
     activeTrip: Trip | null;
     piWalletAddress?: string;
+    rating?: number;
 }
 
 export interface IPaymentType {
@@ -17,7 +18,6 @@ export interface IPaymentType {
     label: string;
     amount: number;
 }
-
 
 export class IDashboardInput {
     @IsString()
