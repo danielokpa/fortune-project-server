@@ -21,6 +21,8 @@ import {
   IStationsSearchResponse,
   IToggleFavoriteResponse,
 } from '../interfaces/cng-station.interface';
+import { UserCngStationService } from './user-cng-station.service';
+import { UserCngStationRepository } from '../repositories/user-cng-station.repository';
 
 @Injectable()
 export class CngStationsService {
@@ -35,6 +37,7 @@ export class CngStationsService {
     private readonly userModel: typeof User,
     @InjectModel(Driver)
     private readonly driverModel: typeof Driver,
+    private readonly userCngStationRepository: UserCngStationRepository,
   ) {}
 
   /**
@@ -87,12 +90,16 @@ export class CngStationsService {
         this.cngStationRepository.count({ where }),
       ]);
 
+      
+      // const activeTrip = await this.userCngStationRepository.findActiveTripByUserId(userId || '');
+
       return {
         stations: this.addDefaultImages(stations),
         total,
         page,
         limit,
         totalPages: Math.ceil(total / limit),
+        // activeTrip: activeTrip || undefined,
       };
     } catch (error) {
       this.logger.error(`Error fetching CNG stations: ${error.message}`);

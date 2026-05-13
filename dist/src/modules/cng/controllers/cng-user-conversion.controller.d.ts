@@ -20,6 +20,7 @@ export declare class CngUserConversionController {
         user: JwtAuthPayload;
     }, page?: number, limit?: number, search?: string): Promise<import("src/utils/response.utils").ApiResponse<{
         conversions: import("../entities/user.cng-conversion.entity").UserCngConversion[];
+        activeTrip: import("../entities/user.cng-station.entity").UserCngStation | null;
     }>>;
     fetchUserCngConversionsStats(req: ExpressRequest & {
         user: JwtAuthPayload;

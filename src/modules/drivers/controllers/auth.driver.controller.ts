@@ -112,10 +112,10 @@ import {
     })
     @ApiResponse({ status: 404, description: 'User not found' })
     async deleteDriverAccount(
-      @Body() userCredentials: { email: string; password: string },
+      @Body() userCredentials: LoginDriverDto,
     ) {
-      const { email, password } = userCredentials;
-      const data = await this.authService.deleteUserAccount(email, password);
+      const { identity, password } = userCredentials;
+      const data = await this.authService.deleteUserAccount(identity, password);
       return ResponseUtil.handleResponse(
         {},
         'Driver account deleted successfully',

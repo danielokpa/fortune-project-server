@@ -5,6 +5,7 @@ import { ChargingStationFavorite } from '../entities/charging-station-favorite.e
 import { ChargingStationRating } from '../entities/charging-station-rating.entity';
 import { ChargingStationReview } from '../entities/charging-station-review.entity';
 import { Op, literal, fn, col, QueryTypes } from 'sequelize';
+import { UserChargingStationRepository } from './user-charging-station.repository';
 
 /** Plain row shape (matches raw SQL / JSON), not a Sequelize Model instance */
 export type ChargingStationRow = Pick<
@@ -58,6 +59,7 @@ export class ChargingStationRepository {
     private readonly chargingStationRatingModel: typeof ChargingStationRating,
     @InjectModel(ChargingStationReview)
     private readonly chargingStationReviewModel: typeof ChargingStationReview,
+    private readonly userChargingStationRepository: UserChargingStationRepository,
   ) {}
 
   async count(options?: any): Promise<number> {
@@ -280,6 +282,8 @@ export class ChargingStationRepository {
     const reviewsMap = new Map(
       (reviewsCounts as any[]).map((r) => [r.stationId, Number(r.count)]),
     );
+    
+    const activeTrip = await this.userChargingStationRepository.findActiveTripByUserId(userId || '');
 
     return stations.map((station) => {
       const stationData = station.toJSON ? station.toJSON() : station;
@@ -291,6 +295,7 @@ export class ChargingStationRepository {
         reviews: reviewsMap.get(station.id) || 0,
         totalRatings: ratingInfo.totalRatings,
         totalReviews: reviewsMap.get(station.id) || 0,
+        activeTrip:  activeTrip,
       } as any;
     });
   }

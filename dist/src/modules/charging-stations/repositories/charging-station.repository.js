@@ -20,16 +20,19 @@ const charging_station_favorite_entity_1 = require("../entities/charging-station
 const charging_station_rating_entity_1 = require("../entities/charging-station-rating.entity");
 const charging_station_review_entity_1 = require("../entities/charging-station-review.entity");
 const sequelize_2 = require("sequelize");
+const user_charging_station_repository_1 = require("./user-charging-station.repository");
 let ChargingStationRepository = class ChargingStationRepository {
     chargingStationModel;
     chargingStationFavoriteModel;
     chargingStationRatingModel;
     chargingStationReviewModel;
-    constructor(chargingStationModel, chargingStationFavoriteModel, chargingStationRatingModel, chargingStationReviewModel) {
+    userChargingStationRepository;
+    constructor(chargingStationModel, chargingStationFavoriteModel, chargingStationRatingModel, chargingStationReviewModel, userChargingStationRepository) {
         this.chargingStationModel = chargingStationModel;
         this.chargingStationFavoriteModel = chargingStationFavoriteModel;
         this.chargingStationRatingModel = chargingStationRatingModel;
         this.chargingStationReviewModel = chargingStationReviewModel;
+        this.userChargingStationRepository = userChargingStationRepository;
     }
     async count(options) {
         const count = await this.chargingStationModel.count(options);
@@ -196,6 +199,7 @@ let ChargingStationRepository = class ChargingStationRepository {
             },
         ]));
         const reviewsMap = new Map(reviewsCounts.map((r) => [r.stationId, Number(r.count)]));
+        const activeTrip = await this.userChargingStationRepository.findActiveTripByUserId(userId || '');
         return stations.map((station) => {
             const stationData = station.toJSON ? station.toJSON() : station;
             const ratingInfo = ratingsMap.get(station.id) || { averageRating: 0, totalRatings: 0 };
@@ -206,6 +210,7 @@ let ChargingStationRepository = class ChargingStationRepository {
                 reviews: reviewsMap.get(station.id) || 0,
                 totalRatings: ratingInfo.totalRatings,
                 totalReviews: reviewsMap.get(station.id) || 0,
+                activeTrip: activeTrip,
             };
         });
     }
@@ -493,6 +498,6 @@ exports.ChargingStationRepository = ChargingStationRepository = __decorate([
     __param(1, (0, sequelize_1.InjectModel)(charging_station_favorite_entity_1.ChargingStationFavorite)),
     __param(2, (0, sequelize_1.InjectModel)(charging_station_rating_entity_1.ChargingStationRating)),
     __param(3, (0, sequelize_1.InjectModel)(charging_station_review_entity_1.ChargingStationReview)),
-    __metadata("design:paramtypes", [Object, Object, Object, Object])
+    __metadata("design:paramtypes", [Object, Object, Object, Object, user_charging_station_repository_1.UserChargingStationRepository])
 ], ChargingStationRepository);
 //# sourceMappingURL=charging-station.repository.js.map

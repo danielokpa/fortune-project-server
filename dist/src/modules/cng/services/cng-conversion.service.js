@@ -19,14 +19,17 @@ const user_cng_conversion_status_enum_1 = require("../../../enums/user-cng-conve
 const user_service_1 = require("../../users/services/user.service");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
 const sequelize_1 = require("sequelize");
+const user_cng_station_repository_1 = require("../repositories/user-cng-station.repository");
 const USER_CNG_CONVERSION_SEARCH_MAX_LEN = 200;
 const USER_CNG_STATS_RECENT_LIMIT = 3;
 let CngConversionService = class CngConversionService {
     cngConversionRepository;
     userService;
-    constructor(cngConversionRepository, userService) {
+    userCngStations;
+    constructor(cngConversionRepository, userService, userCngStations) {
         this.cngConversionRepository = cngConversionRepository;
         this.userService = userService;
+        this.userCngStations = userCngStations;
     }
     fetchTransmission() {
         const transmissions = Object.values(transmission_enum_1.TRANSMISSION);
@@ -87,7 +90,8 @@ let CngConversionService = class CngConversionService {
                 offset: offset,
             });
             return {
-                conversions
+                conversions,
+                activeTrip: await this.userCngStations.findActiveTripByUserId(userId)
             };
         }
         catch (error) {
@@ -255,6 +259,7 @@ exports.CngConversionService = CngConversionService;
 exports.CngConversionService = CngConversionService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [cng_conversion_repository_1.UserCngConversionRepository,
-        user_service_1.UserService])
+        user_service_1.UserService,
+        user_cng_station_repository_1.UserCngStationRepository])
 ], CngConversionService);
 //# sourceMappingURL=cng-conversion.service.js.map

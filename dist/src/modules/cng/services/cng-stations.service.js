@@ -20,18 +20,21 @@ const cng_station_favorite_entity_1 = require("../entities/cng-station-favorite.
 const cng_station_repository_1 = require("../repositories/cng-station.repository");
 const user_entity_1 = require("../../users/entities/user.entity");
 const driver_entity_1 = require("../../drivers/entities/driver.entity");
+const user_cng_station_repository_1 = require("../repositories/user-cng-station.repository");
 let CngStationsService = CngStationsService_1 = class CngStationsService {
     cngStationRepository;
     cngStationFavoriteModel;
     userModel;
     driverModel;
+    userCngStationRepository;
     logger = new common_1.Logger(CngStationsService_1.name);
     DEFAULT_IMAGE_URL = 'https://www.peppcruise.com/images/about/';
-    constructor(cngStationRepository, cngStationFavoriteModel, userModel, driverModel) {
+    constructor(cngStationRepository, cngStationFavoriteModel, userModel, driverModel, userCngStationRepository) {
         this.cngStationRepository = cngStationRepository;
         this.cngStationFavoriteModel = cngStationFavoriteModel;
         this.userModel = userModel;
         this.driverModel = driverModel;
+        this.userCngStationRepository = userCngStationRepository;
     }
     addDefaultImage(station) {
         const stationData = station.toJSON ? station.toJSON() : station;
@@ -230,6 +233,6 @@ exports.CngStationsService = CngStationsService = CngStationsService_1 = __decor
     __param(1, (0, sequelize_1.InjectModel)(cng_station_favorite_entity_1.CngStationFavorite)),
     __param(2, (0, sequelize_1.InjectModel)(user_entity_1.User)),
     __param(3, (0, sequelize_1.InjectModel)(driver_entity_1.Driver)),
-    __metadata("design:paramtypes", [cng_station_repository_1.CngStationRepository, Object, Object, Object])
+    __metadata("design:paramtypes", [cng_station_repository_1.CngStationRepository, Object, Object, Object, user_cng_station_repository_1.UserCngStationRepository])
 ], CngStationsService);
 //# sourceMappingURL=cng-stations.service.js.map

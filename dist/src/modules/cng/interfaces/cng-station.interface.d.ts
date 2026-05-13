@@ -38,6 +38,7 @@ export interface IStationsListResponse {
     page: number;
     limit: number;
     totalPages: number;
+    activeTrip?: IActiveTrip | undefined;
 }
 export interface IStationsSearchResponse {
     stations: ICngStationBasic[];

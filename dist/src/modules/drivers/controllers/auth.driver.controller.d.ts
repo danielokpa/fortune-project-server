@@ -21,8 +21,5 @@ export declare class AuthDriverController {
     changePassword(input: ChangePasswordDto, req: ExpressRequest & {
         user: any;
     }): Promise<import("src/utils/response.utils").ApiResponse<null>>;
-    deleteDriverAccount(userCredentials: {
-        email: string;
-        password: string;
-    }): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
+    deleteDriverAccount(userCredentials: LoginDriverDto): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
 }

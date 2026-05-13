@@ -17,6 +17,7 @@ import { UserCngConversionStatus } from 'src/enums/user-cng-conversion-status.en
 import { UserService } from 'src/modules/users/services/user.service';
 import { UserType } from 'src/enums/user-type.enum';
 import { Op } from 'sequelize';
+import { UserCngStationRepository } from '../repositories/user-cng-station.repository';
 
 const USER_CNG_CONVERSION_SEARCH_MAX_LEN = 200;
 const USER_CNG_STATS_RECENT_LIMIT = 3;
@@ -52,6 +53,7 @@ export class CngConversionService {
   constructor(
     private readonly cngConversionRepository: UserCngConversionRepository,
     private readonly userService: UserService,
+    private readonly userCngStations: UserCngStationRepository
   ) {}
 
   fetchTransmission() {
@@ -130,7 +132,8 @@ export class CngConversionService {
         offset: offset,
       });
       return {
-        conversions
+        conversions,
+        activeTrip: await this.userCngStations.findActiveTripByUserId(userId)
       };
     } catch (error) {
       if (error instanceof BadRequestException) {
