@@ -147,6 +147,18 @@ let UserService = class UserService {
             throw new common_1.NotFoundException('Failed to update image URL');
         }
     }
+    async updateUser(userId, userData) {
+        try {
+            const updateUser = await this.userRepository.update(userId, userData);
+            if (updateUser[0] === 0) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            return updateUser[1][0];
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('Failed to update user');
+        }
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

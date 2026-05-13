@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
 import { UserRepository } from '../repositories/user.repository';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
+import { UpdateUserDto } from '../dto/user.dto';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { TripRepository } from 'src/modules/trips/repositories/trip.repository';
 export declare class UserService {
@@ -19,4 +20,5 @@ export declare class UserService {
     restore(id: string): Promise<void>;
     dashboard(data: IDashboardInput, userId: string): Promise<IDashboard>;
     updateImageUrl(userId: string, imageUrl: string): Promise<User>;
+    updateUser(userId: string, userData: UpdateUserDto): Promise<User>;
 }

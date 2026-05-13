@@ -10,7 +10,7 @@ import { UserType } from '../../../enums/user-type.enum';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { JwtAuthPayload } from '../../auth/auth.interface';
 import { Validators } from 'src/utils/validators.utils';
-import { DashboardDto, UpdateImageUrlDto } from '../dto/user.dto';
+import { DashboardDto, UpdateImageUrlDto, UpdateUserDto } from '../dto/user.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -73,6 +73,24 @@ export class UserController {
     return ResponseUtil.handleResponse(
       data,
       'Image URL updated successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Put()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update user image URL' })
+  @ApiResponse({ status: 200, description: 'Image URL updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async updateUser(
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const userId = Validators.validateUuid(req.user.userId);
+    const data = await this.userService.updateUser(userId, updateUserDto);
+    return ResponseUtil.handleResponse(
+      data,
+      'User updated successfully',
       HttpStatus.OK,
     );
   }

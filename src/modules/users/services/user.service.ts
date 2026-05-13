@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
 import { UserRepository } from '../repositories/user.repository';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-import { DashboardDto } from '../dto/user.dto';
+import { DashboardDto, UpdateUserDto } from '../dto/user.dto';
 import { DriverService } from 'src/modules/drivers/services/driver.service';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { PasswordUtil } from 'src/utils/password.util';
@@ -152,6 +152,18 @@ export class UserService {
         throw error;
       }
       throw new NotFoundException('Failed to update image URL');
+    }
+  }
+
+  async updateUser(userId: string, userData: UpdateUserDto): Promise<User> {
+    try {
+      const updateUser = await this.userRepository.update(userId, userData);
+      if (updateUser[0] === 0) {
+        throw new NotFoundException('User not found!');
+      }
+      return updateUser[1][0];
+    } catch (error: unknown) {
+      throw new NotFoundException('Failed to update user');
     }
   }
 }

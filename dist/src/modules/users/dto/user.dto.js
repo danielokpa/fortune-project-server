@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateImageUrlDto = exports.DashboardDto = void 0;
+exports.UpdateUserDto = exports.UpdateImageUrlDto = exports.DashboardDto = void 0;
 const class_validator_1 = require("class-validator");
 class DashboardDto {
     deviceFCMToken;
@@ -33,4 +33,12 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateImageUrlDto.prototype, "imageUrl", void 0);
+class UpdateUserDto {
+    fullName;
+}
+exports.UpdateUserDto = UpdateUserDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "fullName", void 0);
 //# sourceMappingURL=user.dto.js.map

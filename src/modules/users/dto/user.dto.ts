@@ -15,3 +15,8 @@ export class UpdateImageUrlDto {
     // @IsUrl()
     imageUrl: string;
 }
+
+export class UpdateUserDto {
+    @IsString()
+    fullName: string;
+}

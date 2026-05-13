@@ -5,3 +5,6 @@ export declare class DashboardDto {
 export declare class UpdateImageUrlDto {
     imageUrl: string;
 }
+export declare class UpdateUserDto {
+    fullName: string;
+}

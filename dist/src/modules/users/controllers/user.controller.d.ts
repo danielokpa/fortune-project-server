@@ -2,7 +2,7 @@ import type { Request as ExpressRequest } from 'express';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 import { JwtAuthPayload } from '../../auth/auth.interface';
-import { DashboardDto, UpdateImageUrlDto } from '../dto/user.dto';
+import { DashboardDto, UpdateImageUrlDto, UpdateUserDto } from '../dto/user.dto';
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
@@ -15,4 +15,7 @@ export declare class UserController {
     updateImageUrl(req: ExpressRequest & {
         user: JwtAuthPayload;
     }, updateImageUrlDto: UpdateImageUrlDto): Promise<import("src/utils/response.utils").ApiResponse<User>>;
+    updateUser(req: ExpressRequest & {
+        user: JwtAuthPayload;
+    }, updateUserDto: UpdateUserDto): Promise<import("src/utils/response.utils").ApiResponse<User>>;
 }
