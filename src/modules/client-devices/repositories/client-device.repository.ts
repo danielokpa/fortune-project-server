@@ -85,6 +85,12 @@ export class ClientDeviceRepository {
     });
   }
 
+  async deleteAll(driverId: string): Promise<number> {
+    return await this.clientDeviceModel.destroy({
+      where: { driverId },
+    });
+  }
+
   async restore(id: string): Promise<void> {
     await this.clientDeviceModel.restore({
       where: { id },

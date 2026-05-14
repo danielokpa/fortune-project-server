@@ -84,6 +84,11 @@ let ClientDeviceRepository = class ClientDeviceRepository {
             where: { id },
         });
     }
+    async deleteAll(driverId) {
+        return await this.clientDeviceModel.destroy({
+            where: { driverId },
+        });
+    }
     async restore(id) {
         await this.clientDeviceModel.restore({
             where: { id },

@@ -13,6 +13,7 @@ import { ClientDeviceService } from '../../client-devices/services/client-device
 import { Driver } from '../entities/driver.entity';
 import { IDriverLoginData } from '../../../shared/interfaces/auth.interface';
 import { IVirtualAccount } from 'src/shared/interfaces/virtual.account.interface';
+import { ClientDeviceRepository } from 'src/modules/client-devices/repositories/client-device.repository';
 export declare class AuthDriverService {
     private readonly driverRepository;
     private readonly tokenService;
@@ -23,9 +24,13 @@ export declare class AuthDriverService {
     private readonly configService;
     private readonly eventEmitter;
     private readonly axiosService;
-    constructor(driverRepository: DriverRepository, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, clientDeviceService: ClientDeviceService, configService: ConfigService, eventEmitter: EventEmitter2, axiosService: AxiosService);
+    private readonly clientDeviceRepository;
+    constructor(driverRepository: DriverRepository, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, clientDeviceService: ClientDeviceService, configService: ConfigService, eventEmitter: EventEmitter2, axiosService: AxiosService, clientDeviceRepository: ClientDeviceRepository);
     private readonly logger;
     deleteUserAccount(identity: string, password: string): Promise<null>;
+    logout(input: {
+        deviceToken: any;
+    }, userId: string): Promise<null>;
     signUpPhoneNo(input: SignUpDriverPhoneDto): Promise<{}>;
     signUpEmail(input: SignupEmail): Promise<null>;
     verifyOtp(input: VerifyDriverOtpDto): Promise<VerifyDriverOtpDto>;

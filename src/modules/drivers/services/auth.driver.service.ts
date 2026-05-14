@@ -41,6 +41,7 @@ import { Validators } from 'src/utils/validators.utils';
 import { Utils } from 'src/utils/utils';
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 import { IVirtualAccount } from 'src/shared/interfaces/virtual.account.interface';
+import { ClientDeviceRepository } from 'src/modules/client-devices/repositories/client-device.repository';
 
 @Injectable()
 export class AuthDriverService {
@@ -54,6 +55,7 @@ export class AuthDriverService {
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
     private readonly axiosService: AxiosService,
+    private readonly clientDeviceRepository: ClientDeviceRepository,
   ) { }
 
   private readonly logger = new Logger(AuthDriverService.name);
@@ -90,6 +92,20 @@ export class AuthDriverService {
       }
       throw new NotFoundException('Failed to delete driver account');
     }
+  }
+
+  async logout(input: {deviceToken}, userId: string) {
+    const user = await this.driverRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const existingClientDevice = await this.clientDeviceRepository.findByDriverId(userId);
+    if (!existingClientDevice) {
+      throw new NotFoundException('Client device not found');
+    }
+    // await this.clientDeviceRepository.delete(existingClientDevice.);
+    return null;
   }
 
   async signUpPhoneNo(input: SignUpDriverPhoneDto) {

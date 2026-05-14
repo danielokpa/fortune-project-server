@@ -33,6 +33,7 @@ const client_device_service_1 = require("../../client-devices/services/client-de
 const validators_utils_1 = require("../../../utils/validators.utils");
 const utils_1 = require("../../../utils/utils");
 const kyc_enums_1 = require("../../../enums/kyc.enums");
+const client_device_repository_1 = require("../../client-devices/repositories/client-device.repository");
 let AuthDriverService = AuthDriverService_1 = class AuthDriverService {
     driverRepository;
     tokenService;
@@ -43,7 +44,8 @@ let AuthDriverService = AuthDriverService_1 = class AuthDriverService {
     configService;
     eventEmitter;
     axiosService;
-    constructor(driverRepository, tokenService, emailEventService, smsEventService, countryService, clientDeviceService, configService, eventEmitter, axiosService) {
+    clientDeviceRepository;
+    constructor(driverRepository, tokenService, emailEventService, smsEventService, countryService, clientDeviceService, configService, eventEmitter, axiosService, clientDeviceRepository) {
         this.driverRepository = driverRepository;
         this.tokenService = tokenService;
         this.emailEventService = emailEventService;
@@ -53,6 +55,7 @@ let AuthDriverService = AuthDriverService_1 = class AuthDriverService {
         this.configService = configService;
         this.eventEmitter = eventEmitter;
         this.axiosService = axiosService;
+        this.clientDeviceRepository = clientDeviceRepository;
     }
     logger = new common_1.Logger(AuthDriverService_1.name);
     async deleteUserAccount(identity, password) {
@@ -80,6 +83,17 @@ let AuthDriverService = AuthDriverService_1 = class AuthDriverService {
             }
             throw new common_1.NotFoundException('Failed to delete driver account');
         }
+    }
+    async logout(input, userId) {
+        const user = await this.driverRepository.findById(userId);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const existingClientDevice = await this.clientDeviceRepository.findByDriverId(userId);
+        if (!existingClientDevice) {
+            throw new common_1.NotFoundException('Client device not found');
+        }
+        return null;
     }
     async signUpPhoneNo(input) {
         const { country, phoneNo } = input;
@@ -463,6 +477,7 @@ exports.AuthDriverService = AuthDriverService = AuthDriverService_1 = __decorate
         client_device_service_1.ClientDeviceService,
         config_1.ConfigService,
         event_emitter_1.EventEmitter2,
-        axios_service_1.AxiosService])
+        axios_service_1.AxiosService,
+        client_device_repository_1.ClientDeviceRepository])
 ], AuthDriverService);
 //# sourceMappingURL=auth.driver.service.js.map

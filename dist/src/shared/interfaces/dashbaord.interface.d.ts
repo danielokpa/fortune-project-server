@@ -14,6 +14,7 @@ export interface IPaymentType {
     type: PAYMENT_TYPE;
     label: string;
     amount: number;
+    currency: string;
 }
 export declare class IDashboardInput {
     deviceFCMToken: string;

@@ -99,22 +99,26 @@ export class UserService {
           {
             type: PAYMENT_TYPE.CASH,
             label: 'Cash',
-            amount: 0
+            amount: 0,
+            currency: 'N'
           },
           {
             type: PAYMENT_TYPE.PEPP_COIN,
             label: 'PEPP Coins',
-            amount: 0
+            amount: 0,
+            currency: 'PC'
           },
           {
             type: PAYMENT_TYPE.PI_COIN,
             label: 'Pi',
-            amount: 0
+            amount: 0,
+            currency: 'Pi'
           },
           {
             type: PAYMENT_TYPE.BANK_TRANSFER,
             label: 'Bank Transfer',
-            amount: 0
+            amount: 0,
+            currency: 'N'
           }
         ],
         activeTrip: await this.tripRepository.findUserActiveTrip(userId),

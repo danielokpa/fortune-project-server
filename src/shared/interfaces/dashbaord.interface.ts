@@ -17,6 +17,7 @@ export interface IPaymentType {
     type: PAYMENT_TYPE;
     label: string;
     amount: number;
+    currency: string;
 }
 
 export class IDashboardInput {

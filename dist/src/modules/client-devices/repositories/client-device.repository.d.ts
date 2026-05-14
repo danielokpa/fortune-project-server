@@ -14,6 +14,7 @@ export declare class ClientDeviceRepository {
     create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice>;
     update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]>;
     delete(id: string): Promise<number>;
+    deleteAll(driverId: string): Promise<number>;
     restore(id: string): Promise<void>;
     findByUserAndDevice(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
     findByDriverAndDevice(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
