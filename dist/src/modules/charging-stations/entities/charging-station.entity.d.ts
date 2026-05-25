@@ -3,6 +3,7 @@ import { UserChargingStation } from './user-charging-station.entity';
 export declare class ChargingStation extends Model<ChargingStation> {
     id: string;
     name: string;
+    stationSlug: string;
     country: string;
     state: string;
     address: string;

@@ -14,6 +14,26 @@ module.exports = {
       'Benue': 'Benue'
     };
 
+    const stationSlugsByName = {
+      'Charging Hub (Possible EVS)': 'CPABUJA000000001',
+      'ECN Hybrid EV Charging Station': 'CPABUJA000000002',
+      'Lake Mall EV Charging Station': 'CPABUJA000000003',
+      'CASS EV Charging Station': 'CPABUJA000000004',
+      'Spiro Battery Swap Station – Kubwa': 'CPABUJA000000005',
+      'Spiro Battery Swap Station – Jabi': 'CPABUJA000000006',
+      'Spiro Battery Swap Station – Gwarinpa': 'CPABUJA000000007',
+      'SAGLEV EV Charging – Mega Plaza': 'CPLAGOS000000001',
+      'Siltech E-Box EV Charging Station': 'CPLAGOS000000002',
+      'NADDC EV Charging Station': 'CPLAGOS000000003',
+      'University of Lagos Solar EV Charger': 'CPLAGOS000000004',
+      'Sterling Bank EV Charging Station': 'CPLAGOS000000005',
+      'Qoray – Marina Road EV Charging': 'CPLAGOS000000006',
+      'Qoray – Adeola Odeku EV Charging': 'CPLAGOS000000007',
+      'Qoray – Sheraton Hotel EV Charging': 'CPLAGOS000000008',
+      'Virta EV Charging Station': 'CPKADUNA00000001',
+      'Makurdi EV Charging Station': 'CPBENUE000000001',
+    };
+
     // EV Charging Stations data
     const stations = [
       {
@@ -179,9 +199,16 @@ module.exports = {
       const contactEmail = `info@${station.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
       const contactPhone = '+2348100000000'; // Default Nigerian phone number
 
+      const stationSlug = stationSlugsByName[station.name];
+      if (!stationSlug) {
+        console.warn(`⚠️  No stationSlug mapped for "${station.name}", skipping`);
+        continue;
+      }
+
       stationsToInsert.push({
         id: randomUUID(),
         name: station.name,
+        stationSlug,
         country: 'Nigeria', // Use country name as string (default provided)
         state: dbStateName, // Use state name as string (FCT, Lagos, Kaduna, Benue)
         address: station.address,

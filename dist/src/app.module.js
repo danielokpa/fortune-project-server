@@ -55,7 +55,7 @@ const client_device_entity_1 = require("./modules/client-devices/entities/client
 const entities_4 = require("./services/token/entities");
 const trip_entity_1 = require("./modules/trips/entities/trip.entity");
 const trips_module_1 = require("./modules/trips/trips.module");
-const referred_user_entity_1 = require("./modules/referred-users/entities/referred-user.entity");
+const referal_user_entity_1 = require("./modules/referal-users/entities/referal-user.entity");
 const civil_servant_installment_verification_entity_1 = require("./modules/cng/entities/civil-servant-installment-verification.entity");
 let AppModule = class AppModule {
 };
@@ -104,7 +104,7 @@ exports.AppModule = AppModule = __decorate([
                     client_device_entity_1.ClientDevice,
                     entities_4.Token,
                     trip_entity_1.Trip,
-                    referred_user_entity_1.ReferredUser,
+                    referal_user_entity_1.ReferalUser,
                 ],
                 synchronize: process.env.NODE_ENV !== 'production',
                 logging: process.env.NODE_ENV === 'development',

@@ -13,7 +13,12 @@ import {
   Min,
   Max,
   IsTimeZone,
+  Matches,
 } from 'class-validator';
+
+/** OCPP WebSocket slug: unique, 16–64 alphanumeric characters */
+export const STATION_SLUG_PATTERN = /^[A-Za-z0-9]{16,64}$/;
+export const STATION_SLUG_MIN_LENGTH = 16;
 
 export class CreateChargingStationDto {
   @ApiProperty({
@@ -25,6 +30,21 @@ export class CreateChargingStationDto {
   @MinLength(2)
   @MaxLength(100)
   name: string;
+
+  @ApiProperty({
+    description:
+      'Unique OCPP WebSocket slug (16–64 alphanumeric). Used in ws://host/ocpp/{stationSlug}',
+    example: 'CPLAGOS000000001',
+    minLength: STATION_SLUG_MIN_LENGTH,
+    maxLength: 64,
+  })
+  @IsString()
+  @MinLength(STATION_SLUG_MIN_LENGTH)
+  @MaxLength(64)
+  @Matches(STATION_SLUG_PATTERN, {
+    message: 'stationSlug must be 16–64 alphanumeric characters (A–Z, a–z, 0–9)',
+  })
+  stationSlug: string;
 
   @ApiProperty({
     description: 'Country name',
@@ -182,6 +202,21 @@ export class UpdateChargingStationDto {
   @MinLength(2)
   @MaxLength(100)
   name?: string;
+
+  @ApiPropertyOptional({
+    description: 'Unique OCPP WebSocket slug (16–64 alphanumeric)',
+    example: 'CPLAGOS000000001',
+    minLength: STATION_SLUG_MIN_LENGTH,
+    maxLength: 64,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(STATION_SLUG_MIN_LENGTH)
+  @MaxLength(64)
+  @Matches(STATION_SLUG_PATTERN, {
+    message: 'stationSlug must be 16–64 alphanumeric characters (A–Z, a–z, 0–9)',
+  })
+  stationSlug?: string;
 
   @ApiPropertyOptional({
     description: 'Country name',

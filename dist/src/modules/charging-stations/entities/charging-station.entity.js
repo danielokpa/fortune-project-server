@@ -14,6 +14,7 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const user_charging_station_entity_1 = require("./user-charging-station.entity");
 let ChargingStation = class ChargingStation extends sequelize_typescript_1.Model {
     name;
+    stationSlug;
     country;
     state;
     address;
@@ -44,6 +45,14 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], ChargingStation.prototype, "name", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(64),
+        allowNull: false,
+        unique: true,
+    }),
+    __metadata("design:type", String)
+], ChargingStation.prototype, "stationSlug", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING(100),

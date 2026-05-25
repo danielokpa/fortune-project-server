@@ -1,5 +1,8 @@
+export declare const STATION_SLUG_PATTERN: RegExp;
+export declare const STATION_SLUG_MIN_LENGTH = 16;
 export declare class CreateChargingStationDto {
     name: string;
+    stationSlug: string;
     country: string;
     state: string;
     address: string;
@@ -18,6 +21,7 @@ export declare class CreateChargingStationDto {
 }
 export declare class UpdateChargingStationDto {
     name?: string;
+    stationSlug?: string;
     country?: string;
     state?: string;
     address?: string;

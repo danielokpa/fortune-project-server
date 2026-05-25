@@ -1,11 +1,11 @@
 import type { GenerateReferalCodeEvent } from '../events/user.events';
 import { UserRepository } from '../repositories/user.repository';
-import { ReferredUserService } from '../../referred-users/services/referred-user.service';
+import { ReferalUserService } from '../../referal-users/services/referal-user.service';
 export declare class UserEventListener {
     private readonly userRepository;
-    private readonly referredUserService;
+    private readonly referalUserService;
     private readonly logger;
-    constructor(userRepository: UserRepository, referredUserService: ReferredUserService);
+    constructor(userRepository: UserRepository, referalUserService: ReferalUserService);
     handleGenerateReferalCode(event: GenerateReferalCodeEvent): Promise<void>;
     private handleReferralTracking;
 }

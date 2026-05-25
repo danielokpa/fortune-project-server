@@ -47,15 +47,15 @@ exports.UserEventListener = void 0;
 const common_1 = require("@nestjs/common");
 const event_emitter_1 = require("@nestjs/event-emitter");
 const user_repository_1 = require("../repositories/user.repository");
-const referred_user_service_1 = require("../../referred-users/services/referred-user.service");
+const referal_user_service_1 = require("../../referal-users/services/referal-user.service");
 const randomstring = __importStar(require("randomstring"));
 let UserEventListener = UserEventListener_1 = class UserEventListener {
     userRepository;
-    referredUserService;
+    referalUserService;
     logger = new common_1.Logger(UserEventListener_1.name);
-    constructor(userRepository, referredUserService) {
+    constructor(userRepository, referalUserService) {
         this.userRepository = userRepository;
-        this.referredUserService = referredUserService;
+        this.referalUserService = referalUserService;
     }
     async handleGenerateReferalCode(event) {
         try {
@@ -123,17 +123,16 @@ let UserEventListener = UserEventListener_1 = class UserEventListener {
                 this.logger.error(`Referrer user ${referrerUser.id} has invalid ID. Skipping referral tracking.`);
                 return;
             }
-            const existingReferral = await this.referredUserService.findByReferredUserId(referredUserId);
+            const existingReferral = await this.referalUserService.findByReferredUserId(referredUserId);
             if (existingReferral) {
                 this.logger.log(`User ${referredUserId} was already referred. Skipping duplicate record.`);
                 return;
             }
-            await this.referredUserService.create({
+            await this.referalUserService.create({
                 referalCode: usedReferalCode,
                 userId: referrerUser.id,
-                referredUserId: referredUserId,
-                completedRides: 0,
-                hasRewarded: false,
+                referredUserId,
+                hasCompletedFirstTrip: false,
             });
             this.logger.log(`Successfully created referral record: Referrer user ${referrerUser.id} (code: ${referrerUser.referalCode}) referred user ${referredUserId} with code ${usedReferalCode}`);
         }
@@ -152,6 +151,6 @@ __decorate([
 exports.UserEventListener = UserEventListener = UserEventListener_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [user_repository_1.UserRepository,
-        referred_user_service_1.ReferredUserService])
+        referal_user_service_1.ReferalUserService])
 ], UserEventListener);
 //# sourceMappingURL=user.listener.js.map

@@ -39,6 +39,16 @@ export class ChargingStation extends Model<ChargingStation> {
   })
   public name: string;
 
+  /**
+   * Unique OCPP WebSocket identifier (min 16 alphanumeric). Used in ws://host/ocpp/{stationSlug}
+   */
+  @Column({
+    type: DataType.STRING(64),
+    allowNull: false,
+    unique: true,
+  })
+  public stationSlug: string;
+
   @Column({
     type: DataType.STRING(100),
     allowNull: false,

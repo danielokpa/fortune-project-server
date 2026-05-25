@@ -13,27 +13,16 @@ import {
 import { User } from '../../users/entities/user.entity';
 
 @Table({
-  tableName: 'referred_users',
+  tableName: 'referal_users',
   timestamps: true,
-  defaultScope: {
-    attributes: {
-      exclude: [],
-    },
-  },
 })
-export class ReferredUser extends Model<ReferredUser> {
+export class ReferalUser extends Model<ReferalUser> {
   @Column({
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
     primaryKey: true,
   })
   declare id: string;
-
-  @AllowNull(false)
-  @Column({
-    type: DataType.STRING(10),
-  })
-  declare referalCode: string;
 
   @ForeignKey(() => User)
   @AllowNull(false)
@@ -55,19 +44,18 @@ export class ReferredUser extends Model<ReferredUser> {
   @BelongsTo(() => User, 'referredUserId')
   declare referredUser: User;
 
-  @Default(0)
   @AllowNull(false)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING(10),
   })
-  declare completedRides: number;
+  declare referalCode: string;
 
   @Default(false)
   @AllowNull(false)
   @Column({
     type: DataType.BOOLEAN,
   })
-  declare hasRewarded: boolean;
+  declare hasCompletedFirstTrip: boolean;
 
   @CreatedAt
   @AllowNull(false)
@@ -83,4 +71,3 @@ export class ReferredUser extends Model<ReferredUser> {
   })
   declare updatedAt: Date;
 }
-

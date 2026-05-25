@@ -45,7 +45,7 @@ import { ClientDevice } from './modules/client-devices/entities/client-device.en
 import { Token } from './services/token/entities';
 import { Trip } from './modules/trips/entities/trip.entity';
 import { TripsModule } from './modules/trips/trips.module';
-import { ReferredUser } from './modules/referred-users/entities/referred-user.entity';
+import { ReferalUser } from './modules/referal-users/entities/referal-user.entity';
 import { CivilServantInstallmentPaymentProof } from './modules/cng/entities/civil-servant-installment-verification.entity';
 
 
@@ -92,7 +92,7 @@ import { CivilServantInstallmentPaymentProof } from './modules/cng/entities/civi
         ClientDevice,
         Token,
         Trip,
-        ReferredUser,
+        ReferalUser,
       ],
       synchronize: process.env.NODE_ENV !== 'production', // Disable in production
       logging: process.env.NODE_ENV === 'development',

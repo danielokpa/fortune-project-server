@@ -9,7 +9,7 @@ import { UserEventService } from './services/user-event.service';
 import { UserEventListener } from './listeners/user.listener';
 import { ClientDevicesModule } from '../client-devices/client-devices.module';
 import { TripsModule } from '../trips/trips.module';
-import { ReferredUsersModule } from '../referred-users/referred-users.module';
+import { ReferalUsersModule } from '../referal-users/referal-users.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { ReferredUsersModule } from '../referred-users/referred-users.module';
     EventEmitterModule,
     ClientDevicesModule,
     TripsModule,
-    ReferredUsersModule,
+    ReferalUsersModule,
   ],
   controllers: [UserController],
   providers: [UserService, UserRepository, UserEventService, UserEventListener],

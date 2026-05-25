@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import type { GenerateReferalCodeEvent } from '../events/user.events';
 import { UserRepository } from '../repositories/user.repository';
-import { ReferredUserService } from '../../referred-users/services/referred-user.service';
+import { ReferalUserService } from '../../referal-users/services/referal-user.service';
 import * as randomstring from 'randomstring';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class UserEventListener {
 
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly referredUserService: ReferredUserService,
+    private readonly referalUserService: ReferalUserService,
   ) {}
 
   @OnEvent('user.generate-referal-code')
@@ -106,19 +106,17 @@ export class UserEventListener {
       }
 
       // Check if this user was already referred (prevent duplicate records)
-      const existingReferral = await this.referredUserService.findByReferredUserId(referredUserId);
+      const existingReferral = await this.referalUserService.findByReferredUserId(referredUserId);
       if (existingReferral) {
         this.logger.log(`User ${referredUserId} was already referred. Skipping duplicate record.`);
         return;
       }
 
-      // Create referral record with validated referrer user
-      await this.referredUserService.create({
+      await this.referalUserService.create({
         referalCode: usedReferalCode,
-        userId: referrerUser.id, // Ensure userId matches referrerUser.id
-        referredUserId: referredUserId,
-        completedRides: 0,
-        hasRewarded: false,
+        userId: referrerUser.id,
+        referredUserId,
+        hasCompletedFirstTrip: false,
       });
 
       this.logger.log(

@@ -12,6 +12,7 @@ export type ChargingStationRow = Pick<
   ChargingStation,
   | 'id'
   | 'name'
+  | 'stationSlug'
   | 'state'
   | 'country'
   | 'address'
@@ -646,6 +647,13 @@ export class ChargingStationRepository {
       })),
       total,
     };
+  }
+
+  async findByStationSlug(stationSlug: string): Promise<ChargingStation | null> {
+    const station = await this.chargingStationModel.findOne({
+      where: { stationSlug },
+    });
+    return station ? (station.toJSON() as ChargingStation) : null;
   }
 
   async create(

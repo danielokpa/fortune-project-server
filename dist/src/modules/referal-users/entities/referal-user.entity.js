@@ -9,12 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReferredUser = void 0;
+exports.ReferalUser = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const user_entity_1 = require("../../users/entities/user.entity");
-let ReferredUser = class ReferredUser extends sequelize_typescript_1.Model {
+let ReferalUser = class ReferalUser extends sequelize_typescript_1.Model {
 };
-exports.ReferredUser = ReferredUser;
+exports.ReferalUser = ReferalUser;
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.UUID,
@@ -22,46 +22,38 @@ __decorate([
         primaryKey: true,
     }),
     __metadata("design:type", String)
-], ReferredUser.prototype, "id", void 0);
+], ReferalUser.prototype, "id", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.UUID,
+    }),
+    __metadata("design:type", String)
+], ReferalUser.prototype, "userId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User, 'userId'),
+    __metadata("design:type", user_entity_1.User)
+], ReferalUser.prototype, "user", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.UUID,
+    }),
+    __metadata("design:type", String)
+], ReferalUser.prototype, "referredUserId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User, 'referredUserId'),
+    __metadata("design:type", user_entity_1.User)
+], ReferalUser.prototype, "referredUser", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING(10),
     }),
     __metadata("design:type", String)
-], ReferredUser.prototype, "referalCode", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
-    }),
-    __metadata("design:type", String)
-], ReferredUser.prototype, "userId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User, 'userId'),
-    __metadata("design:type", user_entity_1.User)
-], ReferredUser.prototype, "user", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
-    }),
-    __metadata("design:type", String)
-], ReferredUser.prototype, "referredUserId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User, 'referredUserId'),
-    __metadata("design:type", user_entity_1.User)
-], ReferredUser.prototype, "referredUser", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-    }),
-    __metadata("design:type", Number)
-], ReferredUser.prototype, "completedRides", void 0);
+], ReferalUser.prototype, "referalCode", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -69,7 +61,7 @@ __decorate([
         type: sequelize_typescript_1.DataType.BOOLEAN,
     }),
     __metadata("design:type", Boolean)
-], ReferredUser.prototype, "hasRewarded", void 0);
+], ReferalUser.prototype, "hasCompletedFirstTrip", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -77,7 +69,7 @@ __decorate([
         type: sequelize_typescript_1.DataType.DATE,
     }),
     __metadata("design:type", Date)
-], ReferredUser.prototype, "createdAt", void 0);
+], ReferalUser.prototype, "createdAt", void 0);
 __decorate([
     sequelize_typescript_1.UpdatedAt,
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -85,16 +77,11 @@ __decorate([
         type: sequelize_typescript_1.DataType.DATE,
     }),
     __metadata("design:type", Date)
-], ReferredUser.prototype, "updatedAt", void 0);
-exports.ReferredUser = ReferredUser = __decorate([
+], ReferalUser.prototype, "updatedAt", void 0);
+exports.ReferalUser = ReferalUser = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: 'referred_users',
+        tableName: 'referal_users',
         timestamps: true,
-        defaultScope: {
-            attributes: {
-                exclude: [],
-            },
-        },
     })
-], ReferredUser);
-//# sourceMappingURL=referred-user.entity.js.map
+], ReferalUser);
+//# sourceMappingURL=referal-user.entity.js.map

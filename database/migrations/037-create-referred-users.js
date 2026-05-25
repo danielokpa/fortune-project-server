@@ -15,24 +15,10 @@ module.exports = {
       userId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-        comment: 'User who owns the referral code (referrer)',
       },
       referredUserId: {
         type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-        comment: 'User who used the referral code (referred)',
+        allowNull: false
       },
       completedRides: {
         type: DataTypes.INTEGER,

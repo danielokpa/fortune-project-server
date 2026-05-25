@@ -9,11 +9,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CancelTripDto = exports.EndTripDto = exports.StartTripDto = exports.SearchChargingStationsDto = exports.FindNearbyStationsDto = exports.FindChargingStationsDto = exports.UpdateUserChargingStationDto = exports.AddUserChargingStationDto = exports.UpdateChargingStationDto = exports.CreateChargingStationDto = void 0;
+exports.CancelTripDto = exports.EndTripDto = exports.StartTripDto = exports.SearchChargingStationsDto = exports.FindNearbyStationsDto = exports.FindChargingStationsDto = exports.UpdateUserChargingStationDto = exports.AddUserChargingStationDto = exports.UpdateChargingStationDto = exports.CreateChargingStationDto = exports.STATION_SLUG_MIN_LENGTH = exports.STATION_SLUG_PATTERN = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
+exports.STATION_SLUG_PATTERN = /^[A-Za-z0-9]{16,64}$/;
+exports.STATION_SLUG_MIN_LENGTH = 16;
 class CreateChargingStationDto {
     name;
+    stationSlug;
     country;
     state;
     address;
@@ -42,6 +45,21 @@ __decorate([
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreateChargingStationDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Unique OCPP WebSocket slug (16–64 alphanumeric). Used in ws://host/ocpp/{stationSlug}',
+        example: 'CPLAGOS000000001',
+        minLength: exports.STATION_SLUG_MIN_LENGTH,
+        maxLength: 64,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(exports.STATION_SLUG_MIN_LENGTH),
+    (0, class_validator_1.MaxLength)(64),
+    (0, class_validator_1.Matches)(exports.STATION_SLUG_PATTERN, {
+        message: 'stationSlug must be 16–64 alphanumeric characters (A–Z, a–z, 0–9)',
+    }),
+    __metadata("design:type", String)
+], CreateChargingStationDto.prototype, "stationSlug", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Country name',
@@ -203,6 +221,7 @@ __decorate([
 ], CreateChargingStationDto.prototype, "isActive", void 0);
 class UpdateChargingStationDto {
     name;
+    stationSlug;
     country;
     state;
     address;
@@ -232,6 +251,22 @@ __decorate([
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], UpdateChargingStationDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Unique OCPP WebSocket slug (16–64 alphanumeric)',
+        example: 'CPLAGOS000000001',
+        minLength: exports.STATION_SLUG_MIN_LENGTH,
+        maxLength: 64,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(exports.STATION_SLUG_MIN_LENGTH),
+    (0, class_validator_1.MaxLength)(64),
+    (0, class_validator_1.Matches)(exports.STATION_SLUG_PATTERN, {
+        message: 'stationSlug must be 16–64 alphanumeric characters (A–Z, a–z, 0–9)',
+    }),
+    __metadata("design:type", String)
+], UpdateChargingStationDto.prototype, "stationSlug", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
         description: 'Country name',

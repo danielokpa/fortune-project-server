@@ -49,8 +49,13 @@ let ChargingStationService = ChargingStationService_1 = class ChargingStationSer
     }
     async create(createDto) {
         try {
+            const slugTaken = await this.chargingStationRepository.findByStationSlug(createDto.stationSlug);
+            if (slugTaken) {
+                throw new common_1.ConflictException(`Station slug "${createDto.stationSlug}" is already in use`);
+            }
             const station = await this.chargingStationRepository.create({
                 name: createDto.name,
+                stationSlug: createDto.stationSlug,
                 country: createDto.country,
                 state: createDto.state,
                 address: createDto.address,
@@ -200,6 +205,12 @@ let ChargingStationService = ChargingStationService_1 = class ChargingStationSer
     async update(id, updateDto) {
         try {
             await this.findById(id);
+            if (updateDto.stationSlug) {
+                const existing = await this.chargingStationRepository.findByStationSlug(updateDto.stationSlug);
+                if (existing && existing.id !== id) {
+                    throw new common_1.ConflictException(`stationSlug "${updateDto.stationSlug}" is already in use`);
+                }
+            }
             const [affectedCount, updatedStations] = await this.chargingStationRepository.update(id, updateDto);
             if (affectedCount === 0) {
                 throw new common_1.NotFoundException(`Charging station with ID ${id} not found`);

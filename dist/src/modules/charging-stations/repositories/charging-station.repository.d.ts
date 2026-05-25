@@ -3,7 +3,7 @@ import { ChargingStationFavorite } from '../entities/charging-station-favorite.e
 import { ChargingStationRating } from '../entities/charging-station-rating.entity';
 import { ChargingStationReview } from '../entities/charging-station-review.entity';
 import { UserChargingStationRepository } from './user-charging-station.repository';
-export type ChargingStationRow = Pick<ChargingStation, 'id' | 'name' | 'state' | 'country' | 'address' | 'contactPhone' | 'openingTime' | 'closingTime' | 'amountPerUnit' | 'currency' | 'amountPerUnitType' | 'contactEmail' | 'isActive' | 'longitude' | 'latitude' | 'stationImage' | 'createdAt' | 'updatedAt'>;
+export type ChargingStationRow = Pick<ChargingStation, 'id' | 'name' | 'stationSlug' | 'state' | 'country' | 'address' | 'contactPhone' | 'openingTime' | 'closingTime' | 'amountPerUnit' | 'currency' | 'amountPerUnitType' | 'contactEmail' | 'isActive' | 'longitude' | 'latitude' | 'stationImage' | 'createdAt' | 'updatedAt'>;
 export type ChargingStationWithVirtualAccount = ChargingStationRow & {
     virtualAccount: {
         accountName: string;
@@ -68,6 +68,7 @@ export declare class ChargingStationRepository {
         }>;
         total: number;
     }>;
+    findByStationSlug(stationSlug: string): Promise<ChargingStation | null>;
     create(chargingStationData: Partial<ChargingStation>): Promise<ChargingStation>;
     update(id: string, chargingStationData: Partial<ChargingStation>): Promise<[number, ChargingStation[]]>;
     delete(id: string): Promise<number>;

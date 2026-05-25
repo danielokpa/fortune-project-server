@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   Logger,
@@ -68,8 +69,18 @@ export class ChargingStationService {
     createDto: CreateChargingStationDto,
   ): Promise<ChargingStation> {
     try {
+      const slugTaken = await this.chargingStationRepository.findByStationSlug(
+        createDto.stationSlug,
+      );
+      if (slugTaken) {
+        throw new ConflictException(
+          `Station slug "${createDto.stationSlug}" is already in use`,
+        );
+      }
+
       const station = await this.chargingStationRepository.create({
         name: createDto.name,
+        stationSlug: createDto.stationSlug,
         country: createDto.country,
         state: createDto.state,
         address: createDto.address,
@@ -337,6 +348,17 @@ export class ChargingStationService {
     try {
       // Verify station exists
       await this.findById(id);
+
+      if (updateDto.stationSlug) {
+        const existing = await this.chargingStationRepository.findByStationSlug(
+          updateDto.stationSlug,
+        );
+        if (existing && existing.id !== id) {
+          throw new ConflictException(
+            `stationSlug "${updateDto.stationSlug}" is already in use`,
+          );
+        }
+      }
 
       const [affectedCount, updatedStations] =
         await this.chargingStationRepository.update(id, updateDto);

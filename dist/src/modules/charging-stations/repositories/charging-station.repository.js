@@ -460,6 +460,12 @@ let ChargingStationRepository = class ChargingStationRepository {
             total,
         };
     }
+    async findByStationSlug(stationSlug) {
+        const station = await this.chargingStationModel.findOne({
+            where: { stationSlug },
+        });
+        return station ? station.toJSON() : null;
+    }
     async create(chargingStationData) {
         const station = await this.chargingStationModel.create(chargingStationData, { raw: true, returning: true });
         return station.toJSON();

@@ -18,7 +18,7 @@ const user_event_service_1 = require("./services/user-event.service");
 const user_listener_1 = require("./listeners/user.listener");
 const client_devices_module_1 = require("../client-devices/client-devices.module");
 const trips_module_1 = require("../trips/trips.module");
-const referred_users_module_1 = require("../referred-users/referred-users.module");
+const referal_users_module_1 = require("../referal-users/referal-users.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -29,7 +29,7 @@ exports.UsersModule = UsersModule = __decorate([
             event_emitter_1.EventEmitterModule,
             client_devices_module_1.ClientDevicesModule,
             trips_module_1.TripsModule,
-            referred_users_module_1.ReferredUsersModule,
+            referal_users_module_1.ReferalUsersModule,
         ],
         controllers: [user_controller_1.UserController],
         providers: [user_service_1.UserService, user_repository_1.UserRepository, user_event_service_1.UserEventService, user_listener_1.UserEventListener],
