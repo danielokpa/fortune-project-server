@@ -8,7 +8,7 @@ export declare class SignUpUserDto {
     otpEmail: string;
     country: string;
     readonly fullName: string;
-    readonly referalCode: string;
+    readonly referralCode: string;
 }
 export declare class SignUpSocialUserDto {
     readonly loginType: LoginType;

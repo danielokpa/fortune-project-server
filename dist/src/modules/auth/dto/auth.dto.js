@@ -22,7 +22,7 @@ class SignUpUserDto {
     otpEmail;
     country;
     fullName;
-    referalCode;
+    referralCode;
 }
 exports.SignUpUserDto = SignUpUserDto;
 __decorate([
@@ -93,7 +93,7 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.MaxLength)(10),
     __metadata("design:type", String)
-], SignUpUserDto.prototype, "referalCode", void 0);
+], SignUpUserDto.prototype, "referralCode", void 0);
 class SignUpSocialUserDto {
     loginType;
     email;

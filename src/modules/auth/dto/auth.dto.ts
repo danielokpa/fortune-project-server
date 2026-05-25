@@ -74,7 +74,7 @@ export class SignUpUserDto {
   @IsString()
   @IsOptional()
   @MaxLength(10)
-  readonly referalCode: string;
+  readonly referralCode: string;
 }
 
 export class SignUpSocialUserDto {

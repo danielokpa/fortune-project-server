@@ -212,11 +212,11 @@ let AuthService = class AuthService {
         const token = await this.tokenService.generateJWTtoken(payload);
         await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
         let referalUserId;
-        if (input.referalCode) {
-            const referrerUser = await this.userRepository.findByReferalCode(input.referalCode);
+        if (input.referralCode) {
+            const referrerUser = await this.userRepository.findByReferalCode(input.referralCode);
             referalUserId = referrerUser?.id;
         }
-        await this.userEventService.emitGenerateReferalCode(user.id, input.referalCode, referalUserId);
+        await this.userEventService.emitGenerateReferalCode(user.id, input.referralCode, referalUserId);
         return {
             email: input.email,
             userType: user_type_enum_1.UserType.USER,

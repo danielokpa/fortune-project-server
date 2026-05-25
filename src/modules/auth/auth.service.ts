@@ -273,13 +273,13 @@ export class AuthService {
 
     // Find referrer user if referral code is provided
     let referalUserId: string | undefined;
-    if (input.referalCode) {
-      const referrerUser = await this.userRepository.findByReferalCode(input.referalCode);
+    if (input.referralCode) {
+      const referrerUser = await this.userRepository.findByReferalCode(input.referralCode);
       referalUserId = referrerUser?.id;
     }
 
     // Emit event to generate referral code and handle referral tracking
-    await this.userEventService.emitGenerateReferalCode(user.id, input.referalCode, referalUserId);
+    await this.userEventService.emitGenerateReferalCode(user.id, input.referralCode, referalUserId);
 
     return {
       email: input.email, 
