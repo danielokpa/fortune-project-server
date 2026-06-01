@@ -22,7 +22,7 @@ const sms_event_service_1 = require("../../services/sms/sms-event.service");
 const token_service_1 = require("../../services/token/token.service");
 const password_util_1 = require("../../utils/password.util");
 const user_repository_1 = require("../users/repositories/user.repository");
-const token_enum_1 = require("../../enums/token.enum");
+const client_1 = require("@prisma/client");
 const moment_1 = __importDefault(require("moment"));
 const login_type_enum_1 = require("../../enums/login-type.enum");
 const country_service_1 = require("../countries/services/country.service");
@@ -30,7 +30,6 @@ const user_service_1 = require("../users/services/user.service");
 const client_device_service_1 = require("../client-devices/services/client-device.service");
 const validators_utils_1 = require("../../utils/validators.utils");
 const utils_1 = require("../../utils/utils");
-const user_event_service_1 = require("../users/services/user-event.service");
 let AuthService = class AuthService {
     userRepository;
     mailService;
@@ -40,8 +39,7 @@ let AuthService = class AuthService {
     countryService;
     userService;
     clientDeviceService;
-    userEventService;
-    constructor(userRepository, mailService, tokenService, emailEventService, smsEventService, countryService, userService, clientDeviceService, userEventService) {
+    constructor(userRepository, mailService, tokenService, emailEventService, smsEventService, countryService, userService, clientDeviceService) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.tokenService = tokenService;
@@ -50,7 +48,6 @@ let AuthService = class AuthService {
         this.countryService = countryService;
         this.userService = userService;
         this.clientDeviceService = clientDeviceService;
-        this.userEventService = userEventService;
     }
     async signUpPhoneNo(input) {
         try {
@@ -67,7 +64,7 @@ let AuthService = class AuthService {
             const otpToken = await this.tokenService.generateOTPtoken({
                 phoneNo: phone,
                 expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
-                subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
+                subject: client_1.TokenSubject.SIGN_UP_PHONE,
             });
             await this.smsEventService.emitSignUpOtpSms(utils_1.Utils.phoneSMSFormat(phone), otpToken.token);
             return {};
@@ -88,7 +85,10 @@ let AuthService = class AuthService {
             }
             const newEmail = `${user.email}-${user.id}`;
             const newPhoneNo = `${user.phoneNo}-${user.id}`;
-            const updatedDriver = await this.userRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+            const updatedDriver = await this.userRepository.update(user.id, {
+                email: newEmail,
+                phoneNo: newPhoneNo,
+            });
             if (!updatedDriver) {
                 throw new common_1.NotFoundException('User not found after deletion');
             }
@@ -96,7 +96,8 @@ let AuthService = class AuthService {
             return null;
         }
         catch (error) {
-            if (error instanceof common_1.NotFoundException || error instanceof common_1.UnauthorizedException) {
+            if (error instanceof common_1.NotFoundException ||
+                error instanceof common_1.UnauthorizedException) {
                 throw error;
             }
             throw new common_1.NotFoundException('Failed to delete driver account');
@@ -113,7 +114,7 @@ let AuthService = class AuthService {
             const otpToken = await this.tokenService.generateOTPtoken({
                 email: input.email,
                 expiry: expiryDate,
-                subject: token_enum_1.TokenSubject.SIGN_UP_EMAIL,
+                subject: client_1.TokenSubject.SIGN_UP_EMAIL,
             });
             await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());
             return null;
@@ -125,9 +126,14 @@ let AuthService = class AuthService {
     async verifyOtp(input) {
         const { token, subject, email, phoneNo, country } = input;
         let data;
-        if (subject === token_enum_1.TokenSubject.SIGN_UP_EMAIL) {
+        if (subject === client_1.TokenSubject.SIGN_UP_EMAIL) {
             input.email = validators_utils_1.Validators.validateEmail(input.email);
-            data = await this.tokenService.validateOtp({ token, subject, email, phoneNo });
+            data = await this.tokenService.validateOtp({
+                token,
+                subject,
+                email,
+                phoneNo,
+            });
         }
         else {
             if (!country) {
@@ -139,7 +145,9 @@ let AuthService = class AuthService {
             }
             const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength);
             data = await this.tokenService.validateOtp({
-                token, subject, phoneNo: phone
+                token,
+                subject,
+                phoneNo: phone,
             });
         }
         if (!data) {
@@ -150,7 +158,11 @@ let AuthService = class AuthService {
     async verifyPasswordResetOtp(input) {
         const { token, subject, email } = input;
         input.email = validators_utils_1.Validators.validateEmail(input.email);
-        const data = await this.tokenService.validatePasswordResetOtp({ token, subject, email });
+        const data = await this.tokenService.validatePasswordResetOtp({
+            token,
+            subject,
+            email,
+        });
         if (!data) {
             throw new common_1.BadRequestException('Invalid Password Reset OTP');
         }
@@ -164,7 +176,7 @@ let AuthService = class AuthService {
         input.email = validators_utils_1.Validators.validateEmail(input.email);
         const emailUser = await this.checkEmailExist(input.email);
         if (emailUser) {
-            throw new common_1.ConflictException("User with email already exist");
+            throw new common_1.ConflictException('User with email already exist');
         }
         if (!input.country) {
             throw new common_1.BadRequestException('Must provide a valid country!');
@@ -174,18 +186,10 @@ let AuthService = class AuthService {
             throw new common_1.ConflictException('Country code not found!');
         }
         const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, input.phoneNo, existingCountry.phoneLength);
-        const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-            phoneNo: phone,
-            token: input.otpPhone,
-            subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
-        });
-        if (!verifyPhoneOtp) {
-            throw new common_1.BadRequestException('Invalid OTP');
-        }
         const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
             email: input.email,
             token: input.otpEmail,
-            subject: token_enum_1.TokenSubject.SIGN_UP_EMAIL,
+            subject: client_1.TokenSubject.SIGN_UP_EMAIL,
         });
         if (!verifyEmailOtp) {
             throw new common_1.BadRequestException('Invalid OTP');
@@ -195,93 +199,27 @@ let AuthService = class AuthService {
             email: input.email,
             phoneNo: phone,
             fullName: input.fullName,
+            username: input.username,
             password: password,
-            countryId: country.id,
+            countryId: existingCountry.id,
             userType: user_type_enum_1.UserType.USER,
             loginType: login_type_enum_1.LoginType.NORMAL,
             isEmailVerified: true,
-            isPhoneVerified: true,
             isActive: true,
         });
         const payload = {
             sub: user.id,
             userType: user_type_enum_1.UserType.USER,
             userId: user.id,
-            email: input.email
+            email: input.email,
         };
         const token = await this.tokenService.generateJWTtoken(payload);
         await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-        let referalUserId;
-        if (input.referralCode) {
-            const referrerUser = await this.userRepository.findByReferalCode(input.referralCode);
-            referalUserId = referrerUser?.id;
-        }
-        await this.userEventService.emitGenerateReferalCode(user.id, input.referralCode, referalUserId);
         return {
             email: input.email,
             userType: user_type_enum_1.UserType.USER,
             id: user.id,
-            token: token
-        };
-    }
-    async signUpSocial(input) {
-        const country = await this.countryService.findById(input.country);
-        if (!country) {
-            throw new common_1.NotFoundException('Country not found');
-        }
-        input.email = validators_utils_1.Validators.validateEmail(input.email);
-        const emailUser = await this.checkEmailExist(input.email);
-        if (emailUser) {
-            throw new common_1.ConflictException("User with email already exist");
-        }
-        if (!input.country) {
-            throw new common_1.BadRequestException('Must provide a valid country!');
-        }
-        const existingCountry = await this.countryService.findById(input.country);
-        if (!existingCountry) {
-            throw new common_1.ConflictException('Country code not found!');
-        }
-        const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, input.phoneNo, existingCountry.phoneLength);
-        const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-            phoneNo: phone,
-            token: input.otpPhone,
-            subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
-        });
-        if (!verifyPhoneOtp) {
-            throw new common_1.BadRequestException('Invalid OTP');
-        }
-        const password = await password_util_1.PasswordUtil.hashPassword(input.password);
-        const user = await this.userRepository.create({
-            email: input.email,
-            phoneNo: phone,
-            fullName: input.fullName,
-            password: password,
-            countryId: country.id,
-            userType: user_type_enum_1.UserType.USER,
-            loginType: input.loginType,
-            isEmailVerified: true,
-            isPhoneVerified: true,
-            isActive: true,
-        });
-        const payload = {
-            sub: user.id,
-            userType: user_type_enum_1.UserType.USER,
-            userId: user.id,
-            email: input.email
-        };
-        const token = await this.tokenService.generateJWTtoken(payload);
-        await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-        let referalUserId;
-        if (input.referalCode) {
-            const referrerUser = await this.userRepository.findByReferalCode(input.referalCode);
-            referalUserId = referrerUser?.id;
-        }
-        await this.userEventService.emitGenerateReferalCode(user.id, input.referalCode, referalUserId);
-        return {
-            email: input.email,
-            userType: user_type_enum_1.UserType.USER,
-            id: user.id,
-            token: token
+            token: token,
         };
     }
     async login(input) {
@@ -311,7 +249,7 @@ let AuthService = class AuthService {
         if (user.isDisabled) {
             throw new common_1.NotFoundException('Your account is disabled, contact Admin');
         }
-        if (!user.isEmailVerified || !user.isPhoneVerified) {
+        if (!user.isEmailVerified) {
             throw new common_1.UnauthorizedException('Your account is not verified');
         }
         const verifyPassword = await password_util_1.PasswordUtil.verifyPassword(input.password, user.password);
@@ -325,7 +263,7 @@ let AuthService = class AuthService {
                 const otpToken = await this.tokenService.generateOTPtoken({
                     email: user.email,
                     expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
-                    subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
+                    subject: client_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
                 });
                 await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
                 throw new common_1.UnauthorizedException('Detected new device login');
@@ -339,62 +277,6 @@ let AuthService = class AuthService {
         };
         const token = await this.tokenService.generateJWTtoken(payload);
         const { password, ...rest } = user;
-        const data = {
-            id: user.id,
-            token,
-            userType: user.userType,
-            userId: user.id,
-            email: user.email,
-        };
-        return data;
-    }
-    async loginSocial(input) {
-        if (input.loginType == login_type_enum_1.LoginType.NORMAL) {
-            throw new common_1.BadRequestException('login with associated email provider ');
-        }
-        const { identity } = input;
-        let user;
-        user = await this.checkEmailExist(validators_utils_1.Validators.validateEmail(identity));
-        if (user.loginType == login_type_enum_1.LoginType.NORMAL) {
-            throw new common_1.BadRequestException('login with email/phone and password');
-        }
-        if (!user) {
-            throw new common_1.UnauthorizedException('Invalid Credentials');
-        }
-        if (user.loginType == login_type_enum_1.LoginType.NORMAL) {
-            throw new common_1.BadRequestException('login with email/phone and password');
-        }
-        if (user.isDisabled) {
-            throw new common_1.NotFoundException('Your account is disabled, contact Admin');
-        }
-        if (!user.isEmailVerified || !user.isPhoneVerified) {
-            throw new common_1.UnauthorizedException('Your account is not verified');
-        }
-        const clientDeviceToken = express_1.request.headers['x-client-device-token'];
-        if (clientDeviceToken) {
-            const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
-            if (!clientDevice) {
-                const otpToken = await this.tokenService.generateOTPtoken({
-                    email: user.email,
-                    expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
-                    subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
-                });
-                await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
-                throw new common_1.UnauthorizedException('Detected new device login');
-            }
-        }
-        const payload = {
-            sub: user.id,
-            userType: user.userType,
-            userId: user.id,
-            email: user.email,
-        };
-        const token = await this.tokenService.generateJWTtoken(payload);
-        const { password, ...rest } = user;
-        const verifyPassword = await password_util_1.PasswordUtil.verifyPassword(input.password, password);
-        if (!verifyPassword) {
-            throw new common_1.UnauthorizedException('Invalid Credentials');
-        }
         const data = {
             id: user.id,
             token,
@@ -434,13 +316,10 @@ let AuthService = class AuthService {
         if (!user.isEmailVerified) {
             throw new common_1.UnauthorizedException('Your email account is not verified');
         }
-        if (!user.isPhoneVerified) {
-            throw new common_1.UnauthorizedException('Your phone no. is not verified');
-        }
         const verifyOtp = await this.tokenService.verifyOTP({
             email: user.email,
             token: otp,
-            subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
+            subject: client_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
         });
         if (!verifyOtp) {
             throw new common_1.BadRequestException('Invalid OTP');
@@ -449,7 +328,7 @@ let AuthService = class AuthService {
             sub: user.id,
             userType: user_type_enum_1.UserType.USER,
             userId: user.id,
-            email: user.email
+            email: user.email,
         };
         const token = await this.tokenService.generateJWTtoken(payload);
         const loginTime = (0, moment_1.default)().format('MMMM Do YYYY, h:mm A');
@@ -458,7 +337,7 @@ let AuthService = class AuthService {
             email: user.email,
             userType: user_type_enum_1.UserType.USER,
             id: user.id,
-            token: token
+            token: token,
         };
     }
     async forgotPassword(input) {
@@ -474,7 +353,7 @@ let AuthService = class AuthService {
         const otpToken = await this.tokenService.generateOTPtoken({
             email: input.email,
             expiry: expiry,
-            subject: token_enum_1.TokenSubject.FORGOT_PASSWORD,
+            subject: client_1.TokenSubject.FORGOT_PASSWORD,
         });
         await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
         return null;
@@ -487,7 +366,7 @@ let AuthService = class AuthService {
         }
         const tokenResult = await this.tokenService.verifyOTP({
             token: token,
-            subject: token_enum_1.TokenSubject.FORGOT_PASSWORD,
+            subject: client_1.TokenSubject.FORGOT_PASSWORD,
             email: email,
         });
         if (!tokenResult) {
@@ -500,7 +379,9 @@ let AuthService = class AuthService {
         if (user.loginType !== login_type_enum_1.LoginType.NORMAL) {
             throw new common_1.BadRequestException('Only normal login type is allowed to reset password');
         }
-        await this.userService.update(user.id, { password: await password_util_1.PasswordUtil.hashPassword(password) });
+        await this.userService.update(user.id, {
+            password: await password_util_1.PasswordUtil.hashPassword(password),
+        });
         return null;
     }
     async changePassword(input, authUser) {
@@ -551,7 +432,6 @@ exports.AuthService = AuthService = __decorate([
         sms_event_service_1.SmsEventService,
         country_service_1.CountryService,
         user_service_1.UserService,
-        client_device_service_1.ClientDeviceService,
-        user_event_service_1.UserEventService])
+        client_device_service_1.ClientDeviceService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

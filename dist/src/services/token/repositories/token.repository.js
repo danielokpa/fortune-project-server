@@ -8,78 +8,124 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenRepository = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
-const token_entity_1 = require("../entities/token.entity");
-const sequelize_2 = require("sequelize");
+const prisma_service_1 = require("../../../prisma/prisma.service");
+const db_error_handler_util_1 = require("../../../utils/db-error-handler.util");
 let TokenRepository = class TokenRepository {
-    tokenModel;
-    constructor(tokenModel) {
-        this.tokenModel = tokenModel;
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async create(tokenData) {
-        const token = await this.tokenModel.create(tokenData, { raw: true, returning: true });
-        return token.toJSON();
+        try {
+            const token = await this.prisma.token.create({
+                data: tokenData,
+            });
+            return token;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByToken(token) {
-        return await this.tokenModel.findOne({
-            where: { token },
-            attributes: ['id', 'expiry', 'email'],
-            raw: true
-        });
+        try {
+            const tokenRecord = await this.prisma.token.findFirst({
+                where: { token },
+            });
+            return tokenRecord;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByPhoneOrEmailToken(token, phoneNo, email) {
-        return await this.tokenModel.findOne({
-            where: { [sequelize_2.Op.or]: [
-                    { email: email },
-                    { phoneNo: phoneNo },
-                    { token: token }
-                ], },
-            attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
-        });
+        try {
+            const tokenRecord = await this.prisma.token.findFirst({
+                where: {
+                    OR: [
+                        { email },
+                        { phoneNo },
+                        { token },
+                    ],
+                },
+            });
+            return tokenRecord;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByEmailToken(token, email) {
-        return await this.tokenModel.findOne({
-            where: { email, token },
-            attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
-        });
+        try {
+            const tokenRecord = await this.prisma.token.findFirst({
+                where: {
+                    email,
+                    token,
+                },
+            });
+            return tokenRecord;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByTokenEmailAndSubject(token, email, subject) {
-        return await this.tokenModel.findOne({
-            where: { email, token, subject },
-            attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
-        });
+        try {
+            const tokenRecord = await this.prisma.token.findFirst({
+                where: {
+                    email,
+                    token,
+                    subject,
+                },
+            });
+            return tokenRecord;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByPhoneToken(token, phoneNo) {
-        return await this.tokenModel.findOne({
-            where: { phoneNo, token },
-            attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
-        });
+        try {
+            const tokenRecord = await this.prisma.token.findFirst({
+                where: {
+                    phoneNo,
+                    token,
+                },
+            });
+            return tokenRecord;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async delete(id) {
-        return await this.tokenModel.destroy({
-            where: { id },
-        });
+        try {
+            await this.prisma.token.delete({
+                where: { id },
+            });
+            return true;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async deleteByToken(token) {
-        return await this.tokenModel.destroy({
-            where: { token },
-        });
+        try {
+            const result = await this.prisma.token.deleteMany({
+                where: { token },
+            });
+            return result.count;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
 };
 exports.TokenRepository = TokenRepository;
 exports.TokenRepository = TokenRepository = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(token_entity_1.Token)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], TokenRepository);
 //# sourceMappingURL=token.repository.js.map

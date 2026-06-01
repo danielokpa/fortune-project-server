@@ -1,5 +1,3 @@
-import { Op } from 'sequelize';
-
 export interface PaginationOptions {
   page?: number;
   limit?: number;
@@ -17,9 +15,7 @@ export interface SearchOptions {
 }
 
 export interface QueryBuilderOptions
-  extends PaginationOptions,
-    DateFilterOptions,
-    SearchOptions {
+  extends PaginationOptions, DateFilterOptions, SearchOptions {
   additionalFilters?: Record<string, any>;
 }
 
@@ -73,8 +69,8 @@ export class QueryBuilderUtil {
 
     return {
       [dateField]: {
-        [Op.gte]: startDate,
-        [Op.lte]: endDate,
+        gte: startDate,
+        lte: endDate,
       },
     };
   }
@@ -90,12 +86,14 @@ export class QueryBuilderUtil {
     }
 
     return {
-      [Op.or]: searchFields.map((field) => ({
+      OR: searchFields.map((field) => ({
         [field]: {
-          [Op.iLike]: `%${search}%`,
+          contains: search,
+          mode: 'insensitive',
         },
       })),
     };
+
   }
 
   /**

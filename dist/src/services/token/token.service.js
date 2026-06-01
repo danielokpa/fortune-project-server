@@ -49,7 +49,7 @@ const jwt_1 = require("@nestjs/jwt");
 const date_fns_1 = require("date-fns");
 const token_repository_1 = require("./repositories/token.repository");
 const randomstring = __importStar(require("randomstring"));
-const token_enum_1 = require("../../enums/token.enum");
+const client_1 = require("@prisma/client");
 let TokenService = class TokenService {
     jwtService;
     tokenRepository;
@@ -63,11 +63,11 @@ let TokenService = class TokenService {
         const { token, email, phoneNo, subject: subject } = input;
         let userToken = null;
         switch (subject) {
-            case token_enum_1.TokenSubject.SIGN_UP_EMAIL:
-                userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+            case client_1.TokenSubject.SIGN_UP_EMAIL:
+                userToken = await this.tokenRepository.findByEmailToken(token, email || '');
                 break;
-            case token_enum_1.TokenSubject.SIGN_UP_PHONE:
-                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+            case client_1.TokenSubject.SIGN_UP_PHONE:
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || '');
                 break;
             default:
                 throw new common_1.BadRequestException('Invalid OTP Subject');
@@ -84,7 +84,7 @@ let TokenService = class TokenService {
     async validatePasswordResetOtp(input) {
         const { token, email, subject } = input;
         let userToken = null;
-        userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+        userToken = await this.tokenRepository.findByEmailToken(token, email || '');
         if (!userToken)
             throw new common_1.BadRequestException('Invalid Password Reset OTP');
         const isExpired = (0, date_fns_1.isAfter)(new Date(), userToken.expiry);
@@ -97,7 +97,7 @@ let TokenService = class TokenService {
     async verifyOTP(input) {
         console.log(input);
         const { token, email, subject: subject } = input;
-        let userToken = await this.tokenRepository.findByTokenEmailAndSubject(token, email || "", subject || token_enum_1.TokenSubject.FORGOT_PASSWORD);
+        let userToken = await this.tokenRepository.findByTokenEmailAndSubject(token, email || '', subject || client_1.TokenSubject.FORGOT_PASSWORD);
         if (!userToken) {
             throw new common_1.BadRequestException('Invalid OTP');
         }
@@ -113,14 +113,14 @@ let TokenService = class TokenService {
         const { token, email, phoneNo, subject: otpSubject } = dto;
         let userToken = null;
         switch (otpSubject) {
-            case token_enum_1.TokenSubject.SIGN_UP_EMAIL:
-                userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+            case client_1.TokenSubject.SIGN_UP_EMAIL:
+                userToken = await this.tokenRepository.findByEmailToken(token, email || '');
                 break;
-            case token_enum_1.TokenSubject.SIGN_UP_PHONE:
-                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+            case client_1.TokenSubject.SIGN_UP_PHONE:
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || '');
                 break;
-            case token_enum_1.TokenSubject.SIGN_UP_PHONE:
-                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+            case client_1.TokenSubject.SIGN_UP_PHONE:
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || '');
                 break;
             default:
                 throw new common_1.BadRequestException('Invalid OTP Subject');
@@ -133,10 +133,13 @@ let TokenService = class TokenService {
     async generateOTPtoken(payload) {
         let token = '';
         if (payload.phoneNo) {
-            token = process.env.NODE_ENV === 'development' ? '123456' : randomstring.generate({
-                length: 6,
-                charset: 'numeric',
-            });
+            token =
+                process.env.NODE_ENV === 'development'
+                    ? '123456'
+                    : randomstring.generate({
+                        length: 6,
+                        charset: 'numeric',
+                    });
         }
         else {
             token = randomstring.generate({
@@ -147,7 +150,7 @@ let TokenService = class TokenService {
         const created = await this.tokenRepository.create({
             ...payload,
             token: token,
-            tokenType: token_enum_1.TokenType.OTP,
+            tokenType: client_1.TokenType.OTP,
         });
         return {
             ...created,

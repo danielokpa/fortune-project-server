@@ -8,54 +8,97 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CountryRepository = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
-const country_entity_1 = require("../entities/country.entity");
+const prisma_service_1 = require("../../../prisma/prisma.service");
+const db_error_handler_util_1 = require("../../../utils/db-error-handler.util");
 let CountryRepository = class CountryRepository {
-    countryModel;
-    constructor(countryModel) {
-        this.countryModel = countryModel;
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async findById(id) {
-        return await this.countryModel.findByPk(id);
+        try {
+            const country = await this.prisma.country.findUnique({
+                where: { id },
+            });
+            return country;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByName(name) {
-        return await this.countryModel.findOne({
-            where: { name },
-        });
+        try {
+            const country = await this.prisma.country.findFirst({
+                where: { name },
+            });
+            return country;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findAll(options) {
-        return await this.countryModel.findAll(options);
+        try {
+            const countries = await this.prisma.country.findMany(options);
+            return countries;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async create(countryData) {
-        return await this.countryModel.create(countryData);
+        try {
+            const country = await this.prisma.country.create({
+                data: countryData,
+            });
+            return country;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async update(id, countryData) {
-        return await this.countryModel.update(countryData, {
-            where: { id },
-            returning: true,
-        });
+        try {
+            const existingCountry = await this.prisma.country.findUnique({
+                where: { id },
+            });
+            if (!existingCountry) {
+                throw new common_1.NotFoundException('Country not found');
+            }
+            const updatedCountry = await this.prisma.country.update({
+                where: { id },
+                data: countryData,
+            });
+            return updatedCountry;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async delete(id) {
-        return await this.countryModel.destroy({
-            where: { id },
-        });
-    }
-    async restore(id) {
-        await this.countryModel.restore({
-            where: { id },
-        });
+        try {
+            const existingCountry = await this.prisma.country.findUnique({
+                where: { id },
+            });
+            if (!existingCountry) {
+                throw new common_1.NotFoundException('Country not found');
+            }
+            await this.prisma.country.delete({
+                where: { id },
+            });
+            return true;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
 };
 exports.CountryRepository = CountryRepository;
 exports.CountryRepository = CountryRepository = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(country_entity_1.Country)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], CountryRepository);
 //# sourceMappingURL=country.repository.js.map

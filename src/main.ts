@@ -15,7 +15,7 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: "*",
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -30,13 +30,13 @@ async function bootstrap() {
   });
 
   // API versioning
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  //   defaultVersion: '1',
+  // });
 
   // Global prefix
-  app.setGlobalPrefix(configService.get<string>('app.apiPrefix') || 'api');
+  // app.setGlobalPrefix(configService.get<string>('app.apiPrefix') || 'api');
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -52,8 +52,8 @@ async function bootstrap() {
   );
 
   // Global API key interceptor
-  const apiKeyInterceptor = app.get(ApiKeyInterceptor);
-  app.useGlobalInterceptors(apiKeyInterceptor);
+  // const apiKeyInterceptor = app.get(ApiKeyInterceptor);
+  // app.useGlobalInterceptors(apiKeyInterceptor);
 
   // Swagger documentation
   if (configService.get<string>('NODE_ENV') !== 'production') {
@@ -78,7 +78,6 @@ async function bootstrap() {
       },
     });
   }
-
 
   // Start server
   const port = configService.get<number>('app.port');

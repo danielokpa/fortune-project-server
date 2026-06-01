@@ -18,27 +18,38 @@ let StateService = class StateService {
         this.stateRepository = stateRepository;
     }
     async findById(id) {
-        return await this.stateRepository.findById(id);
+        const state = await this.stateRepository.findById(id);
+        if (!state) {
+            throw new common_1.NotFoundException('State not found');
+        }
+        return state;
     }
     async findByCountryId(countryId) {
-        const states = await this.stateRepository.findByCountryId(countryId);
-        return states;
+        return this.stateRepository.findByCountryId(countryId);
     }
-    async findAll(options) {
-        const states = await this.stateRepository.findAll(options);
-        return states;
+    async findAll(params) {
+        return this.stateRepository.findAll(params);
     }
     async create(stateData) {
-        return await this.stateRepository.create(stateData);
+        const state = await this.stateRepository.create(stateData);
+        if (!state) {
+            throw new common_1.BadRequestException('Failed to create state');
+        }
+        return state;
     }
     async update(id, stateData) {
-        return await this.stateRepository.update(id, stateData);
+        const updatedState = await this.stateRepository.update(id, stateData);
+        if (!updatedState) {
+            throw new common_1.NotFoundException('State not found for update');
+        }
+        return updatedState;
     }
     async delete(id) {
-        return await this.stateRepository.delete(id);
-    }
-    async restore(id) {
-        await this.stateRepository.restore(id);
+        const deleted = await this.stateRepository.delete(id);
+        if (!deleted) {
+            throw new common_1.BadRequestException('Failed to delete state');
+        }
+        return deleted;
     }
 };
 exports.StateService = StateService;

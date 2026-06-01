@@ -1,13 +1,12 @@
-import { State } from '../entities/state.entity';
+import { Prisma, State } from '@prisma/client';
 import { StateRepository } from '../repositories/state.repository';
 export declare class StateService {
     private readonly stateRepository;
     constructor(stateRepository: StateRepository);
-    findById(id: string): Promise<State | null>;
+    findById(id: string): Promise<State>;
     findByCountryId(countryId: string): Promise<State[]>;
-    findAll(options?: any): Promise<State[]>;
-    create(stateData: Partial<State>): Promise<State>;
-    update(id: string, stateData: Partial<State>): Promise<[number, State[]]>;
-    delete(id: string): Promise<number>;
-    restore(id: string): Promise<void>;
+    findAll(params?: Prisma.StateFindManyArgs): Promise<State[]>;
+    create(stateData: Prisma.StateCreateInput): Promise<State>;
+    update(id: string, stateData: Prisma.StateUpdateInput): Promise<State>;
+    delete(id: string): Promise<boolean>;
 }

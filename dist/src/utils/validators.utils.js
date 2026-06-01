@@ -10,8 +10,8 @@ class Validators {
         }
         email = email.toLowerCase();
         const invalidEmailDomains = ['mailinator.com'];
-        const emailDomain = email.split("@")[1];
-        invalidEmailDomains.forEach(domain => {
+        const emailDomain = email.split('@')[1];
+        invalidEmailDomains.forEach((domain) => {
             if (domain == emailDomain) {
                 throw new common_1.BadRequestException('Invalid email domain');
             }
@@ -20,9 +20,9 @@ class Validators {
     }
     static getLoginIdentity(identity) {
         if (!identity) {
-            throw new common_1.BadRequestException("Invalid identity");
+            throw new common_1.BadRequestException('Invalid identity');
         }
-        if (identity.includes("@")) {
+        if (identity.includes('@')) {
             return enums_1.UserLoginIdentityType.EMAIL;
         }
         return enums_1.UserLoginIdentityType.PHONE_NO;

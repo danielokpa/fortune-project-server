@@ -1,11 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlpha, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  IsAlpha,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { min } from 'date-fns';
-import { NotNull } from 'sequelize-typescript';
 import { GENDER } from 'src/enums/gender.enum';
 import { LoginType } from 'src/enums/login-type.enum';
-import { TokenSubject } from 'src/enums/token.enum';
-
+import { TokenSubject } from '@prisma/client';
 
 export class SignUpUserDto {
   // @ApiProperty({
@@ -39,9 +48,9 @@ export class SignUpUserDto {
   @MaxLength(15)
   phoneNo: string;
 
-  @IsString()
-  @MaxLength(6)
-  otpPhone: string;
+  // @IsString()
+  // @MaxLength(6)
+  // otpPhone: string;
 
   @IsString()
   @MaxLength(6)
@@ -63,64 +72,10 @@ export class SignUpUserDto {
   @MinLength(4)
   @MaxLength(150)
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
-  
-  @ApiProperty({
-    description: 'Referal code',
-    example: '123456',
-  })
-  @IsString()
-  @IsOptional()
-  @MaxLength(10)
-  readonly referralCode: string;
-}
-
-export class SignUpSocialUserDto {
-  @ApiProperty({
-    description: 'Login type',
-    example: 'NORMAL',
-  })
-  @IsEnum(LoginType)
-  readonly loginType: LoginType;
-
-  @ApiProperty({
-    description: 'User email address',
-    example: 'user@example.com',
-  })
-  @IsEmail()
-  @MaxLength(320)
-  email: string;
-
-  @ApiProperty({
-    description: 'User password',
-    example: 'password123',
-  })
-  @IsString()
-  @MinLength(5000)
-  password: string;
-
-  @ApiProperty({
-    description: 'User Phone No',
-    example: '+234 8100000000',
-  })
-  @IsString()
-  @MaxLength(15)
-  phoneNo: string;
-
-  @IsString()
-  @MaxLength(6)
-  otpPhone: string;
-
-
-  @ApiProperty({
-    description: 'Country',
-    example: 'Country',
-  })
-  @IsString()
-  @IsUUID()
-  country: string;
 
   @ApiProperty({
     description: 'User full name',
@@ -129,20 +84,86 @@ export class SignUpSocialUserDto {
   @IsString()
   @MinLength(4)
   @MaxLength(150)
-  @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+  @Matches(/^[A-Za-z0-9_.-]+$/, {
+    message: 'Username can only contain letters, numbers, underscores, dots, and hyphens',
   })
-  readonly fullName: string;
-  
-  @ApiProperty({
-    description: 'Referal code',
-    example: '123456',
-  })
-  @IsString()
-  @IsOptional()
-  @MaxLength(10)
-  readonly referalCode: string;
+  readonly username: string;
+
+  // @ApiProperty({
+  //   description: 'Referal code',
+  //   example: '123456',
+  // })
+  // @IsString()
+  // @IsOptional()
+  // @MaxLength(10)
+  // readonly referralCode: string;
 }
+
+// export class SignUpSocialUserDto {
+//   @ApiProperty({
+//     description: 'Login type',
+//     example: 'NORMAL',
+//   })
+//   @IsEnum(LoginType)
+//   readonly loginType: LoginType;
+
+//   @ApiProperty({
+//     description: 'User email address',
+//     example: 'user@example.com',
+//   })
+//   @IsEmail()
+//   @MaxLength(320)
+//   email: string;
+
+//   @ApiProperty({
+//     description: 'User password',
+//     example: 'password123',
+//   })
+//   @IsString()
+//   @MinLength(5000)
+//   password: string;
+
+//   @ApiProperty({
+//     description: 'User Phone No',
+//     example: '+234 8100000000',
+//   })
+//   @IsString()
+//   @MaxLength(15)
+//   phoneNo: string;
+
+//   @IsString()
+//   @MaxLength(6)
+//   otpPhone: string;
+
+//   @ApiProperty({
+//     description: 'Country',
+//     example: 'Country',
+//   })
+//   @IsString()
+//   @IsUUID()
+//   country: string;
+
+//   @ApiProperty({
+//     description: 'User full name',
+//     example: 'John Doe',
+//   })
+//   @IsString()
+//   @MinLength(4)
+//   @MaxLength(150)
+//   @Matches(/^[A-Za-z _'-]+$/, {
+//     message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+//   })
+//   readonly fullName: string;
+
+//   @ApiProperty({
+//     description: 'Referal code',
+//     example: '123456',
+//   })
+//   @IsString()
+//   @IsOptional()
+//   @MaxLength(10)
+//   readonly referalCode: string;
+// }
 
 export class LoginUserDto {
   @ApiProperty({
@@ -172,32 +193,31 @@ export class LoginUserDto {
   // readonly loginType: LoginType;
 }
 
-export class LoginUserSocialDto {
-  @ApiProperty({
-    description: 'User email address or phone number',
-    example: 'user@example.com or 08100000000',
-  })
-  @IsString()
-  @MinLength(4)
-  @MaxLength(100)
-  readonly identity: string;
+// export class LoginUserSocialDto {
+//   @ApiProperty({
+//     description: 'User email address or phone number',
+//     example: 'user@example.com or 08100000000',
+//   })
+//   @IsString()
+//   @MinLength(4)
+//   @MaxLength(100)
+//   readonly identity: string;
 
+//   @ApiProperty({
+//     description: 'Login type',
+//     example: 'NORMAL',
+//   })
+//   @IsString()
+//   readonly loginType: LoginType;
 
-  @ApiProperty({
-    description: 'Login type',
-    example: 'NORMAL',
-  })
-  @IsString()
-  readonly loginType: LoginType;
-
-  @ApiProperty({
-    description: 'User password',
-    example: 'password123',
-  })
-  @IsString()
-  @MinLength(5000)
-  readonly password: string;
-}
+//   @ApiProperty({
+//     description: 'User password',
+//     example: 'password123',
+//   })
+//   @IsString()
+//   @MinLength(5000)
+//   readonly password: string;
+// }
 
 export class LoginOtpDto {
   @ApiProperty({
@@ -231,7 +251,6 @@ export class LoginOtpDto {
 
   @IsOptional()
   readonly country: string;
-
 }
 
 export class ForgotPasswordDto {
@@ -359,17 +378,17 @@ export class VerifyOtpDto {
 }
 
 export class SignUserDto {
-
   @ApiProperty({
     description: 'User Name',
     example: 'John Doe',
   })
   @IsString()
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
-  
+
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',

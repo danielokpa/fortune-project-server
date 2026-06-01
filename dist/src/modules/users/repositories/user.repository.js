@@ -1,184 +1,215 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRepository = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
-const user_entity_1 = require("../entities/user.entity");
-const sequelize_2 = require("sequelize");
-const entities_1 = require("../../countries/entities");
-const randomstring = __importStar(require("randomstring"));
+const prisma_service_1 = require("../../../prisma/prisma.service");
+const db_error_handler_util_1 = require("../../../utils/db-error-handler.util");
 let UserRepository = class UserRepository {
-    userModel;
-    constructor(userModel) {
-        this.userModel = userModel;
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async findByIdentity(identity) {
-        return await this.userModel.findOne({
-            where: {
-                [sequelize_2.Op.or]: [
-                    { email: identity },
-                    { phoneNo: identity },
-                ],
-            },
-            raw: true
-        });
-    }
-    async findById(id) {
-        return await this.userModel.findByPk(id, { raw: true });
-    }
-    async fetchUser(id) {
-        let user = await this.userModel.findByPk(id, {
-            attributes: {
-                exclude: ['password', 'deletedAt', 'isDisabled'],
-            },
-            include: [
-                {
-                    model: entities_1.Country
-                },
-            ],
-        });
-        user = user ? user.toJSON() : null;
-        if (user) {
-            if (user.referalCode == null) {
-                const event = {
-                    userId: user.id,
-                };
-                const referalCode = await this.processGenerateReferalCode(event);
-                if (referalCode) {
-                    user.referalCode = referalCode;
-                }
-            }
-        }
-        return user;
-    }
-    async processGenerateReferalCode(event) {
         try {
-            let referalCode;
-            referalCode = randomstring.generate({
-                length: 10,
-                charset: 'alphanumeric',
+            const user = await this.prisma.user.findFirst({
+                where: {
+                    OR: [
+                        { email: identity },
+                        { username: identity },
+                        { phoneNo: identity },
+                    ],
+                },
             });
-            await this.update(event.userId, { referalCode });
-            return referalCode;
+            return user;
         }
         catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
+    }
+    async findById(id) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id },
+            });
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
+    }
+    async fetchUser(id) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id },
+                include: {
+                    country: true,
+                },
+                omit: {
+                    password: true,
+                },
+            });
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
         }
     }
     async fetchAndUpdateUser(id, data) {
-        const user = await this.userModel.update(data, {
-            where: { id },
-            returning: true,
-        });
-        const updatedUser = await this.userModel.findByPk(id, { raw: true });
-        return updatedUser ? updatedUser.toJSON() : null;
+        try {
+            const existingUser = await this.prisma.user.findUnique({
+                where: { id },
+            });
+            if (!existingUser) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            const updatedUser = await this.prisma.user.update({
+                where: { id },
+                data,
+            });
+            return updatedUser;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByEmail(email) {
-        const user = await this.userModel.findOne({
-            where: { email },
-        });
-        return user ? user.toJSON() : null;
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { email },
+            });
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
+    }
+    async findByUsername(username) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { username },
+            });
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByPhone(phoneNo) {
-        const user = await this.userModel.findOne({
-            where: { phoneNo }
-        });
-        return user ? user.toJSON() : null;
-    }
-    async findByReferalCode(referalCode, excludeUserId) {
-        const where = { referalCode };
-        if (excludeUserId) {
-            where.id = { [sequelize_2.Op.ne]: excludeUserId };
+        try {
+            const user = await this.prisma.user.findFirst({
+                where: { phoneNo },
+            });
+            return user;
         }
-        const user = await this.userModel.findOne({
-            where
-        });
-        return user ? user.toJSON() : null;
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByEmailAndRole(email, userType) {
-        return await this.userModel.findOne({
-            where: { email, userType },
-            raw: true
-        });
+        try {
+            const user = await this.prisma.user.findFirst({
+                where: {
+                    email,
+                    userType,
+                },
+            });
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async create(userData) {
-        const user = await this.userModel.create(userData, { raw: true, returning: true });
-        return user.toJSON();
+        try {
+            const user = await this.prisma.user.create({
+                data: userData,
+            });
+            if (!user) {
+                throw new common_1.InternalServerErrorException('Failed to create user');
+            }
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async update(id, userData) {
-        return await this.userModel.update(userData, {
-            where: { id },
-            returning: true,
-        });
+        try {
+            const existingUser = await this.prisma.user.findUnique({
+                where: { id },
+            });
+            if (!existingUser) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            const updatedUser = await this.prisma.user.update({
+                where: { id },
+                data: userData,
+            });
+            return updatedUser;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async delete(id) {
-        return await this.userModel.destroy({
-            where: { id },
-        });
-    }
-    async restore(id) {
-        await this.userModel.restore({
-            where: { id },
-        });
+        try {
+            const existingUser = await this.prisma.user.findUnique({
+                where: { id },
+            });
+            if (!existingUser) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            await this.prisma.user.delete({
+                where: { id },
+            });
+            return true;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findWithCountry(email, userType) {
-        return await this.userModel.findOne({
-            where: { email, userType },
-            include: ['country'],
-        });
+        try {
+            const user = await this.prisma.user.findFirst({
+                where: {
+                    email,
+                    userType,
+                },
+                include: {
+                    country: true,
+                },
+            });
+            return user;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
-    async findAll(options) {
-        return await this.userModel.findAll(options);
+    async findAll(params) {
+        try {
+            const users = await this.prisma.user.findMany(params);
+            if (!users) {
+                throw new common_1.NotFoundException('Users not found');
+            }
+            return users;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
 };
 exports.UserRepository = UserRepository;
 exports.UserRepository = UserRepository = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(user_entity_1.User)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], UserRepository);
 //# sourceMappingURL=user.repository.js.map

@@ -1,76 +1,138 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Model } from 'sequelize-typescript';
-import { Token } from '../entities/token.entity';
-import { Op } from 'sequelize';
-import { TokenSubject } from 'src/enums/token.enum';
+import { Token, Prisma, TokenSubject } from '@prisma/client';
+import { PrismaService } from '../../../prisma/prisma.service';
+// import { TokenSubject } from 'src/enums/token.enum';
+import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 
 @Injectable()
 export class TokenRepository {
+  constructor(private readonly prisma: PrismaService) {}
 
-  constructor(
-    @InjectModel(Token)
-    private tokenModel: typeof Token,
-  ) {}
+  async create(
+    tokenData: Prisma.TokenCreateInput,
+  ): Promise<Token> {
+    try {
+      const token = await this.prisma.token.create({
+        data: tokenData,
+      });
 
-  async create(tokenData: Partial<Token>): Promise<Token> {
-    const token = await this.tokenModel.create(tokenData as any, {raw: true, returning: true});
-    return token.toJSON() as Token;
+      return token;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
   async findByToken(token: string): Promise<Token | null> {
-    return await this.tokenModel.findOne({
-      where: { token },
-      attributes: ['id', 'expiry', 'email'],
-      raw: true
-    });
+    try {
+      const tokenRecord = await this.prisma.token.findFirst({
+        where: { token },
+      });
+
+      return tokenRecord;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async findByPhoneOrEmailToken(token: string, phoneNo: string, email: string): Promise<Token | null> {
-    return await this.tokenModel.findOne({
-      where: { [Op.or]: [
-        { email: email },
-        { phoneNo: phoneNo },
-        { token: token }
-        ], },
-      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
-    });
+  async findByPhoneOrEmailToken(
+    token: string,
+    phoneNo: string,
+    email: string,
+  ): Promise<Token | null> {
+    try {
+      const tokenRecord = await this.prisma.token.findFirst({
+        where: {
+          OR: [
+            { email },
+            { phoneNo },
+            { token },
+          ],
+        },
+      });
+
+      return tokenRecord;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async findByEmailToken(token: string, email: string): Promise<Token | null> {
-    return await this.tokenModel.findOne({
-      where: { email, token },
-      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
-    });
+  async findByEmailToken(
+    token: string,
+    email: string,
+  ): Promise<Token | null> {
+    try {
+      const tokenRecord = await this.prisma.token.findFirst({
+        where: {
+          email,
+          token,
+        },
+      });
+
+      return tokenRecord;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async findByTokenEmailAndSubject(token: string, email: string, subject: TokenSubject): Promise<Token | null> {
-    return await this.tokenModel.findOne({
-      where: { email, token, subject },
-      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
-    });
+  async findByTokenEmailAndSubject(
+    token: string,
+    email: string,
+    subject: TokenSubject,
+  ): Promise<Token | null> {
+    try {
+      const tokenRecord = await this.prisma.token.findFirst({
+        where: {
+          email,
+          token,
+          subject,
+        },
+      });
+
+      return tokenRecord;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async findByPhoneToken(token: string, phoneNo: string): Promise<Token | null> {
-    return await this.tokenModel.findOne({
-      where: { phoneNo, token },
-      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
-    });
+  async findByPhoneToken(
+    token: string,
+    phoneNo: string,
+  ): Promise<Token | null> {
+    try {
+      const tokenRecord = await this.prisma.token.findFirst({
+        where: {
+          phoneNo,
+          token,
+        },
+      });
+
+      return tokenRecord;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async delete(id: string): Promise<number> {
-    return await this.tokenModel.destroy({
-      where: { id },
-    });
+  async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.token.delete({
+        where: { id },
+      });
+
+      return true;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
   async deleteByToken(token: string): Promise<number> {
-    return await this.tokenModel.destroy({
-      where: { token },
-    });
+    try {
+      const result = await this.prisma.token.deleteMany({
+        where: { token },
+      });
+
+      return result.count;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 }

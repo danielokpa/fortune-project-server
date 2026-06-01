@@ -1,4 +1,4 @@
-import { UserType } from "src/enums";
+import { UserType } from 'src/enums';
 
 export interface JwtAuthPayload {
   sub: string;

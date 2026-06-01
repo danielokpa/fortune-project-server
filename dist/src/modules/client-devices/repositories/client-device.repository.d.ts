@@ -1,22 +1,19 @@
-import { ClientDevice } from '../entities/client-device.entity';
+import { ClientDevice, Prisma } from '@prisma/client';
+import { PrismaService } from '../../../prisma/prisma.service';
 export declare class ClientDeviceRepository {
-    private clientDeviceModel;
-    constructor(clientDeviceModel: typeof ClientDevice);
+    private readonly prisma;
+    constructor(prisma: PrismaService);
     findById(id: string): Promise<ClientDevice | null>;
     findByUserId(userId: string): Promise<ClientDevice[]>;
-    findByDriverId(driverId: string): Promise<ClientDevice[]>;
     findWithFcmByUserId(userId: string): Promise<ClientDevice[]>;
-    findWithFcmByDriverId(driverId: string): Promise<ClientDevice[]>;
     findByIpAddress(ipAddress: string): Promise<ClientDevice[]>;
     findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null>;
-    findAll(options?: any): Promise<ClientDevice[]>;
+    findAll(params?: Prisma.ClientDeviceFindManyArgs): Promise<ClientDevice[]>;
     findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
-    create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice>;
-    update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]>;
-    delete(id: string): Promise<number>;
-    deleteAll(driverId: string): Promise<number>;
-    restore(id: string): Promise<void>;
+    create(deviceData: Prisma.ClientDeviceUncheckedCreateInput): Promise<ClientDevice>;
+    update(id: string, deviceData: Prisma.ClientDeviceUpdateInput): Promise<ClientDevice>;
+    delete(id: string): Promise<boolean>;
+    deleteAllByUserId(userId: string): Promise<number>;
     findByUserAndDevice(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
-    findByDriverAndDevice(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
-    updateOrCreateDevice(deviceData: Partial<ClientDevice>): Promise<ClientDevice>;
+    updateOrCreateDevice(deviceData: Prisma.ClientDeviceUncheckedCreateInput): Promise<ClientDevice>;
 }

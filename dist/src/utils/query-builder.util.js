@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryBuilderUtil = void 0;
-const sequelize_1 = require("sequelize");
 class QueryBuilderUtil {
     static buildPagination(options) {
         const { page = 1, limit = 10 } = options;
@@ -40,8 +39,8 @@ class QueryBuilderUtil {
         }
         return {
             [dateField]: {
-                [sequelize_1.Op.gte]: startDate,
-                [sequelize_1.Op.lte]: endDate,
+                gte: startDate,
+                lte: endDate,
             },
         };
     }
@@ -51,9 +50,10 @@ class QueryBuilderUtil {
             return {};
         }
         return {
-            [sequelize_1.Op.or]: searchFields.map((field) => ({
+            OR: searchFields.map((field) => ({
                 [field]: {
-                    [sequelize_1.Op.iLike]: `%${search}%`,
+                    contains: search,
+                    mode: 'insensitive',
                 },
             })),
         };

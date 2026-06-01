@@ -1,22 +1,20 @@
-import { User } from '../entities/user.entity';
-import { UserType } from '../../../enums/user-type.enum';
-import type { GenerateReferalCodeEvent } from '../events/user.events';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { User, Prisma } from '@prisma/client';
+import { UserType } from "../../../enums";
 export declare class UserRepository {
-    private userModel;
-    constructor(userModel: typeof User);
+    private readonly prisma;
+    constructor(prisma: PrismaService);
     findByIdentity(identity: string): Promise<User | null>;
     findById(id: string): Promise<User | null>;
-    fetchUser(id: string): Promise<User | null>;
-    processGenerateReferalCode(event: GenerateReferalCodeEvent): Promise<string | undefined>;
-    fetchAndUpdateUser(id: string, data: Partial<User>): Promise<User | null>;
+    fetchUser(id: string): Promise<Partial<User> | null>;
+    fetchAndUpdateUser(id: string, data: Prisma.UserUpdateInput): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
+    findByUsername(username: string): Promise<User | null>;
     findByPhone(phoneNo: string): Promise<User | null>;
-    findByReferalCode(referalCode: string, excludeUserId?: string): Promise<User | null>;
     findByEmailAndRole(email: string, userType: UserType): Promise<User | null>;
-    create(userData: Partial<User>): Promise<User>;
-    update(id: string, userData: Partial<User>): Promise<[number, User[]]>;
-    delete(id: string): Promise<number>;
-    restore(id: string): Promise<void>;
+    create(userData: Prisma.UserUncheckedCreateInput): Promise<User>;
+    update(id: string, userData: Prisma.UserUpdateInput): Promise<User>;
+    delete(id: string): Promise<boolean>;
     findWithCountry(email: string, userType: UserType): Promise<User | null>;
-    findAll(options?: any): Promise<User[]>;
+    findAll(params?: Prisma.UserFindManyArgs): Promise<User[]>;
 }

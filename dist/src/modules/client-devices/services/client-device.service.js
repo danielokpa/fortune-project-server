@@ -18,22 +18,22 @@ let ClientDeviceService = class ClientDeviceService {
         this.clientDeviceRepository = clientDeviceRepository;
     }
     async findById(id) {
-        return await this.clientDeviceRepository.findById(id);
+        const data = await this.clientDeviceRepository.findById(id);
+        if (!data)
+            throw new common_1.NotFoundException('Device token not found');
+        return data;
     }
     async findByUserId(userId) {
         const devices = await this.clientDeviceRepository.findByUserId(userId);
         return devices;
     }
-    async findByDriverId(driverId) {
-        return await this.clientDeviceRepository.findByDriverId(driverId);
-    }
     async getFcmTokensForUserId(userId) {
         const rows = await this.clientDeviceRepository.findWithFcmByUserId(userId);
-        return [...new Set(rows.map((d) => d.deviceFCMToken).filter((t) => Boolean(t)))];
-    }
-    async getFcmTokensForDriverId(driverId) {
-        const rows = await this.clientDeviceRepository.findWithFcmByDriverId(driverId);
-        return [...new Set(rows.map((d) => d.deviceFCMToken).filter((t) => Boolean(t)))];
+        return [
+            ...new Set(rows
+                .map((d) => d.deviceFCMToken)
+                .filter((t) => Boolean(t))),
+        ];
     }
     async findByIpAddress(ipAddress) {
         const devices = await this.clientDeviceRepository.findByIpAddress(ipAddress);
@@ -42,37 +42,31 @@ let ClientDeviceService = class ClientDeviceService {
     async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
         return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
     }
-    async findByDriverIdAndDeviceToken(driverId, deviceFCMToken) {
-        return await this.clientDeviceRepository.findByDriverAndDevice(driverId, deviceFCMToken);
-    }
     async findAll(options) {
         const devices = await this.clientDeviceRepository.findAll(options);
         return devices;
     }
     async create(clientDeviceData) {
-        return await this.clientDeviceRepository.create(clientDeviceData);
-    }
-    async update(id, clientDeviceData) {
-        return await this.clientDeviceRepository.update(id, clientDeviceData);
+        const data = await this.clientDeviceRepository.create(clientDeviceData);
+        if (!data)
+            throw new common_1.BadRequestException('Failed to create device token');
+        return data;
     }
     async delete(id) {
         return await this.clientDeviceRepository.delete(id);
-    }
-    async restore(id) {
-        await this.clientDeviceRepository.restore(id);
     }
     async registerDevice(deviceData) {
         const device = await this.clientDeviceRepository.updateOrCreateDevice(deviceData);
         return device;
     }
     async updateDeviceToken(clientDeviceId, deviceFCMToken) {
-        const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(clientDeviceId, {
+        const updatedDevice = await this.clientDeviceRepository.update(clientDeviceId, {
             deviceFCMToken,
         });
-        if (affectedCount === 0) {
+        if (!updatedDevice) {
             throw new common_1.NotFoundException('Device not found!');
         }
-        return updatedDevices[0];
+        return updatedDevice;
     }
 };
 exports.ClientDeviceService = ClientDeviceService;

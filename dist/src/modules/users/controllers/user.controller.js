@@ -18,8 +18,6 @@ const swagger_1 = require("@nestjs/swagger");
 const user_service_1 = require("../services/user.service");
 const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_guard_1 = require("../../auth/guards/roles.guard");
-const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
-const user_type_enum_1 = require("../../../enums/user-type.enum");
 const response_utils_1 = require("../../../utils/response.utils");
 const validators_utils_1 = require("../../../utils/validators.utils");
 const user_dto_1 = require("../dto/user.dto");
@@ -32,16 +30,6 @@ let UserController = class UserController {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
         const data = await this.userService.fetchUser(userId);
         return response_utils_1.ResponseUtil.handleResponse(data, 'User info retrieved successfully', common_1.HttpStatus.OK);
-    }
-    async dashboard(req, userData) {
-        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
-        const ipAddress = req.ip;
-        const data = await this.userService.dashboard({
-            deviceFCMToken: userData.deviceFCMToken,
-            ipAddress: ipAddress || '',
-            name: userData.name || '',
-        }, userId);
-        return response_utils_1.ResponseUtil.handleResponse(data, 'User dashboard data retrieved successfully', common_1.HttpStatus.OK);
     }
     async updateImageUrl(req, updateImageUrlDto) {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
@@ -66,18 +54,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "fetchuser", null);
-__decorate([
-    (0, common_1.Post)('dashboard'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.USER),
-    (0, swagger_1.ApiOperation)({ summary: 'Dashboard user' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'User updated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
-    __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, user_dto_1.DashboardDto]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "dashboard", null);
 __decorate([
     (0, common_1.Put)('profile-image'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

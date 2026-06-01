@@ -19,6 +19,7 @@ const auth_dto_1 = require("../dto/auth.dto");
 const auth_decorator_1 = require("../decorators/auth.decorator");
 const auth_guard_1 = require("../guards/auth.guard");
 const swagger_1 = require("@nestjs/swagger");
+const validators_utils_1 = require("../../../utils/validators.utils");
 const response_utils_1 = require("../../../utils/response.utils");
 let AuthController = class AuthController {
     authService;
@@ -45,14 +46,6 @@ let AuthController = class AuthController {
         const data = await this.authService.signUp(input);
         return response_utils_1.ResponseUtil.handleResponse(data, 'User created successfully', common_1.HttpStatus.CREATED);
     }
-    async signUpGoogle(input) {
-        const data = await this.authService.signUpSocial(input);
-        return response_utils_1.ResponseUtil.handleResponse(data, 'User created successfully', common_1.HttpStatus.CREATED);
-    }
-    async loginSocial(input) {
-        const data = await this.authService.loginSocial(input);
-        return response_utils_1.ResponseUtil.handleResponse(data, 'Login Successful', common_1.HttpStatus.OK);
-    }
     async login(input) {
         const data = await this.authService.login(input);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Login Successful', common_1.HttpStatus.OK);
@@ -74,8 +67,10 @@ let AuthController = class AuthController {
         return response_utils_1.ResponseUtil.handleResponse(data, 'Password changed successfully', common_1.HttpStatus.OK);
     }
     async logout(input, req) {
-        const data = await this.authService.logout(input, req.user);
-        return response_utils_1.ResponseUtil.handleResponse(data, 'Password changed successfully', common_1.HttpStatus.OK);
+        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        console.log('User id: ', userId);
+        const data = await this.authService.logout(input, userId);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'User logged out successfully', common_1.HttpStatus.OK);
     }
     async deleteUserAccount(reqBody) {
         const { identity, password } = reqBody;
@@ -124,22 +119,6 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.SignUpUserDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signUp", null);
-__decorate([
-    (0, common_1.Post)('sign-up-social'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_dto_1.SignUpSocialUserDto]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "signUpGoogle", null);
-__decorate([
-    (0, common_1.Post)('login-social'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_dto_1.LoginUserSocialDto]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "loginSocial", null);
 __decorate([
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -203,7 +182,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user account' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Driver account deleted successfully'
+        description: 'Driver account deleted successfully',
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
     __param(0, (0, common_1.Body)()),

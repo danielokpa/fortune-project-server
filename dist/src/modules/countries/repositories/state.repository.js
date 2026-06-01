@@ -8,55 +8,100 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StateRepository = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
-const state_entity_1 = require("../entities/state.entity");
+const prisma_service_1 = require("../../../prisma/prisma.service");
+const db_error_handler_util_1 = require("../../../utils/db-error-handler.util");
 let StateRepository = class StateRepository {
-    stateModel;
-    constructor(stateModel) {
-        this.stateModel = stateModel;
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async findById(id) {
-        return await this.stateModel.findByPk(id);
+        try {
+            const state = await this.prisma.state.findUnique({
+                where: { id },
+            });
+            return state;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByCountryId(countryId) {
-        return await this.stateModel.findAll({
-            where: { countryId },
-            order: [['name', 'ASC']],
-        });
+        try {
+            const states = await this.prisma.state.findMany({
+                where: { countryId },
+                orderBy: {
+                    name: 'asc',
+                }
+            });
+            return states;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findAll(options) {
-        return await this.stateModel.findAll(options);
+        try {
+            const states = await this.prisma.state.findMany(options);
+            return states;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async create(stateData) {
-        return await this.stateModel.create(stateData);
+        try {
+            const state = await this.prisma.state.create({
+                data: stateData,
+            });
+            return state;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async update(id, stateData) {
-        return await this.stateModel.update(stateData, {
-            where: { id },
-            returning: true,
-        });
+        try {
+            const existingState = await this.prisma.state.findUnique({
+                where: { id },
+            });
+            if (!existingState) {
+                throw new common_1.NotFoundException('State not found');
+            }
+            const updatedState = await this.prisma.state.update({
+                where: { id },
+                data: stateData,
+            });
+            return updatedState;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async delete(id) {
-        return await this.stateModel.destroy({
-            where: { id },
-        });
-    }
-    async restore(id) {
-        await this.stateModel.restore({
-            where: { id },
-        });
+        try {
+            const existingState = await this.prisma.state.findUnique({
+                where: { id },
+            });
+            if (!existingState) {
+                throw new common_1.NotFoundException('State not found');
+            }
+            await this.prisma.state.delete({
+                where: { id },
+            });
+            return true;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
 };
 exports.StateRepository = StateRepository;
 exports.StateRepository = StateRepository = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(state_entity_1.State)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], StateRepository);
 //# sourceMappingURL=state.repository.js.map

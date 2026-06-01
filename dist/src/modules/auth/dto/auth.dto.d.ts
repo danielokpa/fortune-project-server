@@ -1,34 +1,17 @@
-import { LoginType } from 'src/enums/login-type.enum';
-import { TokenSubject } from 'src/enums/token.enum';
+import { TokenSubject } from '@prisma/client';
 export declare class SignUpUserDto {
     email: string;
     password: string;
     phoneNo: string;
-    otpPhone: string;
     otpEmail: string;
     country: string;
     readonly fullName: string;
-    readonly referralCode: string;
-}
-export declare class SignUpSocialUserDto {
-    readonly loginType: LoginType;
-    email: string;
-    password: string;
-    phoneNo: string;
-    otpPhone: string;
-    country: string;
-    readonly fullName: string;
-    readonly referalCode: string;
+    readonly username: string;
 }
 export declare class LoginUserDto {
     readonly identity: string;
     readonly password: string;
     country?: string;
-}
-export declare class LoginUserSocialDto {
-    readonly identity: string;
-    readonly loginType: LoginType;
-    readonly password: string;
 }
 export declare class LoginOtpDto {
     readonly identity: string;

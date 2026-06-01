@@ -8,137 +8,205 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientDeviceRepository = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
-const sequelize_2 = require("sequelize");
-const client_device_entity_1 = require("../entities/client-device.entity");
+const prisma_service_1 = require("../../../prisma/prisma.service");
+const db_error_handler_util_1 = require("../../../utils/db-error-handler.util");
 let ClientDeviceRepository = class ClientDeviceRepository {
-    clientDeviceModel;
-    constructor(clientDeviceModel) {
-        this.clientDeviceModel = clientDeviceModel;
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async findById(id) {
-        return await this.clientDeviceModel.findByPk(id);
+        try {
+            const device = await this.prisma.clientDevice.findUnique({
+                where: { id },
+            });
+            return device;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByUserId(userId) {
-        return await this.clientDeviceModel.findAll({
-            where: { userId },
-        });
-    }
-    async findByDriverId(driverId) {
-        return await this.clientDeviceModel.findAll({
-            where: { driverId },
-        });
+        try {
+            const devices = await this.prisma.clientDevice.findMany({
+                where: { userId },
+            });
+            return devices;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findWithFcmByUserId(userId) {
-        return await this.clientDeviceModel.findAll({
-            where: {
-                userId,
-                deviceFCMToken: { [sequelize_2.Op.ne]: null },
-            },
-        });
-    }
-    async findWithFcmByDriverId(driverId) {
-        return await this.clientDeviceModel.findAll({
-            where: {
-                driverId,
-                deviceFCMToken: { [sequelize_2.Op.ne]: null },
-            },
-        });
+        try {
+            const devices = await this.prisma.clientDevice.findMany({
+                where: {
+                    userId,
+                    NOT: {
+                        deviceFCMToken: null,
+                    },
+                },
+            });
+            return devices;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByIpAddress(ipAddress) {
-        return await this.clientDeviceModel.findAll({
-            where: { ipAddress },
-        });
+        try {
+            const devices = await this.prisma.clientDevice.findMany({
+                where: { ipAddress },
+            });
+            return devices;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByDeviceToken(deviceFCMToken) {
-        return await this.clientDeviceModel.findOne({
-            where: { deviceFCMToken },
-        });
+        try {
+            const device = await this.prisma.clientDevice.findFirst({
+                where: { deviceFCMToken },
+            });
+            return device;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
-    async findAll(options) {
-        return await this.clientDeviceModel.findAll(options);
+    async findAll(params) {
+        try {
+            const devices = await this.prisma.clientDevice.findMany(params);
+            return devices;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
-        const data = await this.clientDeviceModel.findOne({
-            where: { userId, deviceFCMToken },
-        });
-        return data ? data.toJSON() : null;
+        try {
+            const device = await this.prisma.clientDevice.findFirst({
+                where: {
+                    userId,
+                    deviceFCMToken,
+                },
+            });
+            return device;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
-    async create(clientDeviceData) {
-        return await this.clientDeviceModel.create(clientDeviceData);
+    async create(deviceData) {
+        try {
+            const device = await this.prisma.clientDevice.create({
+                data: deviceData,
+            });
+            if (!device) {
+                throw new common_1.BadRequestException('Failed to create device');
+            }
+            return device;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
-    async update(id, clientDeviceData) {
-        return await this.clientDeviceModel.update(clientDeviceData, {
-            where: { id },
-            returning: true,
-        });
+    async update(id, deviceData) {
+        try {
+            const existingDevice = await this.prisma.clientDevice.findUnique({
+                where: { id },
+            });
+            if (!existingDevice) {
+                throw new common_1.NotFoundException('Device not found');
+            }
+            const updatedDevice = await this.prisma.clientDevice.update({
+                where: { id },
+                data: deviceData,
+            });
+            return updatedDevice;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async delete(id) {
-        return await this.clientDeviceModel.destroy({
-            where: { id },
-        });
+        try {
+            const existingDevice = await this.prisma.clientDevice.findUnique({
+                where: { id },
+            });
+            if (!existingDevice) {
+                throw new common_1.NotFoundException('Device not found');
+            }
+            await this.prisma.clientDevice.delete({
+                where: { id },
+            });
+            return true;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
-    async deleteAll(driverId) {
-        return await this.clientDeviceModel.destroy({
-            where: { driverId },
-        });
-    }
-    async restore(id) {
-        await this.clientDeviceModel.restore({
-            where: { id },
-        });
+    async deleteAllByUserId(userId) {
+        try {
+            const result = await this.prisma.clientDevice.deleteMany({
+                where: { userId },
+            });
+            return result.count;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async findByUserAndDevice(userId, deviceFCMToken) {
-        return await this.clientDeviceModel.findOne({
-            where: {
-                userId,
-                deviceFCMToken,
-            },
-        });
-    }
-    async findByDriverAndDevice(driverId, deviceFCMToken) {
-        return await this.clientDeviceModel.findOne({
-            where: {
-                driverId,
-                deviceFCMToken,
-            },
-        });
+        try {
+            const device = await this.prisma.clientDevice.findFirst({
+                where: {
+                    userId,
+                    deviceFCMToken,
+                },
+            });
+            return device;
+        }
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
+        }
     }
     async updateOrCreateDevice(deviceData) {
-        const { userId, driverId, deviceFCMToken, ipAddress } = deviceData;
-        if (!deviceFCMToken || !ipAddress) {
-            throw new Error('deviceFCMToken and ipAddress are required');
-        }
-        if (!userId && !driverId) {
-            throw new Error('Either userId or driverId must be provided');
-        }
-        const existingDevice = userId
-            ? await this.findByUserAndDevice(userId, deviceFCMToken)
-            : await this.findByDriverAndDevice(driverId, deviceFCMToken);
-        if (existingDevice) {
-            await this.update(existingDevice.id, deviceData);
-            const data = await this.clientDeviceModel.findOne({
-                where: { id: existingDevice.id }
+        try {
+            const { userId, deviceToken, ipAddress } = deviceData;
+            if (!deviceToken || !ipAddress) {
+                throw new common_1.BadRequestException('deviceToken and ipAddress are required');
+            }
+            if (!userId) {
+                throw new common_1.BadRequestException('userId is required');
+            }
+            const existingDevice = await this.findByUserAndDevice(userId, deviceToken);
+            if (existingDevice) {
+                return await this.prisma.clientDevice.update({
+                    where: {
+                        id: existingDevice.id,
+                    },
+                    data: {
+                        ...deviceData,
+                    },
+                });
+            }
+            return await this.prisma.clientDevice.create({
+                data: deviceData,
             });
-            if (data != null)
-                return data;
-            return existingDevice;
         }
-        else {
-            return await this.create(deviceData);
+        catch (error) {
+            (0, db_error_handler_util_1.handleDatabaseError)(error);
         }
     }
 };
 exports.ClientDeviceRepository = ClientDeviceRepository;
 exports.ClientDeviceRepository = ClientDeviceRepository = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(client_device_entity_1.ClientDevice)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], ClientDeviceRepository);
 //# sourceMappingURL=client-device.repository.js.map

@@ -1,17 +1,16 @@
-import { User } from '../users/entities';
+import { User } from '@prisma/client';
 import { UserType } from '../../enums/user-type.enum';
-import { MailService } from 'src/services/mail/mail.service';
-import { EmailEventService } from 'src/services/mail/email-event.service';
-import { SmsEventService } from 'src/services/sms/sms-event.service';
-import { TokenService } from 'src/services/token/token.service';
+import { MailService } from "../../services/mail/mail.service";
+import { EmailEventService } from "../../services/mail/email-event.service";
+import { SmsEventService } from "../../services/sms/sms-event.service";
+import { TokenService } from "../../services/token/token.service";
 import { UserRepository } from '../users/repositories/user.repository';
 import { JwtAuthPayload } from './auth.interface';
-import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, LoginUserSocialDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpSocialUserDto, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
 import { CountryService } from '../countries/services/country.service';
 import { UserService } from '../users/services/user.service';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
-import { IUserLoginData } from 'src/shared/interfaces/auth.interface';
-import { UserEventService } from '../users/services/user-event.service';
+import { IUserLoginData } from "../../shared/interfaces/auth.interface";
 export declare class AuthService {
     private readonly userRepository;
     private mailService;
@@ -21,8 +20,7 @@ export declare class AuthService {
     private countryService;
     private userService;
     private clientDeviceService;
-    private userEventService;
-    constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService, clientDeviceService: ClientDeviceService, userEventService: UserEventService);
+    constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService, clientDeviceService: ClientDeviceService);
     signUpPhoneNo(input: SignupPhone): Promise<{}>;
     deleteUserAccount(identity: string, password: string): Promise<null>;
     signUpEmail(input: SignupEmail): Promise<null>;
@@ -34,14 +32,7 @@ export declare class AuthService {
         id: string;
         token: string;
     }>;
-    signUpSocial(input: SignUpSocialUserDto): Promise<{
-        email: string;
-        userType: UserType;
-        id: string;
-        token: string;
-    }>;
     login(input: LoginUserDto): Promise<IUserLoginData>;
-    loginSocial(input: LoginUserSocialDto): Promise<IUserLoginData>;
     loginOtp(input: LoginOtpDto): Promise<{
         email: string;
         userType: UserType;

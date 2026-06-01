@@ -5,7 +5,6 @@ const app_module_1 = require("./app.module");
 const config_1 = require("@nestjs/config");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
-const api_key_interceptors_1 = require("./interceptors/api-key.interceptors");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         bufferLogs: true,
@@ -13,7 +12,7 @@ async function bootstrap() {
     const logger = new common_1.Logger('Bootstrap');
     const configService = app.get(config_1.ConfigService);
     app.enableCors({
-        origin: "*",
+        origin: '*',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: [
@@ -26,11 +25,6 @@ async function bootstrap() {
             'x-product-key',
         ],
     });
-    app.enableVersioning({
-        type: common_1.VersioningType.URI,
-        defaultVersion: '1',
-    });
-    app.setGlobalPrefix(configService.get('app.apiPrefix') || 'api');
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
@@ -40,8 +34,6 @@ async function bootstrap() {
         },
         errorHttpStatusCode: 422,
     }));
-    const apiKeyInterceptor = app.get(api_key_interceptors_1.ApiKeyInterceptor);
-    app.useGlobalInterceptors(apiKeyInterceptor);
     if (configService.get('NODE_ENV') !== 'production') {
         const configSwagger = new swagger_1.DocumentBuilder()
             .addBearerAuth()

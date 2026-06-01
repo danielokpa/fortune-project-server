@@ -18,26 +18,42 @@ let CountryService = class CountryService {
         this.countryRepository = countryRepository;
     }
     async findById(id) {
-        return await this.countryRepository.findById(id);
+        const country = await this.countryRepository.findById(id);
+        if (!country) {
+            throw new common_1.NotFoundException('Country not found');
+        }
+        return country;
     }
     async findByName(name) {
-        return await this.countryRepository.findByName(name);
+        const country = await this.countryRepository.findByName(name);
+        if (!country) {
+            throw new common_1.NotFoundException('Country not found');
+        }
+        return country;
     }
-    async findAll(options) {
-        const countries = await this.countryRepository.findAll(options);
-        return countries;
+    async findAll(params) {
+        return this.countryRepository.findAll(params);
     }
     async create(countryData) {
-        return await this.countryRepository.create(countryData);
+        const country = await this.countryRepository.create(countryData);
+        if (!country) {
+            throw new common_1.BadRequestException('Failed to create country');
+        }
+        return country;
     }
     async update(id, countryData) {
-        return await this.countryRepository.update(id, countryData);
+        const updatedCountry = await this.countryRepository.update(id, countryData);
+        if (!updatedCountry) {
+            throw new common_1.NotFoundException('Country not found for update');
+        }
+        return updatedCountry;
     }
     async delete(id) {
-        return await this.countryRepository.delete(id);
-    }
-    async restore(id) {
-        await this.countryRepository.restore(id);
+        const deleted = await this.countryRepository.delete(id);
+        if (!deleted) {
+            throw new common_1.BadRequestException('Failed to delete country');
+        }
+        return deleted;
     }
 };
 exports.CountryService = CountryService;

@@ -8,9 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenModule = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
 const jwt_1 = require("@nestjs/jwt");
-const entities_1 = require("./entities");
 const token_service_1 = require("./token.service");
 const token_repository_1 = require("./repositories/token.repository");
 const config_1 = require("@nestjs/config");
@@ -21,7 +19,6 @@ exports.TokenModule = TokenModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
         imports: [
-            sequelize_1.SequelizeModule.forFeature([entities_1.Token]),
             jwt_1.JwtModule.registerAsync({
                 global: true,
                 inject: [config_1.ConfigService],

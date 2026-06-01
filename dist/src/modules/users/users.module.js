@@ -8,32 +8,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
-const sequelize_1 = require("@nestjs/sequelize");
 const event_emitter_1 = require("@nestjs/event-emitter");
-const user_entity_1 = require("./entities/user.entity");
 const user_controller_1 = require("./controllers/user.controller");
 const user_service_1 = require("./services/user.service");
 const user_repository_1 = require("./repositories/user.repository");
-const user_event_service_1 = require("./services/user-event.service");
 const user_listener_1 = require("./listeners/user.listener");
 const client_devices_module_1 = require("../client-devices/client-devices.module");
-const trips_module_1 = require("../trips/trips.module");
-const referal_users_module_1 = require("../referal-users/referal-users.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            sequelize_1.SequelizeModule.forFeature([user_entity_1.User]),
-            event_emitter_1.EventEmitterModule,
-            client_devices_module_1.ClientDevicesModule,
-            trips_module_1.TripsModule,
-            referal_users_module_1.ReferalUsersModule,
-        ],
+        imports: [event_emitter_1.EventEmitterModule, client_devices_module_1.ClientDevicesModule],
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService, user_repository_1.UserRepository, user_event_service_1.UserEventService, user_listener_1.UserEventListener],
-        exports: [user_service_1.UserService, user_repository_1.UserRepository, user_event_service_1.UserEventService],
+        providers: [user_service_1.UserService, user_repository_1.UserRepository, user_listener_1.UserEventListener],
+        exports: [user_service_1.UserService, user_repository_1.UserRepository],
     })
 ], UsersModule);
 //# sourceMappingURL=users.module.js.map

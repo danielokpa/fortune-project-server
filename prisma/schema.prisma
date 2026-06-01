@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum LoginType {
+  NORMAL
+  SOCIAL
+}
+
+enum TokenType {
+  OTP
+  JWT
+  REFRESH
+}
+
+enum TokenSubject {
+  FORGOT_PASSWORD
+  SIGN_UP_PHONE
+  SIGN_UP_EMAIL 
+  NEW_DEVICE_LOGIN_OTP
+  RESET_PASSCODE
+}
+
+model User {
+  id                String          @id @default(uuid())
+
+  fullName          String
+  username          String          @unique
+  email             String          @unique
+  phoneNo           String?         @unique
+  password          String
+
+  loginType         LoginType       @default(NORMAL)
+  userType          Role            @default(USER)
+
+  isEmailVerified   Boolean         @default(false)
+  isActive          Boolean         @default(true)
+
+  imageUrl          String?
+
+  countryId         String?
+  country           Country?        @relation(fields: [countryId], references: [id])
+
+  addresses         Address[]
+  devices           ClientDevice[]
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("users")
+}
+
+model Country {
+  id                String          @id @default(uuid())
+
+  name              String          @unique
+  isoCode           String          @unique
+  phoneCode         String
+  phoneLength       Int
+  currency          String
+  flag              String?
+
+  users             User[]
+  states            State[]
+  addresses         Address[]
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("countries")
+}
+
+model State {
+  id                String          @id @default(uuid())
+
+  name              String
+
+  countryId         String
+  country           Country         @relation(fields: [countryId], references: [id])
+
+  addresses         Address[]
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([countryId])
+
+  @@unique([countryId, name])
+
+  @@map("states")
+}
+
+model Address {
+  id                String          @id @default(uuid())
+
+  userId            String
+  user              User            @relation(fields: [userId], references: [id])
+
+  countryId         String
+  country           Country         @relation(fields: [countryId], references: [id])
+
+  stateId           String?
+  state             State?          @relation(fields: [stateId], references: [id])
+
+  fullName          String
+  phoneNo           String
+
+  addressLine1      String
+  addressLine2      String?
+
+  city              String
+  postalCode        String?
+
+  landmark          String?
+
+  isDefault         Boolean         @default(false)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([userId])
+
+  @@map("addresses")
+}
+
+model ClientDevice {
+  id                String          @id @default(uuid())
+
+  userId            String
+  user              User            @relation(fields: [userId], references: [id])
+
+  deviceName        String?
+
+  ipAddress         String?
+
+  deviceFCMToken       String?         @db.Text
+
+  platform          String?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([userId])
+
+  @@map("client_devices")
+}
+
+model Token {
+  id         String       @id @default(uuid())
+
+  subject    TokenSubject
+  token      String
+
+  email      String?
+  phoneNo    String?
+
+  tokenType  TokenType
+
+  expiry     DateTime
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([email])
+  @@index([phoneNo])
+  @@index([token])
+  @@index([expiry])
+  @@map("tokens")
+}

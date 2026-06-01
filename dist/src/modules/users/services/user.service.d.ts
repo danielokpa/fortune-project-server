@@ -1,24 +1,20 @@
 import { ConfigService } from '@nestjs/config';
-import { User } from '../entities/user.entity';
+import { Prisma, User } from '@prisma/client';
 import { UserRepository } from '../repositories/user.repository';
-import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
+import { ClientDeviceService } from "../../client-devices/services/client-device.service";
 import { UpdateUserDto } from '../dto/user.dto';
-import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
-import { TripRepository } from 'src/modules/trips/repositories/trip.repository';
 export declare class UserService {
     private readonly userRepository;
     private readonly clientDeviceService;
     private readonly configService;
-    private readonly tripRepository;
-    constructor(userRepository: UserRepository, clientDeviceService: ClientDeviceService, configService: ConfigService, tripRepository: TripRepository);
-    fetchUser(id: string): Promise<User | null>;
-    findByIdentity(identity: string): Promise<User | null>;
+    constructor(userRepository: UserRepository, clientDeviceService: ClientDeviceService, configService: ConfigService);
+    fetchUser(id: string): Promise<Partial<User>>;
+    findByIdentity(identity: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
-    findAll(options?: any): Promise<User[]>;
-    update(id: string, userData: Partial<User>): Promise<[number, User[]]>;
-    delete(id: string): Promise<number>;
-    restore(id: string): Promise<void>;
-    dashboard(data: IDashboardInput, userId: string): Promise<IDashboard>;
+    findByUsername(username: string): Promise<User | null>;
+    findAll(params?: Prisma.UserFindManyArgs): Promise<User[]>;
     updateImageUrl(userId: string, imageUrl: string): Promise<User>;
+    update(id: string, userData: Prisma.UserUncheckedUpdateInput): Promise<User>;
     updateUser(userId: string, userData: UpdateUserDto): Promise<User>;
+    deleteUser(userId: string): Promise<boolean>;
 }

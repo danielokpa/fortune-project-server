@@ -1,198 +1,337 @@
-# PePP Cruise Server
+# E-Commerce Store Backend
 
-A powerful NestJS-based backend server for the PePP Cruise platform, providing authentication, Booking management, and API services with built-in rate limiting and security features.
+A scalable and production-ready e-commerce backend built with **NestJS**, **Prisma ORM**, **PostgreSQL**, and **Stripe**. The platform provides complete functionality for managing users, authentication, products, categories, orders, payments, and administrative operations.
 
-## 🚀 Features
+---
 
-- **Authentication**: JWT-based authentication with Passport.js
-- **Rate Limiting**: Configurable rate limiting with @nestjs/throttler
-- **Database**: MySQL with Sequelize ORM
-- **API Documentation**: Auto-generated Swagger documentation
-- **Security**: Built-in security middleware and validation
-- **Configuration**: Environment-based configuration management
-- **Testing**: Comprehensive unit and e2e testing setup
+# Features
 
-## 📋 Prerequisites
+## Authentication & Authorization
 
-- Node.js (v16 or higher)
-- npm or yarn
-- MySQL database
-- Git
+- User registration and login
+- JWT-based authentication
+- Refresh token support
+- Email verification
+- Password reset flow
+- Role-based access control (RBAC)
+- Admin and customer permissions
 
-## ⚙️ Installation & Setup
+## User Management
 
-### 1. Clone the Repository
+- Customer account management
+- User profile updates
+- Address management
+- Account verification
+- Active/inactive account status
+
+## Marketplace
+
+### Products
+
+- Create, update, and delete products
+- Product inventory management
+- Product images
+- Product pricing
+- Product availability status
+- Product search and filtering
+
+### Categories
+
+- Create and manage product categories
+- Category-based product organization
+- Product-category relationships
+
+## Orders
+
+- Create orders
+- Order status tracking
+- Order history
+- Order item management
+- Customer order management
+- Admin order processing
+
+## Payments
+
+- Stripe payment integration
+- Secure checkout process
+- Payment verification
+- Payment tracking
+- Transaction management
+- Order-payment synchronization
+
+## Admin Module
+
+- User administration
+- Product administration
+- Category administration
+- Order administration
+- Platform analytics foundation
+- Administrative access controls
+
+---
+
+# Technology Stack
+
+## Backend
+
+- NestJS
+- TypeScript
+- Node.js
+
+## Database
+
+- PostgreSQL
+
+## ORM
+
+- Prisma ORM
+
+## Authentication
+
+- JWT
+- Passport
+
+## Payments
+
+- Stripe
+
+## Validation
+
+- class-validator
+- class-transformer
+
+---
+
+# Project Structure
+
+```text
+src/
+├── admin/
+├── auth/
+├── users/
+├── marketplace/
+│   ├── products/
+│   └── categories/
+├── orders/
+├── payments/
+├── prisma/
+├── common/
+├── config/
+└── main.ts
+```
+
+---
+
+# Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/ecommerce"
+
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+
+MAIL_HOST=your_mail_host
+MAIL_PORT=587
+MAIL_USER=your_mail_user
+MAIL_PASSWORD=your_mail_password
+
+FRONTEND_URL=http://localhost:3000
+```
+
+---
+
+# Installation
+
+## Clone Repository
 
 ```bash
 git clone <repository-url>
-cd pepp-cruise-server
+cd <project-folder>
 ```
 
-### 2. Install Dependencies
+## Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Environment Configuration
+---
 
-Create your environment file:
+# Database Setup
+
+## Generate Prisma Client
 
 ```bash
-cp .env.template .env
+npm run prisma:generate
 ```
 
-Configure your environment variables in `.env`:
+## Run Migrations
 
 ```bash
-# Database
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DATABASE_USER=root
-DATABASE_PASSWORD=your_mysql_password
-DATABASE_NAME=peppcruise
-DATABASE_SYNCHRONIZE=true
-DATABASE_LOGGING=true
-
-# JWT Authentication
-JWT_SECRET="your-super-secret-jwt-key-here-make-it-long-and-secure"
-JWT_EXPIRES_IN="7d"
-
-# App Configuration
-NODE_ENV=development
-PORT=3000
-API_PREFIX=api
-CORS_ORIGINS=http://localhost:3000,http://localhost:5173
-
-# Rate Limiting
-RATE_LIMIT_TTL=60000  # Time window in milliseconds
-RATE_LIMIT_LIMIT=10   # Max requests per window
-
-# Email Configuration (optional)
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
-FROM_EMAIL="noreply@peppcruise.com"
-
-# Client URLs
-PEPP_APP_CLIENT_URL="http://localhost:3000"
+npm run prisma:deploy
 ```
 
-### 4. Database Setup
-
-The application uses Sequelize with MySQL. Make sure your MySQL database is running and the connection details are correct in your environment variables.
-
-The application will automatically create tables when `DATABASE_SYNCHRONIZE=true` is set in your environment variables.
-
-## 🏃 Running the Application
-
-### Development Mode
+For local development:
 
 ```bash
-# Start with auto-reload
+npm run prisma:migrate -- --name init
+```
+
+## Seed Database
+
+```bash
+npm run prisma:seed
+```
+
+---
+
+# Running the Application
+
+## Development
+
+```bash
 npm run start:dev
-
-# Start with debugging
-npm run start:debug
 ```
 
-### Production Mode
+## Production
 
 ```bash
-# Build the application
 npm run build
-
-# Start production server
 npm run start:prod
 ```
 
-The server will be available at `http://localhost:3000` (or your configured PORT).
+---
 
-## 🧪 Testing
+# API Modules
+
+## Auth Module
+
+Handles:
+
+- Registration
+- Login
+<!-- - Token refresh -->
+- Password reset
+- Email verification
+
+## Users Module
+
+Handles:
+
+- User profiles
+- User addresses
+- Account management
+
+## Marketplace Module
+
+Handles:
+
+### Products
+
+- Product creation
+- Product updates
+- Product retrieval
+- Product inventory
+
+### Categories
+
+- Category creation
+- Category management
+- Product categorization
+
+## Orders Module
+
+Handles:
+
+- Order creation
+- Order processing
+- Order status updates
+- Order history
+
+## Payments Module
+
+Handles:
+
+- Stripe checkout
+- Payment confirmation
+- Transaction records
+- Payment verification
+
+## Admin Module
+
+Handles:
+
+- Platform administration
+- User management
+- Product management
+- Category management
+- Order management
+
+---
+
+# Prisma Commands
+
+Generate client:
 
 ```bash
-# Unit tests
-npm run test
-
-# Watch mode
-npm run test:watch
-
-# Test coverage
-npm run test:cov
-
-# E2E tests
-npm run test:e2e
+npx prisma generate
 ```
 
-## 📁 Project Structure
+Create migration:
 
-```
-pepp-cruise-server/
- src/
-    config/
-       app.config.ts          # Application configuration
-    models/                   # Sequelize models
-       user.model.ts
-       organization.model.ts
-       ...
-    enums/                    # Application enums
-       user-role.enum.ts
-       ...
-    modules/
-       auth/                  # Authentication module
-          auth.controller.ts
-          auth.service.ts
-          auth.module.ts
-       subscriptions/         # Subscriptions module
-           subscriptions.controller.ts
-           subscriptions.service.ts
-           subscriptions.module.ts
-        ...
-    services/
-        services.md
-    utils/
-        utils.md
-    app.controller.ts          # Main app controller
-    app.service.ts             # Main app service
-    app.module.ts              # Main app module
-    main.ts                    # Application entry point
- database/
-    migrations/                # Database migrations
-    seeders/                   # Database seeders
-    config/                    # Database configuration
- test/                          # E2E tests
- package.json
- tsconfig.json
- nest-cli.json
- README.md
+```bash
+npx prisma migrate dev --name migration_name
 ```
 
-## 📚 API Documentation
+Apply migrations:
 
-When running in development mode, Swagger documentation is available at:
+```bash
+npx prisma migrate deploy
+```
 
-- `http://localhost:3000/api/docs`
+Open Prisma Studio:
 
-## 📜 Available Scripts
+```bash
+npx prisma studio
+```
 
-- `npm run build` - Build the application for production
-- `npm run start` - Start the application
-- `npm run start:dev` - Start in development mode with auto-reload
-- `npm run start:debug` - Start in debug mode
-- `npm run start:prod` - Start production build
-- `npm run lint` - Run ESLint and fix issues
-- `npm run format` - Format code with Prettier
-- `npm run test` - Run unit tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:cov` - Run tests with coverage
-- `npm run test:e2e` - Run end-to-end tests
+Reset database:
 
-## 🔒 Security Features
+```bash
+npx prisma migrate reset
+```
 
-- JWT-based authentication
-- Rate limiting protection
-- CORS configuration
-- Input validation with class-validator
+---
+
+# Security
+
+- JWT authentication
+- Password hashing
+- Role-based authorization
+- Request validation
+- Secure payment processing through Stripe
 - Environment-based configuration
-- Secure password hashing with bcrypt
+
+---
+
+# Future Enhancements
+
+- Product reviews and ratings
+- Wishlist functionality
+- Shopping cart persistence
+- Coupons and discounts
+- Inventory alerts
+- Analytics dashboard
+- Multi-vendor marketplace support
+- Multi-currency support
+
+---
+
+# License
+
+This project is licensed under the MIT License.

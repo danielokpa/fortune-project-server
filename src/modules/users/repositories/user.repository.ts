@@ -1,155 +1,232 @@
-import { Injectable, forwardRef, Inject } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Length, Model } from 'sequelize-typescript';
-import { User } from '../entities/user.entity';
-import { UserType } from '../../../enums/user-type.enum';
-import { Op } from 'sequelize';
-import { Country } from 'src/modules/countries/entities';
-import type { GenerateReferalCodeEvent } from '../events/user.events';
-import { UserEventListener } from '../listeners/user.listener';
-import * as randomstring from 'randomstring';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { User, Prisma } from '@prisma/client';
+import { UserType } from 'src/enums';
+import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 
 @Injectable()
 export class UserRepository {
-  constructor(
-    @InjectModel(User)
-    private userModel: typeof User,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findByIdentity(identity: string): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: {
-        [Op.or]: [
-          { email: identity },
-          { phoneNo: identity },
-        ],
-      },
-      raw: true
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: identity },
+            { username: identity },
+            { phoneNo: identity },
+          ],
+        },
+      });
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
   async findById(id: string): Promise<User | null> {
-    return await this.userModel.findByPk(id, {raw: true});
-  }
-
-  async fetchUser(id: string): Promise<User | null> {
-    let user = await this.userModel.findByPk(id, {
-      attributes: {
-        exclude: ['password', 'deletedAt', 'isDisabled'],
-      },
-      include: [
-        {
-          model: Country
-        },
-      ],
-    });
-
-    user = user ? (user.toJSON() as User) : null;
-
-    if (user) {
-      if (user.referalCode == null) {
-        const event: GenerateReferalCodeEvent = {
-          userId: user.id,
-        };
-        const referalCode = await this.processGenerateReferalCode(event);
-        if (referalCode) {
-          user.referalCode = referalCode;
-        }
-      }
-    }
-    return user ;
-  }
-
-  async processGenerateReferalCode(event: GenerateReferalCodeEvent) {
     try {
-      let referalCode: string | undefined;
-
-      referalCode = randomstring.generate({
-        length: 10,
-        charset: 'alphanumeric',
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+        // omit: {
+        //   password: true
+        // },
       });
-      await this.update(event.userId, { referalCode });
-      return referalCode;
+
+      return user;
     } catch (error) {
+      handleDatabaseError(error);
     }
   }
 
-  async fetchAndUpdateUser(id: string, data: Partial<User>): Promise<User | null> {
-    const user = await this.userModel.update(data, {
-      where: { id },
-      returning: true,
-    });
+  async fetchUser(id: string): Promise<Partial<User> | null> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
 
-    const updatedUser = await this.userModel.findByPk(id, {raw: true});
-    return updatedUser ? (updatedUser.toJSON() as User) : null;
+        include: {
+          country: true,
+        },
+
+        omit: {
+          password: true,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  async fetchAndUpdateUser(
+    id: string,
+    data: Prisma.UserUpdateInput,
+  ): Promise<User> {
+    try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!existingUser) {
+        throw new NotFoundException('User not found');
+      }
+
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data,
+      });
+
+      return updatedUser;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await this.userModel.findOne({
-      where: { email },
-    });
-    return user ? (user.toJSON() as User) : null;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  async findByUsername(username: string): Promise<User | null> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username },
+      });
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
   async findByPhone(phoneNo: string): Promise<User | null> {
-    const user = await this.userModel.findOne({
-      where: { phoneNo }
-    });
-    return user ? (user.toJSON() as User) : null;
-  }
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { phoneNo },
+      });
 
-  async findByReferalCode(referalCode: string, excludeUserId?: string): Promise<User | null> {
-    const where: any = { referalCode };
-    
-    if (excludeUserId) {
-      where.id = { [Op.ne]: excludeUserId };
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
     }
-    
-    const user = await this.userModel.findOne({
-      where
-    });
-    return user ? (user.toJSON() as User) : null;
   }
 
   async findByEmailAndRole(email: string, userType: UserType): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: { email, userType },
-      raw: true
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          email,
+          userType,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async create(userData: Partial<User>): Promise<User> {
-    const user =  await this.userModel.create(userData as any, {raw: true, returning: true});
-    return user.toJSON() as User
+  async create(userData: Prisma.UserUncheckedCreateInput): Promise<User> {
+    try {
+      const user = await this.prisma.user.create({
+        data: userData,
+      });
+
+      if (!user) {
+        throw new InternalServerErrorException('Failed to create user');
+      }
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async update(id: string, userData: Partial<User>): Promise<[number, User[]]> {
-    return await this.userModel.update(userData, {
-      where: { id },
-      returning: true,
-    });
+  async update(id: string, userData: Prisma.UserUpdateInput): Promise<User> {
+    try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!existingUser) {
+        throw new NotFoundException('User not found');
+      }
+
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: userData,
+      });
+
+      return updatedUser;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async delete(id: string): Promise<number> {
-    return await this.userModel.destroy({
-      where: { id },
-    });
-  }
+  async delete(id: string): Promise<boolean> {
+    try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { id },
+      });
 
-  async restore(id: string): Promise<void> {
-    await this.userModel.restore({
-      where: { id },
-    });
+      if (!existingUser) {
+        throw new NotFoundException('User not found');
+      }
+
+      await this.prisma.user.delete({
+        where: { id },
+      });
+
+      return true;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
   async findWithCountry(email: string, userType: UserType): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: { email, userType },
-      include: ['country'],
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          email,
+          userType,
+        },
+
+        include: {
+          country: true,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 
-  async findAll(options?: any): Promise<User[]> {
-    return await this.userModel.findAll(options);
+  async findAll(params?: Prisma.UserFindManyArgs): Promise<User[]> {
+    try {
+      const users = await this.prisma.user.findMany(params);
+
+      if (!users) {
+        throw new NotFoundException('Users not found');
+      }
+
+      return users;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 }

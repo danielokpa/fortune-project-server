@@ -1,13 +1,10 @@
-import { PAYMENT_TYPE } from "src/enums/payment.enums";
-import { Trip } from "src/modules/trips/entities/trip.entity";
+import { PAYMENT_TYPE } from "../../enums/payment.enums";
 export interface IDashboard {
     userId: string;
     email: string;
-    fullName: string;
+    username: string;
     phoneNo: string;
     paymentTypes: IPaymentType[];
-    activeTrip: Trip | null;
-    piWalletAddress?: string;
     rating?: number;
 }
 export interface IPaymentType {
