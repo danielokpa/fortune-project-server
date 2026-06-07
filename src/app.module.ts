@@ -12,7 +12,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
-
+import { ProductModule } from './modules/products/product.module';
+import { CategoryModule } from './modules/categories/category.module';
+import { CartModule } from './modules/cart/cart.module';
+import { OrderModule } from './modules/orders/order.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
@@ -47,6 +50,10 @@ import { PrismaModule } from './prisma/prisma.module';
     UsersModule,
     CountriesModule,
     ClientDevicesModule,
+    CategoryModule,
+    ProductModule,
+    CartModule,
+    OrderModule,
     TokenModule,
     MailModule,
     SmsModule,

@@ -65,7 +65,9 @@ export class ClientDeviceRepository {
     }
   }
 
-  async findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null> {
+  async findByDeviceToken(
+    deviceFCMToken: string,
+  ): Promise<ClientDevice | null> {
     try {
       const device = await this.prisma.clientDevice.findFirst({
         where: { deviceFCMToken },

@@ -24,7 +24,7 @@ export class StateRepository {
         where: { countryId },
         orderBy: {
           name: 'asc',
-        }
+        },
       });
       return states;
     } catch (error) {
@@ -52,10 +52,7 @@ export class StateRepository {
     }
   }
 
-  async update(
-    id: string,
-    stateData: Prisma.StateUpdateInput,
-  ): Promise<State> {
+  async update(id: string, stateData: Prisma.StateUpdateInput): Promise<State> {
     try {
       const existingState = await this.prisma.state.findUnique({
         where: { id },

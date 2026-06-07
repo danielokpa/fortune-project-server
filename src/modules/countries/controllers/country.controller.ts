@@ -71,10 +71,7 @@ export class CountryController {
   // }
 
   @Get(':id')
-  @Roles(
-    UserType.ADMIN,
-    UserType.USER,
-  )
+  @Roles(UserType.ADMIN, UserType.USER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get country by ID' })
@@ -111,10 +108,7 @@ export class CountryController {
   @ApiOperation({ summary: 'Update country' })
   @ApiResponse({ status: 200, description: 'Country updated successfully' })
   @ApiResponse({ status: 404, description: 'Country not found' })
-  async update(
-    @Param('id') id: string,
-    @Body() countryData: UpdateCountryDto,
-  ) {
+  async update(@Param('id') id: string, @Body() countryData: UpdateCountryDto) {
     const data = await this.countryService.update(id, countryData);
     return ResponseUtil.handleResponse(
       data,

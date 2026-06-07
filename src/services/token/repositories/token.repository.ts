@@ -8,9 +8,7 @@ import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 export class TokenRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    tokenData: Prisma.TokenCreateInput,
-  ): Promise<Token> {
+  async create(tokenData: Prisma.TokenCreateInput): Promise<Token> {
     try {
       const token = await this.prisma.token.create({
         data: tokenData,
@@ -42,11 +40,7 @@ export class TokenRepository {
     try {
       const tokenRecord = await this.prisma.token.findFirst({
         where: {
-          OR: [
-            { email },
-            { phoneNo },
-            { token },
-          ],
+          OR: [{ email }, { phoneNo }, { token }],
         },
       });
 
@@ -56,10 +50,7 @@ export class TokenRepository {
     }
   }
 
-  async findByEmailToken(
-    token: string,
-    email: string,
-  ): Promise<Token | null> {
+  async findByEmailToken(token: string, email: string): Promise<Token | null> {
     try {
       const tokenRecord = await this.prisma.token.findFirst({
         where: {

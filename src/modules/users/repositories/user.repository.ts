@@ -125,7 +125,10 @@ export class UserRepository {
     }
   }
 
-  async findByEmailAndRole(email: string, userType: UserType): Promise<User | null> {
+  async findByEmailAndRole(
+    email: string,
+    userType: UserType,
+  ): Promise<User | null> {
     try {
       const user = await this.prisma.user.findFirst({
         where: {
@@ -197,7 +200,10 @@ export class UserRepository {
     }
   }
 
-  async findWithCountry(email: string, userType: UserType): Promise<User | null> {
+  async findWithCountry(
+    email: string,
+    userType: UserType,
+  ): Promise<User | null> {
     try {
       const user = await this.prisma.user.findFirst({
         where: {

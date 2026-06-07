@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Prisma, ClientDevice } from '@prisma/client';
 import { ClientDeviceRepository } from '../repositories/client-device.repository';
 import { UserType } from 'src/enums';
@@ -53,7 +58,9 @@ export class ClientDeviceService {
     return devices;
   }
 
-  async create(clientDeviceData: Prisma.ClientDeviceUncheckedCreateInput): Promise<ClientDevice> {
+  async create(
+    clientDeviceData: Prisma.ClientDeviceUncheckedCreateInput,
+  ): Promise<ClientDevice> {
     const data = await this.clientDeviceRepository.create(clientDeviceData);
     if (!data) throw new BadRequestException('Failed to create device token');
     return data;
@@ -86,9 +93,12 @@ export class ClientDeviceService {
   }
 
   async updateDeviceToken(clientDeviceId: string, deviceFCMToken: string) {
-    const updatedDevice = await this.clientDeviceRepository.update(clientDeviceId, {
-      deviceFCMToken,
-    });
+    const updatedDevice = await this.clientDeviceRepository.update(
+      clientDeviceId,
+      {
+        deviceFCMToken,
+      },
+    );
 
     if (!updatedDevice) {
       throw new NotFoundException('Device not found!');

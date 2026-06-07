@@ -85,7 +85,8 @@ export class SignUpUserDto {
   @MinLength(4)
   @MaxLength(150)
   @Matches(/^[A-Za-z0-9_.-]+$/, {
-    message: 'Username can only contain letters, numbers, underscores, dots, and hyphens',
+    message:
+      'Username can only contain letters, numbers, underscores, dots, and hyphens',
   })
   readonly username: string;
 
