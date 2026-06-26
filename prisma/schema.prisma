@@ -11,11 +11,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 enum LoginType {
   NORMAL
   SOCIAL
@@ -30,191 +25,186 @@ enum TokenType {
 enum TokenSubject {
   FORGOT_PASSWORD
   SIGN_UP_PHONE
-  SIGN_UP_EMAIL 
+  SIGN_UP_EMAIL
   NEW_DEVICE_LOGIN_OTP
   RESET_PASSCODE
 }
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PROCESSING
-  PACKED
-  SHIPPED
-  DELIVERED
-  CANCELLED
-  REFUNDED
+// model User {
+//   id                String          @id @default(uuid())
+
+//   fullName          String
+//   username          String          @unique
+//   email             String          @unique
+//   phoneNo           String?         @unique
+//   password          String
+
+//   loginType         LoginType       @default(NORMAL)
+//   userType          Role            @default(USER)
+
+//   isEmailVerified   Boolean         @default(false)
+//   isActive          Boolean         @default(true)
+
+//   imageUrl          String?
+
+//   countryId         String?
+//   country           Country?        @relation(fields: [countryId], references: [id])
+
+//   addresses         Address[]
+//   devices           ClientDevice[]
+//   cart              Cart?
+//   orders            Order[]
+
+//   createdAt         DateTime        @default(now())
+//   updatedAt         DateTime        @updatedAt
+
+//   @@map("users")
+// }
+// model ClientDevice {
+//   id                String          @id @default(uuid())
+
+//   userId            String
+//   user              User            @relation(fields: [userId], references: [id])
+
+//   deviceName        String?
+
+//   ipAddress         String?
+
+//   deviceFCMToken       String?         @db.Text
+
+//   platform          String?
+
+//   createdAt         DateTime        @default(now())
+//   updatedAt         DateTime        @updatedAt
+
+//   @@index([userId])
+
+//   @@map("client_devices")
+// }
+
+enum Role {
+  SUPER_ADMIN
+  ORG_ADMIN
+  RECRUITER
+  HIRING_MANAGER
+  CANDIDATE
 }
 
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  REFUNDED
-}
-
-enum InventoryUnit {
-  PIECE
-  BUNCH
-  BUNDLE
-  BAG
-  CARTON
-  CRATE
-  PACK
-  KG
-  GRAM
-  LITRE
-}
-
-enum ProductStatus {
+enum JobStatus {
   DRAFT
-  IN_STOCK
-  OUT_OF_STOCK
-  ARCHIVED
+  PUBLISHED
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SCREENED
+  ASSESSMENT_PENDING
+  ASSESSMENT_COMPLETED
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+}
+
+enum AssessmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+enum CandidateClassification {
+  STRONG_FIT
+  CONDITIONAL_FIT
+  WILD_CARD
+  FIT_LATER
+  WEAK_MATCH
+}
+
+enum DocumentType {
+  PHOTO
+  CV
+  DRIVERS_LICENSE
+  NYSC
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum QuestionCategory {
+  PROFESSIONAL_ATTITUDE
+  EMOTIONAL_INTELLIGENCE
+  CUSTOMER_SERVICE
+  SAFETY
+  AVAILABILITY
+}
+
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum RolePlayCategory {
+  CUSTOMER_SERVICE
+  EMOTIONAL_INTELLIGENCE
+  PROFESSIONALISM
+  SAFETY
+  INTEGRITY
+  PROBLEM_SOLVING
+  CONFLICT_RESOLUTION
+}
+model Organization {
+  id String @id @default(uuid())
+
+  name String
+
+  users User[]
+  jobs  Job[]
+
+  createdAt DateTime @default(now())
 }
 
 model User {
-  id                String          @id @default(uuid())
+  id String @id @default(uuid())
 
-  fullName          String
-  username          String          @unique
-  email             String          @unique
-  phoneNo           String?         @unique
-  password          String
+  email    String @unique
+  password String
 
-  loginType         LoginType       @default(NORMAL)
-  userType          Role            @default(USER)
+  firstName String
+  lastName  String
 
-  isEmailVerified   Boolean         @default(false)
-  isActive          Boolean         @default(true)
+  role Role
 
-  imageUrl          String?
+  organizationId String?
 
-  countryId         String?
-  country           Country?        @relation(fields: [countryId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
 
-  addresses         Address[]
-  devices           ClientDevice[]
-  cart              Cart?
-  orders            Order[]
+  createdJobs Job[]
 
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  @@map("users")
-}
-
-model Country {
-  id                String          @id @default(uuid())
-
-  name              String          @unique
-  isoCode           String          @unique
-  phoneCode         String
-  phoneLength       Int
-  currency          String
-  flag              String?
-
-  users             User[]
-  states            State[]
-  addresses         Address[]
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  @@map("countries")
-}
-
-model State {
-  id                String          @id @default(uuid())
-
-  name              String
-
-  countryId         String
-  country           Country         @relation(fields: [countryId], references: [id])
-
-  productOrigins    Product[]       @relation("ProductOriginState")
-  addresses         Address[]
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  @@index([countryId])
-
-  @@unique([countryId, name])
-
-  @@map("states")
-}
-
-model Address {
-  id                String          @id @default(uuid())
-
-  userId            String
-  user              User            @relation(fields: [userId], references: [id])
-
-  countryId         String
-  country           Country         @relation(fields: [countryId], references: [id])
-
-  stateId           String?
-  state             State?          @relation(fields: [stateId], references: [id])
-
-  fullName          String
-  phoneNo           String
-
-  addressLine1      String
-  addressLine2      String?
-
-  city              String
-  postalCode        String?
-
-  landmark          String?
-
-  isDefault         Boolean         @default(false)
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  @@index([userId])
-
-  @@map("addresses")
-}
-
-model ClientDevice {
-  id                String          @id @default(uuid())
-
-  userId            String
-  user              User            @relation(fields: [userId], references: [id])
-
-  deviceName        String?
-
-  ipAddress         String?
-
-  deviceFCMToken       String?         @db.Text
-
-  platform          String?
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  @@index([userId])
-
-  @@map("client_devices")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Token {
-  id         String       @id @default(uuid())
+  id String @id @default(uuid())
 
-  subject    TokenSubject
-  token      String
+  subject TokenSubject
+  token   String
 
-  email      String?
-  phoneNo    String?
+  email   String?
+  phoneNo String?
 
-  tokenType  TokenType
+  tokenType TokenType
 
-  expiry     DateTime
+  expiry DateTime
 
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([email])
   @@index([phoneNo])
@@ -223,321 +213,303 @@ model Token {
   @@map("tokens")
 }
 
-model Category {
-  id            String      @id @default(uuid())
+model Candidate {
+  id String @id @default(uuid())
+  // candidateCode         String @unique
 
-  name          String      @unique
-  // slug          String      @unique
+  fullName String
+  email    String
+  phone    String
 
-  description   String?
+  whatsapp String?
 
-  imageUrl      String?
+  residentialAddress String?
 
-  isActive      Boolean     @default(true)
+  gender String?
 
-  products      Product[]
+  dateOfBirth DateTime?
 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  stateOfOrigin String?
 
-  @@index([isActive])
-  @@map("categories")
-}
-model Product {
-  id                    String            @id @default(uuid())
+  currentLocation String?
 
-  name                  String
-  // slug                  String            @unique
+  highestQualification String?
 
-  description           String?           @db.Text
-  shortDescription      String?
+  yearsOfExperience Int?
 
-  categoryId            String
-  category              Category          @relation(fields: [categoryId], references: [id])
+  applications Application[]
 
-  originStateId         String?
-  originState           State?            @relation("ProductOriginState", fields: [originStateId], references: [id])
+  documents CandidateDocument[]
 
-  inventoryUnit         InventoryUnit
+  createdAt DateTime @default(now())
 
-  price                 Decimal?          @db.Decimal(12,2)
-  status                ProductStatus     @default(DRAFT)
-
-  availableQuantity     Decimal?          @db.Decimal(12,2)
-
-  minimumOrderQuantity  Decimal           @default(1) @db.Decimal(12,2)
-
-  maximumOrderQuantity  Decimal?          @db.Decimal(12,2)
-
-  isAvailable           Boolean           @default(true)
-
-  hasVariants           Boolean           @default(false)
-
-  availableFrom         DateTime?
-
-  availableTo           DateTime?
-
-  images                ProductImage[]
-
-  variants              ProductVariant[]
-
-  cartItems             CartItem[]
-  orderItems            OrderItem[]
-
-
-  deletedAt             DateTime?
-
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
-
-  @@index([categoryId])
-  @@index([originStateId])
-  @@index([status])
-  @@index([isAvailable])
-  @@index([createdAt])
-  @@index([deletedAt])
-
-  @@map("products")
+  @@unique([email])
 }
 
-model ProductImage {
-  id            String      @id @default(uuid())
+model CandidateDocument {
+  id String @id @default(uuid())
 
-  productId     String
-  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  candidateId String
 
-  imageUrl      String
+  type DocumentType
 
-  isPrimary     Boolean     @default(false)
+  fileUrl String
 
-  sortOrder     Int         @default(0)
+  candidate Candidate @relation(fields: [candidateId], references: [id])
 
-  createdAt     DateTime    @default(now())
+  createdAt DateTime @default(now())
 
-  @@index([productId])
-  @@index([productId, sortOrder])
-
-  @@map("product_images")
-}
-model ProductVariant {
-  id                    String            @id @default(uuid())
-
-  productId             String
-  product               Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  name                  String
-
-  sku                   String?           @unique
-
-  price                 Decimal           @db.Decimal(12,2)
-
-  inventoryUnit         InventoryUnit
-
-  availableQuantity     Decimal?          @db.Decimal(12,2)
-
-  weightKg              Decimal?          @db.Decimal(10,3)
-
-  isAvailable           Boolean           @default(true)
-
-  cartItems             CartItem[]
-  orderItems            OrderItem[]
-
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
-
-  @@index([productId])
-  @@index([sku])
-  @@index([createdAt])
-
-  @@map("product_variants")
+  @@unique([candidateId, type])
 }
 
-model Order {
-  id                    String            @id @default(uuid())
+model Job {
+  id String @id @default(uuid())
 
-  userId                String
-  user                  User              @relation(fields: [userId], references: [id])
+  organizationId String
 
-  orderNumber           String            @unique
+  slug String @unique
 
-  status                OrderStatus       @default(PENDING)
+  title       String
+  description String
 
-  paymentStatus         PaymentStatus     @default(PENDING)
+  status JobStatus @default(DRAFT)
 
-  subtotalAmount        Decimal           @db.Decimal(12,2)
+  createdById String
 
-  discountAmount        Decimal           @default(0) @db.Decimal(12,2)
+  organization Organization @relation(fields: [organizationId], references: [id])
 
-  shippingAmount        Decimal           @default(0) @db.Decimal(12,2)
+  createdBy User @relation(fields: [createdById], references: [id])
 
-  totalAmount           Decimal           @db.Decimal(12,2)
+  applications Application[]
 
-  currency              String            @default("NGN")
+  assessment Assessment?
 
-  recipientName         String
-
-  recipientPhoneNo      String
-
-  deliveryAddress       String            @db.Text
-
-  deliveryCity          String
-
-  deliveryState         String
-
-  deliveryCountry       String
-
-  postalCode            String?
-
-  notes                 String?           @db.Text
-
-  carrierName           String?
-
-  trackingNumber        String?
-
-  paidAt                DateTime?
-
-  deliveredAt           DateTime?
-
-  cancelledAt           DateTime?
-
-  items                 OrderItem[]
-
-  payments              Payment[]
-
-  trackingEvents        OrderTracking[]
-
-  createdAt             DateTime          @default(now())
-
-  updatedAt             DateTime          @updatedAt
-
-  @@index([userId])
-
-  @@index([status])
-
-  @@index([paymentStatus])
-
-  @@index([createdAt])
-  @@index([userId, createdAt])
-
-  @@map("orders")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model OrderTracking {
-  id          String      @id @default(uuid())
+model Application {
+  id String @id @default(uuid())
 
-  orderId     String
-  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  jobId       String
+  candidateId String
 
-  status      OrderStatus
+  source String?
 
-  note        String?
+  status ApplicationStatus @default(APPLIED)
 
-  location    String?
+  fitScore Float?
 
-  createdAt   DateTime    @default(now())
+  classification CandidateClassification?
 
-  @@index([orderId])
+  job Job @relation(fields: [jobId], references: [id])
 
-  @@map("order_tracking")
+  candidate Candidate @relation(fields: [candidateId], references: [id])
+
+  assessmentAttempt AssessmentAttempt?
+
+  interviews Interview[]
+
+  statusHistory ApplicationStatusHistory[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([jobId, candidateId])
 }
 
-model OrderItem {
-  id                    String            @id @default(uuid())
+model ApplicationStatusHistory {
+  id String @id @default(uuid())
 
-  orderId               String
-  order                 Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  applicationId String
 
-  productId             String
-  product               Product           @relation(fields: [productId], references: [id])
+  status ApplicationStatus
 
-  productVariantId      String?
-  productVariant        ProductVariant?   @relation(fields: [productVariantId], references: [id])
+  application Application @relation(fields: [applicationId], references: [id])
 
-  productName           String
-
-  variantName           String?
-
-  quantity              Decimal           @db.Decimal(12,2)
-
-  unitPrice             Decimal           @db.Decimal(12,2)
-
-  totalPrice            Decimal           @db.Decimal(12,2)
-
-  createdAt             DateTime          @default(now())
-
-  @@index([orderId])
-
-  @@index([productId])
-
-  @@map("order_items")
+  createdAt DateTime @default(now())
 }
 
-model Cart {
-  id              String        @id @default(uuid())
+model Assessment {
+  id String @id @default(uuid())
 
-  userId          String        @unique
-  user            User          @relation(fields: [userId], references: [id])
+  jobId String @unique
 
-  items           CartItem[]
+  slug String @unique
 
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  title String
 
-  @@map("carts")
+  durationMinutes Int
+
+  passingScore Int
+
+  job Job @relation(fields: [jobId], references: [id])
+
+  attempts AssessmentAttempt[]
+
+  createdAt DateTime @default(now())
 }
 
-model CartItem {
-  id              String            @id @default(uuid())
+model AssessmentAttempt {
+  id String @id @default(uuid())
 
-  cartId          String
-  cart            Cart              @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  assessmentId String
 
-  productId       String
-  product         Product           @relation(fields: [productId], references: [id])
+  applicationId String? @unique
 
-  productVariantId String?
-  productVariant   ProductVariant?  @relation(fields: [productVariantId], references: [id])
+  score Float?
 
-  unitPrice       Decimal?          @db.Decimal(12,2)
-  quantity        Decimal           @db.Decimal(12,2)
+  passed Boolean?
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  status AssessmentStatus @default(NOT_STARTED)
 
-  @@unique([cartId, productId, productVariantId])
+  assessment Assessment @relation(fields: [assessmentId], references: [id])
 
-  @@index([cartId])
+  application Application? @relation(fields: [applicationId], references: [id])
 
-  @@index([productId])
+  generatedQuestions AssessmentAttemptQuestion[]
 
-  @@map("cart_items")
+  generatedRolePlays AssessmentAttemptRolePlay[]
+
+  answers AssessmentAnswer[]
+
+  rolePlayAnswers RolePlayAnswer[]
+
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
 }
 
-model Payment {
-  id                      String          @id @default(uuid())
+model AssessmentAnswer {
+  id String @id @default(uuid())
 
-  orderId                 String
-  order                   Order           @relation(fields: [orderId], references: [id])
+  attemptId        String
+  questionId       String
+  selectedOptionId String
 
-  amount                  Decimal         @db.Decimal(12,2)
+  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
 
-  currency                String
+  question QuestionBank @relation(fields: [questionId], references: [id])
 
-  provider                String          @default("STRIPE")
+  selectedOption QuestionBankOption @relation(fields: [selectedOptionId], references: [id])
 
-  stripePaymentIntentId   String?         @unique
+  @@unique([attemptId, questionId])
+}
 
-  stripeChargeId          String?         @unique
+model RolePlayAnswer {
+  id String @id @default(uuid())
 
-  status                  PaymentStatus
+  attemptId String
 
-  paidAt                  DateTime?
+  questionId String
 
-  createdAt               DateTime        @default(now())
-  updatedAt               DateTime        @updatedAt
+  answer String
 
-  @@index([orderId])
-  @@index([status])
+  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
 
-  @@map("payments")
+  question RolePlayBank @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, questionId])
+}
+
+model QuestionBank {
+  id String @id @default(uuid())
+
+  category QuestionCategory
+
+  difficulty QuestionDifficulty
+
+  question String   @unique
+
+  weight Int @default(5)
+
+  options QuestionBankOption[]
+
+  answers AssessmentAnswer[]
+
+  createdAt                  DateTime                    @default(now())
+  assessmentAttemptQuestions AssessmentAttemptQuestion[]
+}
+
+model QuestionBankOption {
+  id String @id @default(uuid())
+
+  questionId String
+
+  optionText String
+
+  isCorrect Boolean
+
+  question QuestionBank @relation(fields: [questionId], references: [id])
+
+  selectedAnswers AssessmentAnswer[]
+}
+
+model RolePlayBank {
+  id String @id @default(uuid())
+
+  category RolePlayCategory?
+
+  prompt String
+
+  answers RolePlayAnswer[]
+
+  createdAt                  DateTime                    @default(now())
+  assessmentAttemptRolePlays AssessmentAttemptRolePlay[]
+}
+
+model AssessmentAttemptQuestion {
+  id String @id @default(uuid())
+
+  attemptId String
+
+  questionId String
+
+  displayOrder Int
+
+  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
+
+  question QuestionBank @relation(fields: [questionId], references: [id])
+
+  @@index([attemptId])
+  @@index([questionId])
+
+  @@unique([attemptId, questionId])
+}
+
+model AssessmentAttemptRolePlay {
+  id String @id @default(uuid())
+
+  attemptId String
+
+  questionId String
+
+  displayOrder Int
+
+  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
+
+  question RolePlayBank @relation(fields: [questionId], references: [id])
+  
+  @@index([attemptId])
+  @@index([questionId])
+
+  @@unique([attemptId, questionId])
+}
+
+model Interview {
+  id String @id @default(uuid())
+
+  applicationId String
+
+  scheduledAt DateTime
+
+  meetingLink String?
+
+  notes String?
+
+  score Float?
+
+  status InterviewStatus @default(SCHEDULED)
+
+  application Application @relation(fields: [applicationId], references: [id])
+
+  createdAt DateTime @default(now())
 }

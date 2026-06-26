@@ -8,15 +8,14 @@ import { AppService } from './app.service';
 
 import appConfig from './config/app.config';
 
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { CountriesModule } from './modules/countries/countries.module';
-import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
-import { ProductModule } from './modules/products/product.module';
-import { CategoryModule } from './modules/categories/category.module';
-import { CartModule } from './modules/cart/cart.module';
-import { OrderModule } from './modules/orders/order.module';
-import { TokenModule } from './services/token/token.module';
+// import { AuthModule } from './modules/auth/auth.module';
+// import { UsersModule } from './modules/users/users.module';
+// import { CountriesModule } from './modules/countries/countries.module';
+// import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
+// import { CategoryModule } from './modules/categories/category.module';
+// import { AssessmentModule } from './modules/assessment/assessment.module';
+import { JobModule } from './modules/jobs/job.module';
+// import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
@@ -46,15 +45,14 @@ import { PrismaModule } from './prisma/prisma.module';
       ],
     }),
 
-    AuthModule,
-    UsersModule,
-    CountriesModule,
-    ClientDevicesModule,
-    CategoryModule,
-    ProductModule,
-    CartModule,
-    OrderModule,
-    TokenModule,
+    // AuthModule,
+    // UsersModule,
+    // CountriesModule,
+    // ClientDevicesModule,
+    // CategoryModule,
+    JobModule,
+    // AssessmentModule,
+    // TokenModule,
     MailModule,
     SmsModule,
     AxiosModule,

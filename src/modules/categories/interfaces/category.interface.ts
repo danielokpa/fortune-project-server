@@ -1,11 +1,11 @@
-import { Prisma } from '@prisma/client';
+// import { Prisma } from '@prisma/client';
 
-export interface ICreateCategory extends Prisma.CategoryCreateInput {}
+// export interface ICreateCategory extends Prisma.CategoryCreateInput {}
 
-export interface ICategorySearchParams {
-  search?: string;
+// export interface ICategorySearchParams {
+//   search?: string;
 
-  cursor?: string;
+//   cursor?: string;
 
-  limit?: number;
-}
+//   limit?: number;
+// }
