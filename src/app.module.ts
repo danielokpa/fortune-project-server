@@ -13,7 +13,7 @@ import appConfig from './config/app.config';
 // import { CountriesModule } from './modules/countries/countries.module';
 // import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 // import { CategoryModule } from './modules/categories/category.module';
-// import { AssessmentModule } from './modules/assessment/assessment.module';
+import { AssessmentModule } from './modules/assessment/assessment.module';
 import { JobModule } from './modules/jobs/job.module';
 // import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
@@ -51,7 +51,7 @@ import { PrismaModule } from './prisma/prisma.module';
     // ClientDevicesModule,
     // CategoryModule,
     JobModule,
-    // AssessmentModule,
+    AssessmentModule,
     // TokenModule,
     MailModule,
     SmsModule,

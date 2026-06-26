@@ -12,6 +12,7 @@ import {
 } from './seeds/user.seed';
 import { seedJobs } from './seeds/jobs.seed';
 import { seedQuestionBank } from './seeds/questions.seed';
+import { seedAssessments } from './seeds/assessment.seed';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -44,6 +45,7 @@ async function main() {
   );
 
   await seedQuestionBank(prisma);
+  await seedAssessments(prisma);
 
   console.log('\n');
 
