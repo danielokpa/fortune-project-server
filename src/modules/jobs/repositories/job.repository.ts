@@ -65,4 +65,21 @@ export class JobRepository {
       handleDatabaseError(error);
     }
   }
+
+  // async findPublishedById(id: string) {
+  //   try {
+  //     return await this.prisma.job.findFirst({
+  //       where: {
+  //         id,
+  //         status: JobStatus.PUBLISHED,
+  //       },
+  //       select: {
+  //         id: true,
+  //         title: true,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     handleDatabaseError(error);
+  //   }
+  // }
 }

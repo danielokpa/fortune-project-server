@@ -14,7 +14,9 @@ import appConfig from './config/app.config';
 // import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 // import { CategoryModule } from './modules/categories/category.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
+import { ApplicationModule } from './modules/application/application.module';
 import { JobModule } from './modules/jobs/job.module';
+import { CandidateModule } from './modules/candidates/candidate.module';
 // import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
@@ -52,6 +54,8 @@ import { PrismaModule } from './prisma/prisma.module';
     // CategoryModule,
     JobModule,
     AssessmentModule,
+    ApplicationModule,
+    CandidateModule,
     // TokenModule,
     MailModule,
     SmsModule,
