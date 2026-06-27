@@ -11,6 +11,10 @@ export function handleDatabaseError(error: unknown): never {
       case 'P2002':
         throw new ConflictException('Duplicate field value detected');
 
+      case 'P2003':
+        throw new ConflictException(
+            'Referenced record does not exist.',
+        );
       case 'P2025':
         throw new NotFoundException('Record not found');
 

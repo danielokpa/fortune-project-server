@@ -218,22 +218,22 @@ model Candidate {
   // candidateCode         String @unique
 
   fullName String
-  email    String
-  phone    String
+  email    String     
+  phone    String     
 
   whatsapp String?
 
-  residentialAddress String?
+  residentialAddress String
 
-  gender String?
+  gender String
 
-  dateOfBirth DateTime?
+  dateOfBirth DateTime
 
-  stateOfOrigin String?
+  stateOfOrigin String
 
-  currentLocation String?
+  currentLocation String
 
-  highestQualification String?
+  highestQualification String
 
   yearsOfExperience Int?
 
@@ -244,6 +244,7 @@ model Candidate {
   createdAt DateTime @default(now())
 
   @@unique([email])
+  @@unique([phone])
 }
 
 model CandidateDocument {
