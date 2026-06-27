@@ -46,6 +46,27 @@ export class AssessmentController {
   //     HttpStatus.CREATED,
   //   );
   // }
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Create assessment attempt',
+  })
+  async createAssessmentAttempt(
+    @Body()
+    dto: {assessmentId: string},
+  ) {
+    const data =
+      await this.assessmentService.generateAssessmentAttempt(
+        dto.assessmentId,
+    );
+
+    return ResponseUtil.handleResponse(
+      data,
+      'Assessment attempt generated successfully',
+      HttpStatus.OK,
+    );
+  }
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -76,37 +97,37 @@ export class AssessmentController {
     );
   }
 
-  // @Get(':id/questions')
-  // async getQuestions(
-  //   @Param('id', UuidValidationPipe)
-  //   id: string,
-  // ) {
-  //   const data =
-  //     await this.assessmentService.fetchQuestions(
-  //       id,
-  //     );
+  @Get(':id/questions')
+  async getQuestions(
+    @Param('id', UuidValidationPipe)
+    id: string,
+  ) {
+    const data =
+      await this.assessmentService.fetchQuestions(
+        id,
+      );
 
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Questions fetched successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
+    return ResponseUtil.handleResponse(
+      data,
+      'Questions fetched successfully',
+      HttpStatus.OK,
+    );
+  }
 
-  // @Get(':id/roleplay')
-  // async getRolePlayQuestions(
-  //   @Param('id', UuidValidationPipe)
-  //   id: string,
-  // ) {
-  //   const data =
-  //     await this.assessmentService.fetchRolePlayQuestions(
-  //       id,
-  //     );
+  @Get(':id/roleplay')
+  async getRolePlayQuestions(
+    @Param('id', UuidValidationPipe)
+    id: string,
+  ) {
+    const data =
+      await this.assessmentService.fetchRolePlayQuestions(
+        id,
+      );
 
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Role play questions fetched successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
+    return ResponseUtil.handleResponse(
+      data,
+      'Role play questions fetched successfully',
+      HttpStatus.OK,
+    );
+  }
 }

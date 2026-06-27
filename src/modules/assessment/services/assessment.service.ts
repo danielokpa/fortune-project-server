@@ -60,140 +60,140 @@ export class AssessmentService {
    * Frontend should call this first
    * before rendering questions.
    */
-  // async generateAssessmentAttempt(
-  //   assessmentId: string,
-  // ) {
-  //   return this.repository.generateAttempt(
-  //     assessmentId,
-  //   );
-  // }
+  async generateAssessmentAttempt(
+    assessmentId: string,
+  ) {
+    return this.repository.generateAttempt(
+      assessmentId,
+    );
+  }
 
   /**
    * Fetch generated MCQs
    */
-  // async fetchQuestions(
-  //   attemptId: string,
-  // ) {
-  //   const attempt =
-  //     await this.repository.getAttemptQuestions(
-  //       attemptId,
-  //     );
+  async fetchQuestions(
+    attemptId: string,
+  ) {
+    const attempt =
+      await this.repository.getAttemptQuestions(
+        attemptId,
+      );
 
-  //   if (!attempt) {
-  //     throw new NotFoundException(
-  //       'Assessment attempt not found',
-  //     );
-  //   }
+    if (!attempt) {
+      throw new NotFoundException(
+        'Assessment attempt not found',
+      );
+    }
 
-  //   const totalMarks =
-  //     attempt.generatedQuestions.reduce(
-  //       (sum, item) =>
-  //         sum + item.question.weight,
-  //       0,
-  //     );
+    const totalMarks =
+      attempt.generatedQuestions.reduce(
+        (sum, item) =>
+          sum + item.question.weight,
+        0,
+      );
 
-  //   return {
-  //     attemptId: attempt.id,
+    return {
+      attemptId: attempt.id,
 
-  //     assessmentId:
-  //       attempt.assessment.id,
+      assessmentId:
+        attempt.assessment.id,
 
-  //     title:
-  //       attempt.assessment.title,
+      title:
+        attempt.assessment.title,
 
-  //     durationMinutes:
-  //       attempt.assessment
-  //         .durationMinutes,
+      durationMinutes:
+        attempt.assessment
+          .durationMinutes,
 
-  //     passingScore:
-  //       attempt.assessment
-  //         .passingScore,
+      passingScore:
+        attempt.assessment
+          .passingScore,
 
-  //     totalQuestions:
-  //       attempt.generatedQuestions.length,
+      totalQuestions:
+        attempt.generatedQuestions.length,
 
-  //     totalMarks,
+      totalMarks,
 
-  //     questions:
-  //       attempt.generatedQuestions.map(
-  //         (item) => ({
-  //           id: item.question.id,
+      questions:
+        attempt.generatedQuestions.map(
+          (item) => ({
+            id: item.question.id,
 
-  //           order:
-  //             item.displayOrder,
+            order:
+              item.displayOrder,
 
-  //           category:
-  //             item.question.category,
+            category:
+              item.question.category,
 
-  //           difficulty:
-  //             item.question
-  //               .difficulty,
+            difficulty:
+              item.question
+                .difficulty,
 
-  //           question:
-  //             item.question.question,
+            question:
+              item.question.question,
 
-  //           weight:
-  //             item.question.weight,
+            weight:
+              item.question.weight,
 
-  //           options:
-  //             item.question.options.map(
-  //               (option) => ({
-  //                 id: option.id,
-  //                 text:
-  //                   option.optionText,
-  //               }),
-  //             ),
-  //         }),
-  //       ),
-  //   };
-  // }
+            options:
+              item.question.options.map(
+                (option) => ({
+                  id: option.id,
+                  text:
+                    option.optionText,
+                }),
+              ),
+          }),
+        ),
+    };
+  }
 
   /**
    * Fetch generated Roleplays
    */
-  // async fetchRolePlayQuestions(
-  //   attemptId: string,
-  // ) {
-  //   const attempt =
-  //     await this.repository.getAttemptRolePlays(
-  //       attemptId,
-  //     );
+  async fetchRolePlayQuestions(
+    attemptId: string,
+  ) {
+    const attempt =
+      await this.repository.getAttemptRolePlays(
+        attemptId,
+      );
 
-  //   if (!attempt) {
-  //     throw new NotFoundException(
-  //       'Assessment attempt not found',
-  //     );
-  //   }
+    if (!attempt) {
+      throw new NotFoundException(
+        'Assessment attempt not found',
+      );
+    }
 
-  //   return {
-  //     attemptId: attempt.id,
+    return {
+      attemptId: attempt.id,
 
-  //     assessmentId:
-  //       attempt.assessment.id,
+      assessmentId:
+        attempt.assessment.id,
 
-  //     title:
-  //       attempt.assessment.title,
+      title:
+        attempt.assessment.title,
 
-  //     minimumCharacters: 20,
+      minimumCharacters: 20,
 
-  //     totalQuestions:
-  //       attempt.generatedRolePlays.length,
+      totalQuestions:
+        attempt.generatedRolePlays.length,
 
-  //     questions:
-  //       attempt.generatedRolePlays.map(
-  //         (item) => ({
-  //           id: item.question.id,
+      questions:
+        attempt.generatedRolePlays.map(
+          (item) => ({
+            id: item.question.id,
 
-  //           order:
-  //             item.displayOrder,
+            order:
+              item.displayOrder,
 
-  //           category:
-  //             item.question.category,
+            category:
+              item.question.category,
 
-  //           prompt:
-  //             item.question.prompt,
-  //         }),
-  //       ),
-  //   };
-  // }
+            prompt:
+              item.question.prompt,
+          }),
+        ),
+    };
+  }
 }
