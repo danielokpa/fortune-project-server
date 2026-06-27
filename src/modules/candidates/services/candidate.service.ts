@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { ApplicationRepository } from '../repositories/application.repository';
+import { ApplicationRepository } from '../../application/repositories/application.repository';
 
 import { CreateCandidateDto } from '../dto/candidate.dto';
 
 import { CandidateDocumentsQueuedEvent } from '../events/candidate-documents.event';
+import { CANDIDATE_EVENTS } from '../events/candidate.event';
 
 @Injectable()
 export class CandidateService {

@@ -3,7 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 // import { CandidateDocumentService } from '../services/candidate-document.service';
 import { CandidateDocumentsQueuedEvent } from '../events/candidate-documents.event';
-import { CANDIDATE_EVENTS } from 'src/enums/candidate-events.enum';
+import { CANDIDATE_EVENTS } from '../events/candidate.event';
 
 @Injectable()
 export class CandidateDocumentsListener {

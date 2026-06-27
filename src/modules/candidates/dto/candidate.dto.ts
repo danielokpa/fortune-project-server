@@ -14,6 +14,39 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class DocumentsDto {
+  @ApiPropertyOptional({ 
+    description: 'Secure cloud URL pointing to the candidate passport photograph', 
+    example: 'https://provider.com' 
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'Photo URL must be a valid secure web link' })
+  photoUrl?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'Secure cloud URL pointing to the candidate curriculum vitae (CV)', 
+    example: 'https://provider.com' 
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'CV URL must be a valid secure web link' })
+  cvUrl?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'Secure cloud URL pointing to the candidate driver license document', 
+    example: 'https://provider.com' 
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'Drivers license URL must be a valid secure web link' })
+  driversLicenseUrl?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'Secure cloud URL pointing to the candidate NYSC discharge or exemption certificate', 
+    example: 'https://provider.com' 
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'NYSC certificate URL must be a valid secure web link' })
+  nyscUrl?: string;
+}
 export class CreateCandidateDto {
   @ApiProperty({ 
     description: 'The full name of the candidate', 
@@ -35,7 +68,7 @@ export class CreateCandidateDto {
     description: 'The primary contact phone number (include country code)', 
     example: '+2348012345678' 
   })
-  @IsPhoneNumber(null, { message: 'Phone number must be valid and include country code' })
+  @IsPhoneNumber(undefined, { message: 'Phone number must be valid and include country code' })
   @IsNotEmpty({ message: 'Phone number is required' })
   phone: string;
 
@@ -44,7 +77,7 @@ export class CreateCandidateDto {
     example: '+2348012345678' 
   })
   @IsOptional()
-  @IsPhoneNumber(null, { message: 'WhatsApp number must be a valid phone number' })
+  @IsPhoneNumber(undefined, { message: 'WhatsApp number must be a valid phone number' })
   whatsapp?: string;
 
   @ApiProperty({ 
@@ -113,38 +146,4 @@ export class CreateCandidateDto {
   })
   @IsUUID()
   jobId: string;
-}
-
-export class DocumentsDto {
-  @ApiPropertyOptional({ 
-    description: 'Secure cloud URL pointing to the candidate passport photograph', 
-    example: 'https://provider.com' 
-  })
-  @IsOptional()
-  @IsUrl({}, { message: 'Photo URL must be a valid secure web link' })
-  photoUrl?: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Secure cloud URL pointing to the candidate curriculum vitae (CV)', 
-    example: 'https://provider.com' 
-  })
-  @IsOptional()
-  @IsUrl({}, { message: 'CV URL must be a valid secure web link' })
-  cvUrl?: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Secure cloud URL pointing to the candidate driver license document', 
-    example: 'https://provider.com' 
-  })
-  @IsOptional()
-  @IsUrl({}, { message: 'Drivers license URL must be a valid secure web link' })
-  driversLicenseUrl?: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Secure cloud URL pointing to the candidate NYSC discharge or exemption certificate', 
-    example: 'https://provider.com' 
-  })
-  @IsOptional()
-  @IsUrl({}, { message: 'NYSC certificate URL must be a valid secure web link' })
-  nyscUrl?: string;
 }

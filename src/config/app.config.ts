@@ -21,6 +21,10 @@ export default registerAs('app', () => ({
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
   twilioFromNumber: process.env.TWILIO_FROM_NUMBER || '',
   imageBaseUrl: process.env.IMAGE_BASE_URL || '',
+  r2EndPoint: process.env.R2_ENDPOINT || '',
+  r2Bucket: process.env.R2_BUCKET || 'candidates',
+  r2AccessKey: process.env.R2_ACCESS_KEY! || 'null',
+  r2SecretKey: process.env.R2_SECRET_KEY! || 'null',
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT || '3306', 10),

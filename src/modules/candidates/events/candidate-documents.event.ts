@@ -1,4 +1,4 @@
-import { ICandidateDocumentsPayload } from '../events/candidate-documents.interface';
+import { ICandidateDocumentsPayload } from '../interfaces/candidate-documents.interface';
 
 export interface CandidateDocumentsQueuedEventPayload {
   candidateId: string;

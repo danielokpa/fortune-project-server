@@ -17,6 +17,8 @@ import { AssessmentModule } from './modules/assessment/assessment.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { JobModule } from './modules/jobs/job.module';
 import { CandidateModule } from './modules/candidates/candidate.module';
+import { UploadModule } from './modules/uploads/upload.module';
+import { CloudflareModule } from './services/cloudflare/cloudflare.module';
 // import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
@@ -56,6 +58,8 @@ import { PrismaModule } from './prisma/prisma.module';
     AssessmentModule,
     ApplicationModule,
     CandidateModule,
+    UploadModule,
+    CloudflareModule,
     // TokenModule,
     MailModule,
     SmsModule,
