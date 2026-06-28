@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Prisma, JobStatus } from '@prisma/client';
+import { Prisma, JobStatus, ApplicationStatus } from '@prisma/client';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 import { ICreateCandidate } from '../../candidates/interfaces/candidate.interface';
 
@@ -80,12 +80,21 @@ export class ApplicationRepository {
             data: {
               jobId: dto.jobId,
               candidateId: candidate.id,
+              status: ApplicationStatus.ASSESSMENT_PENDING,
             },
 
             include: {
               job: true,
             },
 
+          });
+          
+          await tx.applicationStatusHistory.create({
+            data: {
+              applicationId: application.id,
+              status:
+                ApplicationStatus.ASSESSMENT_PENDING,
+            },
           });
 
           return {

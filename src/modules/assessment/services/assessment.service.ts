@@ -1,26 +1,310 @@
 import {
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { ApplicationStatus, AssessmentStatus, DocumentType } from '@prisma/client';
 import { SubmitAssessmentDto } from '../dto/assessment.dto';
 import { AssessmentRepository } from '../repositories/assessment.repository';
 import { ApplicationSubmissionService } from './application-submission.service';
+import { AssessmentScoringService } from './assessment-scoring.service';
+import { AssessmentEvents } from '../events/assessment.events';
 
 @Injectable()
 export class AssessmentService {
   constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
     private readonly repository: AssessmentRepository,
     private readonly submissionService: ApplicationSubmissionService,
+    private readonly scoringService: AssessmentScoringService,
   ) {}
 
-  // async submitAssessment(
-  //   dto: SubmitAssessmentDto,
-  // ) {
-  //   return this.submissionService.submitAssessment(
-  //     dto,
-  //   );
-  // }
+  async submitAssessment(
+    dto: SubmitAssessmentDto,
+  ) {
+    const attempt =
+      await this.repository.getAttemptForSubmission(
+        dto.attemptId,
+      );
+
+    if (!attempt) {
+      throw new NotFoundException(
+        'Assessment attempt not found',
+      );
+    }
+    if (!attempt.application) {
+      throw new NotFoundException(
+        'Assessment attempt is not linked to an application.',
+      );
+    }
+    const application = attempt.application;
+
+    if (
+      attempt.status ===
+      AssessmentStatus.COMPLETED
+    ) {
+      throw new ConflictException(
+        'Assessment has already been submitted.',
+      );
+    }
+
+    const answerMap = new Map(
+      dto.mcqAnswers.map((answer) => [
+        answer.questionId,
+        answer.selectedOptionId,
+      ]),
+    );
+
+    const score =
+      this.scoringService.calculate(
+        attempt.generatedQuestions.map(q => q.question),
+        answerMap,
+      );
+
+    const passed =
+      score.percentage >=
+      attempt.assessment.passingScore;
+
+    const transactionResult =
+      await this.prisma.$transaction(
+        async (tx) => {
+
+          const existingCandidate =
+            await tx.candidate.findUnique({
+              where: {
+                id:
+                  application.candidateId,
+              },
+            });
+
+          if (!existingCandidate) {
+            throw new NotFoundException('Candidate not found');
+          }
+
+          // const existingApplication =
+          //   await tx.application.findUnique({
+          //     where: {
+          //       jobId_candidateId: {
+          //         jobId:
+          //           attempt.assessment.jobId,
+
+          //         candidateId:
+          //           existingCandidate.id,
+          //       },
+          //     },
+          //   });
+
+          // if (existingApplication) {
+          //   throw new ConflictException(
+          //     'You already applied for this role',
+          //   );
+          // }
+
+          const documents: Array<{
+            candidateId: string;
+            type: DocumentType;
+            fileUrl: string;
+          }> = [];
+
+          if (
+            dto.documents.photoUrl
+          ) {
+            documents.push({
+              candidateId:
+                existingCandidate.id,
+
+              type: DocumentType.PHOTO,
+
+              fileUrl:
+                dto.documents.photoUrl,
+            });
+          }
+
+          if (
+            dto.documents.cvUrl
+          ) {
+            documents.push({
+              candidateId:
+                existingCandidate.id,
+
+              type: DocumentType.CV,
+
+              fileUrl:
+                dto.documents.cvUrl,
+            });
+          }
+
+          if (
+            dto.documents
+              .driversLicenseUrl
+          ) {
+            documents.push({
+              candidateId:
+                existingCandidate.id,
+
+              type:
+                DocumentType.DRIVERS_LICENSE,
+
+              fileUrl:
+                dto.documents
+                  .driversLicenseUrl,
+            });
+          }
+
+          if (
+            dto.documents.nyscUrl
+          ) {
+            documents.push({
+              candidateId:
+                existingCandidate.id,
+
+              type:
+                DocumentType.NYSC,
+
+              fileUrl:
+                dto.documents.nyscUrl,
+            });
+          }
+
+          if (documents.length) {
+            await tx.candidateDocument.createMany({
+              data: documents,
+            });
+          }
+
+          await tx.assessmentAttempt.update({
+            where: {
+              id: attempt.id,
+            },
+
+            data: {
+              score: score.percentage,
+              passed,
+              status: AssessmentStatus.COMPLETED,
+              submittedAt: new Date(),
+            },
+          });
+
+          await tx.assessmentAnswer.createMany({
+            data:
+              dto.mcqAnswers.map(
+                (answer) => ({
+                  attemptId:
+                    attempt.id,
+
+                  questionId:
+                    answer.questionId,
+
+                  selectedOptionId:
+                    answer.selectedOptionId,
+                }),
+              ),
+          });
+
+          await tx.rolePlayAnswer.createMany({
+            data:
+              dto.rolePlayAnswers.map(
+                (answer) => ({
+                  attemptId:
+                    attempt.id,
+
+                  questionId:
+                    answer.questionId,
+
+                  answer:
+                    answer.answer,
+                }),
+              ),
+          });
+
+          const updatedApplication = 
+            await tx.application.update({
+              where: {
+                jobId_candidateId: {
+                  jobId: attempt.assessment.jobId,
+                  candidateId: existingCandidate.id,
+                },
+              },
+
+              data: {
+                status: ApplicationStatus.ASSESSMENT_COMPLETED,
+              },
+            });
+
+          await tx.applicationStatusHistory.create({
+            data: {
+              applicationId: application.id,
+              status: ApplicationStatus.ASSESSMENT_COMPLETED,
+            },
+          });
+
+          return {
+            candidateId: existingCandidate.id,
+            applicationId: application.id,
+            assessmentId: attempt.assessmentId,
+            score: score.percentage,
+            passed,
+          };
+    
+        },
+      );
+
+    this.eventEmitter.emit(
+      AssessmentEvents.ASSESSMENT_COMPLETED,
+      {
+        candidateId:
+          application.candidateId,
+        applicationId:
+          application.id,
+        assessmentId:
+          attempt.assessmentId,
+        score:
+          score.percentage,
+        passed,
+      },
+    );
+    // if (
+    //   transactionResult.candidateCreated
+    // ) {
+    //   this.eventEmitter.emit(
+    //     AssessmentEvents.CANDIDATE_CREATED,
+    //     {
+    //       candidateId:
+    //         transactionResult.candidateId,
+    //     },
+    //   );
+    // }
+
+    // this.eventEmitter.emit(
+    //   AssessmentEvents.APPLICATION_SUBMITTED,
+    //   {
+    //     applicationId:
+    //       transactionResult.applicationId,
+    //   },
+    // );
+
+    // this.eventEmitter.emit(
+    //   AssessmentEvents.ASSESSMENT_COMPLETED,
+    //   {
+    //     candidateId:
+    //       transactionResult.candidateId,
+
+    //     applicationId:
+    //       transactionResult.applicationId,
+
+    //     score:
+    //       transactionResult.score,
+
+    //     passed:
+    //       transactionResult.passed,
+    //   },
+    // );
+
+    return transactionResult;
+  }
 
   // keep
   async getAssessments() {

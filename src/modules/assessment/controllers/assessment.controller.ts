@@ -24,28 +24,7 @@ export class AssessmentController {
   constructor(
     private readonly assessmentService: AssessmentService,
   ) {}
-  
-  // @Post()
-  // @HttpCode(HttpStatus.CREATED)
-  // @ApiOperation({
-  //   summary:
-  //     'Submit assessment and application',
-  // })
-  // async submitAssessment(
-  //   @Body()
-  //   dto: SubmitAssessmentDto,
-  // ) {
-  //   const data =
-  //     await this.assessmentService.submitAssessment(
-  //       dto,
-  //   );
 
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Assessment submitted successfully',
-  //     HttpStatus.CREATED,
-  //   );
-  // }
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -65,6 +44,28 @@ export class AssessmentController {
       data,
       'Assessment attempt generated successfully',
       HttpStatus.OK,
+    );
+  }
+
+  @Post('submit')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary:
+      'Submit assessment and application',
+  })
+  async submitAssessment(
+    @Body()
+    dto: SubmitAssessmentDto,
+  ) {
+    const data =
+      await this.assessmentService.submitAssessment(
+        dto,
+    );
+
+    return ResponseUtil.handleResponse(
+      data,
+      'Assessment submitted successfully',
+      HttpStatus.CREATED,
     );
   }
 

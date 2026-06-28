@@ -163,9 +163,9 @@ export class RolePlayAnswerDto {
 }
 
 export class SubmitAssessmentDto {
-  @ValidateNested()
-  @Type(() => CandidateDto)
-  candidate: CandidateDto;
+  // @ValidateNested()
+  // @Type(() => CandidateDto)
+  // candidate: CandidateDto;
 
   @ValidateNested()
   @Type(() => DocumentsDto)
