@@ -301,6 +301,12 @@ export class AssessmentRepository {
             job: true,
           },
         },
+  
+        application: {
+          include: {
+            candidate: true,
+          },
+        },
 
         generatedQuestions: {
           include: {
@@ -310,11 +316,17 @@ export class AssessmentRepository {
               },
             },
           },
+          orderBy: {
+            displayOrder: 'asc',
+          },
         },
 
         generatedRolePlays: {
           include: {
             question: true,
+          },
+          orderBy: {
+            displayOrder: 'asc',
           },
         },
       },
