@@ -8,6 +8,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { ApplicationStatus, AssessmentStatus, DocumentType } from '@prisma/client';
 import { SubmitAssessmentDto } from '../dto/assessment.dto';
 import { AssessmentRepository } from '../repositories/assessment.repository';
+import { ApplicationRepository } from '../../application/repositories/application.repository';
 import { ApplicationSubmissionService } from './application-submission.service';
 import { AssessmentScoringService } from './assessment-scoring.service';
 import { AssessmentEvents } from '../events/assessment.events';
@@ -20,6 +21,7 @@ export class AssessmentService {
     private readonly repository: AssessmentRepository,
     private readonly submissionService: ApplicationSubmissionService,
     private readonly scoringService: AssessmentScoringService,
+    private readonly applicationRepository: ApplicationRepository
   ) {}
 
   async submitAssessment(
@@ -346,9 +348,14 @@ export class AssessmentService {
    */
   async generateAssessmentAttempt(
     assessmentId: string,
+    applicationId: string,
   ) {
+    const application = await this.applicationRepository.findApplication(applicationId);
+    if (!application) throw new NotFoundException('Applicationn not found');
+  
     return this.repository.generateAttempt(
       assessmentId,
+      application.id,
     );
   }
 
