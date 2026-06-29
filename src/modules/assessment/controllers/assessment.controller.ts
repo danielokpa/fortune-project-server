@@ -33,11 +33,12 @@ export class AssessmentController {
   })
   async createAssessmentAttempt(
     @Body()
-    dto: {assessmentId: string},
+    dto: { assessmentId: string, applicationId: string },
   ) {
     const data =
       await this.assessmentService.generateAssessmentAttempt(
         dto.assessmentId,
+        dto.applicationId,
     );
 
     return ResponseUtil.handleResponse(

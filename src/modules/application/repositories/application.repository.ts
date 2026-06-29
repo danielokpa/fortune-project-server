@@ -122,4 +122,29 @@ export class ApplicationRepository {
       handleDatabaseError(error);
     }
   }
+
+  async findApplication(applicationId: string) {
+    try {
+      const application =
+        await this.prisma.application.findUnique({
+          where: {
+            id: applicationId,
+          },
+          select: {
+            id: true,
+            candidateId: true,
+            jobId: true,
+          },
+        });
+
+      if (!application) {
+        throw new NotFoundException(
+          'Application not found',
+        );
+      }
+      return application;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  } 
 }

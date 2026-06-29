@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   Prisma,
   QuestionCategory,
+  AssessmentStatus,
 } from '@prisma/client';
 
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -76,6 +77,7 @@ export class AssessmentRepository {
 
   async generateAttempt(
     assessmentId: string,
+    applicationId: string,
   ) {
     const assessment =
       await this.prisma.assessment.findUnique({
@@ -180,7 +182,7 @@ export class AssessmentRepository {
         data: {
           assessmentId,
 
-          status: 'NOT_STARTED',
+          status: AssessmentStatus.NOT_STARTED,
         },
       });
 
@@ -211,6 +213,19 @@ export class AssessmentRepository {
         }),
       ),
     });
+    await this.prisma.application.update({
+      where: {
+        id: applicationId,
+      },
+      data: {
+        assessmentAttempt: {
+          connect: {
+            id: attempt.id,
+          },
+        },
+      }
+    });
+
 
     return {
       attemptId: attempt.id,
