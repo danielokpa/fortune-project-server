@@ -213,18 +213,26 @@ export class AssessmentRepository {
         }),
       ),
     });
-    await this.prisma.application.update({
+    await this.prisma.assessmentAttempt.update({
       where: {
-        id: applicationId,
+        id: attempt.id,
       },
       data: {
-        assessmentAttempt: {
-          connect: {
-            id: attempt.id,
-          },
-        },
-      }
+        applicationId,
+      },
     });
+    // await this.prisma.application.update({
+    //   where: {
+    //     id: applicationId,
+    //   },
+    //   data: {
+    //     assessmentAttempt: {
+    //       connect: {
+    //         id: attempt.id,
+    //       },
+    //     },
+    //   }
+    // });
 
 
     return {
