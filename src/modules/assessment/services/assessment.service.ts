@@ -351,7 +351,7 @@ export class AssessmentService {
     applicationId: string,
   ) {
     const application = await this.applicationRepository.findApplication(applicationId);
-    if (!application) throw new NotFoundException('Applicationn not found');
+    if (!application) throw new NotFoundException('Application not found');
   
     return this.repository.generateAttempt(
       assessmentId,
