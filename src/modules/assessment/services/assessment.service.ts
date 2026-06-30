@@ -105,77 +105,77 @@ export class AssessmentService {
           //   );
           // }
 
-          const documents: Array<{
-            candidateId: string;
-            type: DocumentType;
-            fileUrl: string;
-          }> = [];
+          // const documents: Array<{
+          //   candidateId: string;
+          //   type: DocumentType;
+          //   fileUrl: string;
+          // }> = [];
 
-          if (
-            dto.documents.photoUrl
-          ) {
-            documents.push({
-              candidateId:
-                existingCandidate.id,
+          // if (
+          //   dto.documents.photoUrl
+          // ) {
+          //   documents.push({
+          //     candidateId:
+          //       existingCandidate.id,
 
-              type: DocumentType.PHOTO,
+          //     type: DocumentType.PHOTO,
 
-              fileUrl:
-                dto.documents.photoUrl,
-            });
-          }
+          //     fileUrl:
+          //       dto.documents.photoUrl,
+          //   });
+          // }
 
-          if (
-            dto.documents.cvUrl
-          ) {
-            documents.push({
-              candidateId:
-                existingCandidate.id,
+          // if (
+          //   dto.documents.cvUrl
+          // ) {
+          //   documents.push({
+          //     candidateId:
+          //       existingCandidate.id,
 
-              type: DocumentType.CV,
+          //     type: DocumentType.CV,
 
-              fileUrl:
-                dto.documents.cvUrl,
-            });
-          }
+          //     fileUrl:
+          //       dto.documents.cvUrl,
+          //   });
+          // }
 
-          if (
-            dto.documents
-              .driversLicenseUrl
-          ) {
-            documents.push({
-              candidateId:
-                existingCandidate.id,
+          // if (
+          //   dto.documents
+          //     .driversLicenseUrl
+          // ) {
+          //   documents.push({
+          //     candidateId:
+          //       existingCandidate.id,
 
-              type:
-                DocumentType.DRIVERS_LICENSE,
+          //     type:
+          //       DocumentType.DRIVERS_LICENSE,
 
-              fileUrl:
-                dto.documents
-                  .driversLicenseUrl,
-            });
-          }
+          //     fileUrl:
+          //       dto.documents
+          //         .driversLicenseUrl,
+          //   });
+          // }
 
-          if (
-            dto.documents.nyscUrl
-          ) {
-            documents.push({
-              candidateId:
-                existingCandidate.id,
+          // if (
+          //   dto.documents.nyscUrl
+          // ) {
+          //   documents.push({
+          //     candidateId:
+          //       existingCandidate.id,
 
-              type:
-                DocumentType.NYSC,
+          //     type:
+          //       DocumentType.NYSC,
 
-              fileUrl:
-                dto.documents.nyscUrl,
-            });
-          }
+          //     fileUrl:
+          //       dto.documents.nyscUrl,
+          //   });
+          // }
 
-          if (documents.length) {
-            await tx.candidateDocument.createMany({
-              data: documents,
-            });
-          }
+          // if (documents.length) {
+          //   await tx.candidateDocument.createMany({
+          //     data: documents,
+          //   });
+          // }
 
           await tx.assessmentAttempt.update({
             where: {

@@ -167,9 +167,9 @@ export class SubmitAssessmentDto {
   // @Type(() => CandidateDto)
   // candidate: CandidateDto;
 
-  @ValidateNested()
-  @Type(() => DocumentsDto)
-  documents: DocumentsDto;
+  // @ValidateNested()
+  // @Type(() => DocumentsDto)
+  // documents: DocumentsDto;
 
   @IsUUID()
   attemptId: string;
