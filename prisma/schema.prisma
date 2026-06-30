@@ -442,6 +442,8 @@ model QuestionBankOption {
   question QuestionBank @relation(fields: [questionId], references: [id])
 
   selectedAnswers AssessmentAnswer[]
+
+  @@unique([questionId, optionText])
 }
 
 model RolePlayBank {
@@ -455,6 +457,8 @@ model RolePlayBank {
 
   createdAt                  DateTime                    @default(now())
   assessmentAttemptRolePlays AssessmentAttemptRolePlay[]
+
+  @@unique([category, prompt])
 }
 
 model AssessmentAttemptQuestion {

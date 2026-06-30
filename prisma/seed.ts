@@ -29,39 +29,39 @@ async function main() {
   // await seedCountries(prisma);
   // await seedStates(prisma);
 
-  const organization =
-    await seedOrganization(
-      prisma,
-    );
+  // const organization =
+  //   await seedOrganization(
+  //     prisma,
+  //   );
 
-  const admin =
-    await seedAdminUser(
-      prisma,
-      organization.id,
-    );
+  // const admin =
+  //   await seedAdminUser(
+  //     prisma,
+  //     organization.id,
+  //   );
 
-  await seedJobs(
-    prisma,
-  );
+  // await seedJobs(
+  //   prisma,
+  // );
 
-  await seedQuestionBank(prisma);
+  // await seedQuestionBank(prisma);
   await seedAssessments(prisma);
 
-  console.log('\n');
+  // console.log('\n');
 
-  console.log(
-    'Organization ID:',
-    organization.id,
-  );
+  // console.log(
+  //   'Organization ID:',
+  //   organization.id,
+  // );
 
-  console.log(
-    'Admin User ID:',
-    admin.id,
-  );
+  // console.log(
+  //   'Admin User ID:',
+  //   admin.id,
+  // );
 
-  console.log(
-    '\n✅ Base seed complete\n',
-  );
+  // console.log(
+  //   '\n✅ Base seed complete\n',
+  // );
 }
 
 main()
