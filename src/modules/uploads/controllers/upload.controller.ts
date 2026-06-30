@@ -22,7 +22,7 @@ export class UploadController {
   @ApiOkResponse({
     type: UploadResponseDto,
   })
-  generateCandidateUploadUrl(
+  async generateCandidateUploadUrl(
     @Body() dto: GenerateUploadUrlDto,
   ) {
     const data = await this.uploadService.generateCandidateUploadUrl(
