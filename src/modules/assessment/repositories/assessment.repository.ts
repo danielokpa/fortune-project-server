@@ -75,169 +75,69 @@ export class AssessmentRepository {
    |--------------------------------------------------------------------------
    */
 
-  async generateAttempt(
-    assessmentId: string,
-    applicationId: string,
-  ) {
-    const assessment =
-      await this.prisma.assessment.findUnique({
-        where: {
-          id: assessmentId,
-        },
-      });
+  private shuffle<T>(items: T[]): T[] {
+    const arr = [...items];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 
-    if (!assessment) {
-      return null;
+  async generateAttempt(assessmentId: string, applicationId: string) {
+    const assessment = await this.prisma.assessment.findUnique({
+      where: { id: assessmentId },
+    });
+    if (!assessment) return null;
+
+    // Tune these per your real spec — they currently sum to 20.
+    const MCQ_COUNTS: Record<QuestionCategory, number> = {
+      [QuestionCategory.PROFESSIONAL_ATTITUDE]: 4,
+      [QuestionCategory.EMOTIONAL_INTELLIGENCE]: 4,
+      [QuestionCategory.CUSTOMER_SERVICE]: 4,
+      [QuestionCategory.SAFETY]: 4,
+      [QuestionCategory.AVAILABILITY]: 4,
+    };
+    const ROLEPLAY_COUNT = 5;
+
+    const mcqs: any[] = [];
+    for (const [category, count] of Object.entries(MCQ_COUNTS)) {
+      if (count <= 0) continue;
+      const pool = await this.prisma.questionBank.findMany({
+        where: { category: category as QuestionCategory },
+      });
+      mcqs.push(...this.shuffle(pool).slice(0, count));
     }
 
-    /*
-     * Random MCQs by category
-     */
+    const roleplayPool = await this.prisma.rolePlayBank.findMany();
+    const roleplays = this.shuffle(roleplayPool).slice(0, ROLEPLAY_COUNT);
 
-    const professional =
-      await this.prisma.questionBank.findMany({
-        where: {
-          category:
-            QuestionCategory.PROFESSIONAL_ATTITUDE,
-        },
-
-        take: 20,
-
-        orderBy: {
-          createdAt: 'asc',
-        },
-      });
-
-    const emotional =
-      await this.prisma.questionBank.findMany({
-        where: {
-          category:
-            QuestionCategory.EMOTIONAL_INTELLIGENCE,
-        },
-
-        take: 20,
-
-        orderBy: {
-          createdAt: 'asc',
-        },
-      });
-
-    const customer =
-      await this.prisma.questionBank.findMany({
-        where: {
-          category:
-            QuestionCategory.CUSTOMER_SERVICE,
-        },
-
-        take: 20,
-
-        orderBy: {
-          createdAt: 'asc',
-        },
-      });
-
-    const safety =
-      await this.prisma.questionBank.findMany({
-        where: {
-          category:
-            QuestionCategory.SAFETY,
-        },
-
-        take: 20,
-
-        orderBy: {
-          createdAt: 'asc',
-        },
-      });
-
-    const availability =
-      await this.prisma.questionBank.findMany({
-        where: {
-          category:
-            QuestionCategory.AVAILABILITY,
-        },
-
-        take: 10,
-
-        orderBy: {
-          createdAt: 'asc',
-        },
-      });
-
-    const mcqs = [
-      ...professional,
-      ...emotional,
-      ...customer,
-      ...safety,
-      ...availability,
-    ];
-
-    const roleplays =
-      await this.prisma.rolePlayBank.findMany({
-        take: 20,
-      });
-
-    const attempt =
-      await this.prisma.assessmentAttempt.create({
-        data: {
-          assessmentId,
-
-          status: AssessmentStatus.NOT_STARTED,
-        },
-      });
+    const attempt = await this.prisma.assessmentAttempt.create({
+      data: { assessmentId, status: AssessmentStatus.NOT_STARTED },
+    });
 
     await this.prisma.assessmentAttemptQuestion.createMany({
-      data: mcqs.map(
-        (question, index) => ({
-          attemptId: attempt.id,
-
-          questionId:
-            question.id,
-
-          displayOrder:
-            index + 1,
-        }),
-      ),
+      data: mcqs.map((q, i) => ({
+        attemptId: attempt.id,
+        questionId: q.id,
+        displayOrder: i + 1,
+      })),
     });
 
     await this.prisma.assessmentAttemptRolePlay.createMany({
-      data: roleplays.map(
-        (question, index) => ({
-          attemptId: attempt.id,
-
-          questionId:
-            question.id,
-
-          displayOrder:
-            index + 1,
-        }),
-      ),
+      data: roleplays.map((q, i) => ({
+        attemptId: attempt.id,
+        questionId: q.id,
+        displayOrder: i + 1,
+      })),
     });
+
     await this.prisma.assessmentAttempt.update({
-      where: {
-        id: attempt.id,
-      },
-      data: {
-        applicationId,
-      },
+      where: { id: attempt.id },
+      data: { applicationId },
     });
-    // await this.prisma.application.update({
-    //   where: {
-    //     id: applicationId,
-    //   },
-    //   data: {
-    //     assessmentAttempt: {
-    //       connect: {
-    //         id: attempt.id,
-    //       },
-    //     },
-    //   }
-    // });
 
-
-    return {
-      attemptId: attempt.id,
-    };
+    return { attemptId: attempt.id };
   }
 
   /*

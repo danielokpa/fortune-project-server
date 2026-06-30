@@ -5,42 +5,42 @@ export async function seedAssessments(
 ) {
   const assessments = [
     {
-      jobId: '4fd915b0-c452-4e31-b6ce-7ebe35c44b17', // Paste your Job ID here
+      jobId: '24610979-4b3b-4ea6-8a60-6f4355598fde', // Paste your Job ID here
       slug: 'male-driver',
       title: 'Male Driver',
       durationMinutes: 30,
       passingScore: 75,
     },
     {
-      jobId: '3dcbe116-4e36-49b8-b4d6-095adb4d11ae', // Paste your Job ID here
+      jobId: 'db65b267-910f-40cb-b0d0-e5ed92168d47', // Paste your Job ID here
       slug: 'female-driver',
       title: 'Female Driver',
       durationMinutes: 30,
       passingScore: 75,
     },
     {
-      jobId: 'f9c3c74a-73dc-4ffe-9408-1ecd6f76df40', // Paste your Job ID here
+      jobId: 'ede783c5-8869-4db6-9569-48aa01fed54f', // Paste your Job ID here
       slug: 'customer-support',
       title: 'Customer Support',
       durationMinutes: 30,
       passingScore: 75,
     },
     {
-      jobId: '4ee2bcdf-f29c-4cad-9440-b95d0da80833', // Paste your Job ID here
+      jobId: '4730c375-50f6-487a-8d54-bed2e0670198', // Paste your Job ID here
       slug: 'administrative-executive',
       title: 'Administrative Executive',
       durationMinutes: 30,
       passingScore: 75,
     },
     {
-      jobId: '1ab4f54f-8d52-45a2-87a0-26a0b0ff900f', // Paste your Job ID here
+      jobId: '2ecf8b11-a03a-4002-af64-49ebbfbda479', // Paste your Job ID here
       slug: 'inventory-coordinator',
       title: 'Inventory Coordinator',
       durationMinutes: 30,
       passingScore: 75,
     },
     {
-      jobId: '21ae390e-f76f-422c-885c-1e9b7378c02b', // Paste your Job ID here
+      jobId: '5ee415f4-4ef4-49a1-9271-17f5a36692f7', // Paste your Job ID here
       slug: 'operations-officer',
       title: 'Operations Officer',
       durationMinutes: 30,
