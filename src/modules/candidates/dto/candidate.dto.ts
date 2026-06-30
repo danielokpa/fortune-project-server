@@ -20,7 +20,7 @@ export class DocumentsDto {
     example: 'https://provider.com' 
   })
   @IsOptional()
-  @IsUrl({}, { message: 'Photo URL must be a valid secure web link' })
+  // @IsUrl({}, { message: 'Photo URL must be a valid secure web link' })
   photoUrl?: string;
 
   @ApiPropertyOptional({ 
@@ -28,7 +28,7 @@ export class DocumentsDto {
     example: 'https://provider.com' 
   })
   @IsOptional()
-  @IsUrl({}, { message: 'CV URL must be a valid secure web link' })
+  // @IsUrl({}, { message: 'CV URL must be a valid secure web link' })
   cvUrl?: string;
 
   @ApiPropertyOptional({ 
@@ -36,7 +36,7 @@ export class DocumentsDto {
     example: 'https://provider.com' 
   })
   @IsOptional()
-  @IsUrl({}, { message: 'Drivers license URL must be a valid secure web link' })
+  // @IsUrl({}, { message: 'Drivers license URL must be a valid secure web link' })
   driversLicenseUrl?: string;
 
   @ApiPropertyOptional({ 
@@ -44,7 +44,7 @@ export class DocumentsDto {
     example: 'https://provider.com' 
   })
   @IsOptional()
-  @IsUrl({}, { message: 'NYSC certificate URL must be a valid secure web link' })
+  // @IsUrl({}, { message: 'NYSC certificate URL must be a valid secure web link' })
   nyscUrl?: string;
 }
 export class CreateCandidateDto {
