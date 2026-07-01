@@ -3,6 +3,7 @@ import {
   Prisma,
   QuestionCategory,
   AssessmentStatus,
+  JobRole,
 } from '@prisma/client';
 
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -87,6 +88,10 @@ export class AssessmentRepository {
   async generateAttempt(assessmentId: string, applicationId: string) {
     const assessment = await this.prisma.assessment.findUnique({
       where: { id: assessmentId },
+      select: {
+        id: true,
+        jobRole: true,
+      },
     });
     if (!assessment) return null;
 
@@ -98,18 +103,29 @@ export class AssessmentRepository {
       [QuestionCategory.SAFETY]: 4,
       [QuestionCategory.AVAILABILITY]: 4,
     };
-    const ROLEPLAY_COUNT = 5;
+    const ROLEPLAY_COUNT = 7;
 
     const mcqs: any[] = [];
     for (const [category, count] of Object.entries(MCQ_COUNTS)) {
       if (count <= 0) continue;
       const pool = await this.prisma.questionBank.findMany({
-        where: { category: category as QuestionCategory },
+        where: { category: category as QuestionCategory, OR: [
+            { jobRole: assessment.jobRole },
+            { jobRole: JobRole.GENERAL },
+          ],
+        },
       });
       mcqs.push(...this.shuffle(pool).slice(0, count));
     }
 
-    const roleplayPool = await this.prisma.rolePlayBank.findMany();
+    const roleplayPool = await this.prisma.rolePlayBank.findMany({
+      where: { 
+        OR: [
+          { jobRole: assessment.jobRole },
+          { jobRole: JobRole.GENERAL },
+        ],
+      }
+    });
     const roleplays = this.shuffle(roleplayPool).slice(0, ROLEPLAY_COUNT);
 
     const attempt = await this.prisma.assessmentAttempt.create({

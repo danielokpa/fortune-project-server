@@ -2,8 +2,8 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-// import { seedCountries } from './seeds/countries.seed';
-// import { seedStates } from './seeds/states.seed';
+import { seedCountries } from './seeds/countries.seed';
+import { seedStates } from './seeds/states.seed';
 import {
   seedOrganization,
 } from './seeds/organisation.seed';
@@ -44,7 +44,7 @@ async function main() {
   //   prisma,
   // );
 
-  // await seedQuestionBank(prisma);
+  await seedQuestionBank(prisma);
   await seedAssessments(prisma);
 
   // console.log('\n');
@@ -59,9 +59,9 @@ async function main() {
   //   admin.id,
   // );
 
-  // console.log(
-  //   '\n✅ Base seed complete\n',
-  // );
+  console.log(
+    '\n✅ Base seed complete\n',
+  );
 }
 
 main()

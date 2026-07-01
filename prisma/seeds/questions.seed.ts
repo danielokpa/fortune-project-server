@@ -27,6 +27,7 @@ export async function seedQuestionBank(prisma: PrismaClient) {
    */
   const questionRecords = mcqQuestions.map((question) => ({
     category: question.category,
+    jobRole: question.jobRole,
     difficulty: question.difficulty,
     question: question.question,
     weight: question.weight,
@@ -88,6 +89,7 @@ export async function seedQuestionBank(prisma: PrismaClient) {
     await prisma.rolePlayBank.createMany({
       data: ROLEPLAY_QUESTIONS.map((question) => ({
         category: question.category,
+        jobRole: question.jobRole,
         prompt: question.prompt,
       })),
       skipDuplicates: true,
