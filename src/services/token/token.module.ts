@@ -1,27 +1,27 @@
-// import { Global, Module } from '@nestjs/common';
-// import { JwtModule } from '@nestjs/jwt';
-// import { TokenService } from './token.service';
-// import { TokenRepository } from './repositories/token.repository';
-// import { ConfigService } from '@nestjs/config';
+import { Global, Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { TokenService } from './token.service';
+import { TokenRepository } from './repositories/token.repository';
+import { ConfigService } from '@nestjs/config';
 
-// @Global()
-// @Module({
-//   imports: [
-//     JwtModule.registerAsync({
-//       global: true,
-//       inject: [ConfigService],
-//       useFactory: (configService: ConfigService) => {
-//         return {
-//           secret:
-//             configService.get<string>('app.jwtSecret') || 'default-secret',
-//           signOptions: {
-//             // No expiresIn means the token will not expire
-//           },
-//         };
-//       },
-//     }),
-//   ],
-//   providers: [TokenService, TokenRepository],
-//   exports: [TokenService, TokenRepository],
-// })
-// export class TokenModule {}
+@Global()
+@Module({
+  imports: [
+    JwtModule.registerAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret:
+            configService.get<string>('app.jwtSecret') || 'default-secret',
+          signOptions: {
+            // No expiresIn means the token will not expire
+          },
+        };
+      },
+    }),
+  ],
+  providers: [TokenService, TokenRepository],
+  exports: [TokenService, TokenRepository],
+})
+export class TokenModule {}

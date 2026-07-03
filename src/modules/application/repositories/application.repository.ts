@@ -51,7 +51,7 @@ export class ApplicationRepository {
             gender: dto.gender,
             dateOfBirth: dto.dateOfBirth,
             stateOfOrigin: dto.stateOfOrigin,
-            currentLocation: dto.currentLocation,
+            currentLocation: dto.currentLocation ?? 'null',
             highestQualification: dto.highestQualification,
             yearsOfExperience: dto.yearsOfExperience,
           },
