@@ -169,7 +169,7 @@ export class AuthController {
   ) {
     const userId = Validators.validateUuid(req.user.userId);
     console.log('User id: ', userId);
-    const data = await this.authService.logout(input, userId);
+    const data = await this.authService.logout(userId);
     return ResponseUtil.handleResponse(
       data,
       'User logged out successfully',

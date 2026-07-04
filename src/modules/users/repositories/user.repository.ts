@@ -112,7 +112,7 @@ export class UserRepository {
   async findByPhone(phoneNo: string): Promise<User | null> {
     try {
       const user = await this.prisma.user.findFirst({
-        where: { phoneNo },
+        where: { phone: phoneNo },
       });
 
       return user;

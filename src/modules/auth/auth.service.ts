@@ -464,7 +464,7 @@ export class AuthService {
 
     const payload: JwtAuthPayload = {
       sub: user.id,
-      userType: user.Role,
+      userType: user.role,
       userId: user.id,
       email: user.email,
     };
@@ -476,7 +476,7 @@ export class AuthService {
     const data: IUserLoginData = {
       id: user.id,
       token,
-      userType: user.userType,
+      userType: user.role,
       userId: user.id,
       email: user.email,
     };

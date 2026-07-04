@@ -11,6 +11,6 @@ import { UserRepository } from './repositories/user.repository';
   imports: [EventEmitterModule/*, ClientDevicesModule*/],
   controllers: [/*UserController*/],
   providers: [UserService, UserRepository, /*UserEventListener*/],
-  exports: [UserService/*, UserRepository*/],
+  exports: [UserService, UserRepository],
 })
 export class UsersModule {}

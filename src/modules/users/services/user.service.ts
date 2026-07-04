@@ -25,15 +25,15 @@ export class UserService {
     return user;
   }
 
-  async findByIdentity(identity: string): Promise<User> {
-    const user = await this.userRepository.findByIdentity(identity);
+  // async findByIdentity(identity: string): Promise<User> {
+  //   const user = await this.userRepository.findByIdentity(identity);
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
 
-    return user;
-  }
+  //   return user;
+  // }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findByEmail(email);
