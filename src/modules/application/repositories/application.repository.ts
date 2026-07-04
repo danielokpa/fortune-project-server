@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Prisma, JobStatus, ApplicationStatus, AssessmentStatus, CandidateClassification, JobRole } from '@prisma/client';
+import { Prisma, JobStatus, ApplicationStatus, AssessmentStatus, CandidateClassification, JobRole, DocumentType } from '@prisma/client';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 import { applicationInclude } from '../constants/application.constants';
 import { ICreateCandidate } from '../../candidates/interfaces/candidate.interface';
@@ -74,6 +74,51 @@ export class ApplicationRepository {
             currentLocation: dto.currentLocation,
           },
         });
+
+        /**
+         * 2.5. Save Candidate Documents
+         */
+        const documents = dto.candidateDocuments;
+
+        const documentOperations = [
+          {
+            type: DocumentType.PHOTO,
+            fileUrl: documents.photoUrl,
+          },
+          {
+            type: DocumentType.CV,
+            fileUrl: documents.cvUrl,
+          },
+          {
+            type: DocumentType.DRIVERS_LICENSE,
+            fileUrl: documents.driversLicenseUrl,
+          },
+          {
+            type: DocumentType.NYSC,
+            fileUrl: documents.nyscUrl,
+          },
+        ]
+          .filter((document) => !!document.fileUrl)
+          .map((document) =>
+            tx.candidateDocument.upsert({
+              where: {
+                candidateId_type: {
+                  candidateId: candidate.id,
+                  type: document.type,
+                },
+              },
+              create: {
+                candidateId: candidate.id,
+                type: document.type,
+                fileUrl: document.fileUrl!,
+              },
+              update: {
+                fileUrl: document.fileUrl!,
+              },
+            }),
+          );
+
+        await Promise.all(documentOperations);
 
         /**
          * 3. Create Application
