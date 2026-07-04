@@ -111,6 +111,8 @@ export class ApplicationService {
       {} as Record<string, string>,
     );
 
+    console.log('Documents: ', documents);
+
     return {
       ...application,
       candidate: {
