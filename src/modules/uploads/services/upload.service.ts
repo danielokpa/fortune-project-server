@@ -18,7 +18,7 @@ export class UploadService {
     const extension = this.getExtension(contentType);
 
     const key =
-      `candidate-documents/temp/${uploadId}/${documentType}.${extension}`;
+      `candidate-documents/${uploadId}/${documentType}.${extension}`;
 
     return this.cloudflareService.generateUploadUrl({
       key,
