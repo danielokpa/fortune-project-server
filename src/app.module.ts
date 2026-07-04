@@ -8,8 +8,8 @@ import { AppService } from './app.service';
 
 import appConfig from './config/app.config';
 
-// import { AuthModule } from './modules/auth/auth.module';
-// import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 // import { CountriesModule } from './modules/countries/countries.module';
 // import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 // import { CategoryModule } from './modules/categories/category.module';
@@ -19,7 +19,7 @@ import { JobModule } from './modules/jobs/job.module';
 import { CandidateModule } from './modules/candidates/candidate.module';
 import { UploadModule } from './modules/uploads/upload.module';
 import { CloudflareModule } from './services/cloudflare/cloudflare.module';
-// import { TokenModule } from './services/token/token.module';
+import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
@@ -49,8 +49,8 @@ import { PrismaModule } from './prisma/prisma.module';
       ],
     }),
 
-    // AuthModule,
-    // UsersModule,
+    AuthModule,
+    UsersModule,
     // CountriesModule,
     // ClientDevicesModule,
     // CategoryModule,
@@ -60,7 +60,7 @@ import { PrismaModule } from './prisma/prisma.module';
     CandidateModule,
     UploadModule,
     CloudflareModule,
-    // TokenModule,
+    TokenModule,
     MailModule,
     SmsModule,
     AxiosModule,

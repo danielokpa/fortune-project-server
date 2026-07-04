@@ -171,10 +171,10 @@ export class LoginUserDto {
     description: 'User email address or phone number',
     example: 'user@example.com or 08100000000',
   })
-  @IsString()
+  @IsEmail()
   @MinLength(4)
   @MaxLength(100)
-  readonly identity: string;
+  readonly email: string;
 
   @ApiProperty({
     description: 'User password',
