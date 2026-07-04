@@ -1,3 +1,5 @@
+import { BadRequestException } from '@nestjs/common';
+
 export interface CursorPayload {
   id: string;
   createdAt: string;
@@ -12,9 +14,13 @@ export class CursorUtil {
     if (!cursor) return null;
 
     try {
-      return JSON.parse(Buffer.from(cursor, 'base64').toString());
+      const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString()) as CursorPayload;
+      if (!decoded.createdAt || !decoded.id) {
+        throw new Error();
+      }
+      return decoded;
     } catch {
-      return null;
+      throw new BadRequestException('Invalid pagination cursor.');
     }
   }
 }
