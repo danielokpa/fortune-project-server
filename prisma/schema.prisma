@@ -258,6 +258,12 @@ model Candidate {
 
   @@unique([email])
   @@unique([phone])
+
+  @@index([fullName])
+
+  @@index([email])
+
+  @@index([phone])
 }
 
 model CandidateDocument {
@@ -329,6 +335,20 @@ model Application {
   createdAt DateTime @default(now())
 
   @@unique([jobId, candidateId])
+
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+
+  @@index([status])
+
+  @@index([classification])
+
+  @@index([jobId])
+
+  @@index([candidateId])
+
+  @@index([jobId, status])
+
+  @@index([jobId, createdAt(sort: Desc), id(sort: Desc)])
 }
 
 model ApplicationStatusHistory {
@@ -392,6 +412,16 @@ model AssessmentAttempt {
 
   startedAt   DateTime  @default(now())
   submittedAt DateTime?
+
+  @@index([status])
+
+  @@index([passed])
+
+  @@index([assessmentId])
+
+  @@index([applicationId])
+
+  @@index([status, passed])
 }
 
 model AssessmentAnswer {

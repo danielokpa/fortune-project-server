@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Prisma, JobStatus, ApplicationStatus } from '@prisma/client';
+import { Prisma, JobStatus, ApplicationStatus, AssessmentStatus, CandidateClassification, JobRole } from '@prisma/client';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
+import { applicationInclude } from '../constants/application.constants';
 import { ICreateCandidate } from '../../candidates/interfaces/candidate.interface';
+import { CursorUtil } from 'src/utils/cursor.util';
+import { ApplicationFilters } from '../interfaces/application.interface';
+
 
 @Injectable()
 export class ApplicationRepository {
@@ -147,4 +151,286 @@ export class ApplicationRepository {
       handleDatabaseError(error);
     }
   } 
+
+  
+  /*
+   |--------------------------------------------------------------------------
+   | Applications
+   |--------------------------------------------------------------------------
+   */
+
+  async findApplications(filters: ApplicationFilters) {
+    try {
+      const where = this.buildWhereClause(filters);
+
+      return await this.prisma.application.findMany({
+        where,
+
+        take: filters.limit + 1,
+
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+          {
+            id: 'desc',
+          },
+        ],
+
+        include: applicationInclude
+      });
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  private buildWhereClause(
+    filters: ApplicationFilters,
+  ): Prisma.ApplicationWhereInput {
+    const andConditions: Prisma.ApplicationWhereInput[] = [];
+
+    /**
+     * ---------------------------------------------------------
+     * Search
+     * ---------------------------------------------------------
+     */
+
+    if (filters.search?.trim()) {
+      const keyword = filters.search.trim();
+
+      andConditions.push({
+        OR: [
+          {
+            candidate: {
+              fullName: {
+                contains: keyword,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            candidate: {
+              email: {
+                contains: keyword,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            candidate: {
+              phone: {
+                contains: keyword,
+                mode: 'insensitive',
+              },
+            },
+          },
+        ],
+      });
+    }
+
+    /**
+     * ---------------------------------------------------------
+     * Job Role
+     * ---------------------------------------------------------
+     */
+
+    if (filters.jobSlugs?.length) {
+      andConditions.push({
+        job: {
+          slug: {
+            in: filters.jobSlugs,
+          },
+        },
+      });
+    }
+
+    /**
+     * ---------------------------------------------------------
+     * Application Status
+     * ---------------------------------------------------------
+     */
+
+    if (filters.applicationStatus) {
+      andConditions.push({
+        status: filters.applicationStatus,
+      });
+    }
+
+    /**
+     * ---------------------------------------------------------
+     * Candidate Classification
+     * ---------------------------------------------------------
+     */
+
+    if (filters.classification) {
+      andConditions.push({
+        classification: filters.classification,
+      });
+    }
+
+    /**
+     * ---------------------------------------------------------
+     * Assessment Filters
+     * ---------------------------------------------------------
+     */
+
+    if (
+      filters.assessmentStatus ||
+      filters.passedOnly !== undefined
+    ) {
+      const assessmentFilter: Prisma.AssessmentAttemptWhereInput = {};
+
+      if (filters.assessmentStatus) {
+        assessmentFilter.status = filters.assessmentStatus;
+      }
+
+      if (filters.passedOnly === true) {
+        assessmentFilter.passed = true;
+      }
+
+      andConditions.push({
+        assessmentAttempt: {
+          is: assessmentFilter,
+        },
+      });
+    }
+
+    /**
+     * ---------------------------------------------------------
+     * Cursor Pagination (Keyset Pagination)
+     * ---------------------------------------------------------
+     */
+
+    if (filters.cursor) {
+      const cursor = CursorUtil.decode(filters.cursor);
+
+      const cursorDate = cursor?.createdAt ? new Date(cursor.createdAt) : undefined;
+
+      andConditions.push({
+        OR: [
+          {
+            createdAt: {
+              lt: cursorDate,
+            },
+          },
+          {
+            AND: [
+              {
+                createdAt: cursorDate,
+              },
+              {
+                id: {
+                  lt: cursor?.id,
+                },
+              },
+            ],
+          },
+        ],
+      });
+    }
+
+    /**
+     * ---------------------------------------------------------
+     * Final Where Clause
+     * ---------------------------------------------------------
+     */
+
+    if (!andConditions.length) {
+      return {};
+    }
+
+    return {
+      AND: andConditions,
+    };
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Find One
+  |--------------------------------------------------------------------------
+  */
+
+  async findApplicationById(id: string) {
+    try {
+      return await this.prisma.application.findUnique({
+        where: {
+          id,
+        },
+
+        include: applicationInclude,
+      });
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Dashboard Summary
+  |--------------------------------------------------------------------------
+  */
+
+  async getDashboardSummary() {
+    try {
+      const [
+        totalApplications,
+        assessmentCompleted,
+        interview,
+        hired,
+        rejected,
+        passing,
+      ] = await this.prisma.$transaction([
+        this.prisma.application.count(),
+
+        this.prisma.application.count({
+          where: {
+            assessmentAttempt: {
+              is: {
+                status: AssessmentStatus.COMPLETED,
+              },
+            },
+          },
+        }),
+
+        this.prisma.application.count({
+          where: {
+            status: ApplicationStatus.INTERVIEW,
+          },
+        }),
+
+        this.prisma.application.count({
+          where: {
+            status: ApplicationStatus.HIRED,
+          },
+        }),
+
+        this.prisma.application.count({
+          where: {
+            status: ApplicationStatus.REJECTED,
+          },
+        }),
+
+        this.prisma.application.count({
+          where: {
+            assessmentAttempt: {
+              is: {
+                passed: true,
+              },
+            },
+          },
+        }),
+      ]);
+
+      return {
+        totalApplications,
+        assessmentCompleted,
+        interview,
+        hired,
+        rejected,
+        passing,
+      };
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
 }
