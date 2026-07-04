@@ -11,6 +11,18 @@ export const applicationInclude =
         currentLocation: true,
         highestQualification: true,
         yearsOfExperience: true,
+
+        documents: {
+          select: {
+            id: true,
+            type: true,
+            fileUrl: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
       },
     },
     job: {

@@ -103,7 +103,21 @@ export class ApplicationService {
       throw new NotFoundException('Application not found.');
     }
 
-    return application;
+    const documents = application.candidate.documents.reduce(
+      (acc, document) => {
+        acc[document.type] = document.fileUrl;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    return {
+      ...application,
+      candidate: {
+        ...application.candidate,
+        documents,
+      },
+    };
   }
 
   /*
