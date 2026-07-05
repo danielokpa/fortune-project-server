@@ -44,6 +44,7 @@ export const applicationInclude =
     },
   });
 
+
 export const applicationIncludeDetails =
   Prisma.validator<Prisma.ApplicationInclude>()({
     candidate: {
@@ -59,7 +60,6 @@ export const applicationIncludeDetails =
         currentLocation: true,
         highestQualification: true,
         yearsOfExperience: true,
-
         documents: {
           select: {
             id: true,
@@ -67,9 +67,7 @@ export const applicationIncludeDetails =
             fileUrl: true,
             createdAt: true,
           },
-          orderBy: {
-            createdAt: 'asc',
-          },
+          orderBy: { createdAt: 'asc' },
         },
       },
     },
@@ -77,7 +75,6 @@ export const applicationIncludeDetails =
       select: {
         id: true,
         title: true,
-        // role: true,
       },
     },
     assessmentAttempt: {
@@ -88,17 +85,26 @@ export const applicationIncludeDetails =
         status: true,
         startedAt: true,
         submittedAt: true,
-
-        // ── ADD THESE ──────────────────────────────────────────────────
         answers: {
-          include: {
-            question: { select: { question: true } },
+          select: {
+            questionId: true,
+            question: {
+              select: {
+                question: true,
+                options: {
+                  where: { isCorrect: true },
+                  select: { optionText: true },
+                  take: 1,
+                },
+              }, 
+            },
             selectedOption: { select: { optionText: true, isCorrect: true } },
           },
-          orderBy: { question: { displayOrder: 'asc' } }, // or however you order
         },
         rolePlayAnswers: {
-          include: {
+          select: {
+            questionId: true,
+            answer: true,
             question: { select: { prompt: true } },
           },
         },
