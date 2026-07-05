@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Prisma, JobStatus, ApplicationStatus, AssessmentStatus, CandidateClassification, JobRole, DocumentType } from '@prisma/client';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
-import { applicationInclude } from '../constants/application.constants';
+import { applicationInclude, applicationIncludeDetails } from '../constants/application.constants';
 import { ICreateCandidate } from '../../candidates/interfaces/candidate.interface';
 import { CursorUtil } from 'src/utils/cursor.util';
 import { ApplicationFilters } from '../interfaces/application.interface';
@@ -402,7 +402,7 @@ export class ApplicationRepository {
           id,
         },
 
-        include: applicationInclude,
+        include: applicationIncludeDetails,
       });
     } catch (error) {
       handleDatabaseError(error);
