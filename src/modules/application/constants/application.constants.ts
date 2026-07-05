@@ -54,7 +54,7 @@ export const applicationIncludeDetails =
         phone: true,
         whatsapp: true,
         gender: true,
-        dataOfBirth: true,
+        dateOfBirth: true,
         stateOfOrigin: true,
         currentLocation: true,
         highestQualification: true,
