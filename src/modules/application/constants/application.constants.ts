@@ -92,8 +92,8 @@ export const applicationIncludeDetails =
         // ── ADD THESE ──────────────────────────────────────────────────
         answers: {
           include: {
-            question: { select: { text: true } },
-            selectedOption: { select: { text: true, isCorrect: true } },
+            question: { select: { question: true } },
+            selectedOption: { select: { optionText: true, isCorrect: true } },
           },
           orderBy: { question: { displayOrder: 'asc' } }, // or however you order
         },
