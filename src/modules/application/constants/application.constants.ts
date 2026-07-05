@@ -88,6 +88,28 @@ export const applicationIncludeDetails =
         status: true,
         startedAt: true,
         submittedAt: true,
+
+        // ── ADD THESE ──────────────────────────────────────────────────
+        answers: {
+          include: {
+            question: { select: { text: true } },
+            selectedOption: { select: { text: true, isCorrect: true } },
+          },
+          orderBy: { question: { displayOrder: 'asc' } }, // or however you order
+        },
+        rolePlayAnswers: {
+          include: {
+            question: { select: { prompt: true } },
+          },
+        },
+        generatedQuestions: {
+          select: { displayOrder: true, questionId: true },
+          orderBy: { displayOrder: 'asc' },
+        },
+        generatedRolePlays: {
+          select: { displayOrder: true, questionId: true },
+          orderBy: { displayOrder: 'asc' },
+        },
       },
     },
   });
