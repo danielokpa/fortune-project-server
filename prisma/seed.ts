@@ -13,6 +13,7 @@ import {
 import { seedJobs } from './seeds/jobs.seed';
 import { seedQuestionBank } from './seeds/questions.seed';
 import { seedAssessments } from './seeds/assessment.seed';
+import { seedCandidateDocuments } from './seeds/candidate-documents.seed';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -44,8 +45,9 @@ async function main() {
   //   prisma,
   // );
 
-  await seedQuestionBank(prisma);
-  await seedAssessments(prisma);
+  // await seedQuestionBank(prisma);
+  // await seedAssessments(prisma);
+  await seedCandidateDocuments(prisma);
 
   // console.log('\n');
 
