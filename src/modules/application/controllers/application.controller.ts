@@ -1,9 +1,11 @@
 import {
   Controller,
   Get,
+  Patch,
   HttpCode,
   HttpStatus,
   Param,
+  Body,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -20,7 +22,7 @@ import { UserType } from '../../../enums/user-type.enum';
 import { JwtAuthPayload } from '../../auth/auth.interface';
 import { Validators } from 'src/utils/validators.utils';
 import { ApplicationService } from '../services/application.service';
-import { GetApplicationsDto } from '../dto/application.dto';
+import { GetApplicationsDto, UpdateHrDecisionDto } from '../dto/application.dto';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 
@@ -117,6 +119,35 @@ export class ApplicationController {
     return ResponseUtil.handleResponse(
       data,
       'Application fetched successfully.',
+      HttpStatus.OK,
+    );
+  }
+
+  @Patch(':id/review')
+  @ApiOperation({
+    summary: 'Update HR decision',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'HR decision updated successfully',
+  })
+  async updateHrDecision(
+    @Param('id', UuidValidationPipe)
+    id: string,
+
+    @Body()
+    dto: UpdateHrDecisionDto,
+  ) {
+    const data =
+      await this.applicationService.updateHrDecision(
+        id,
+        dto,
+      );
+
+    return ResponseUtil.handleResponse(
+      data,
+      'HR decision updated successfully.',
       HttpStatus.OK,
     );
   }

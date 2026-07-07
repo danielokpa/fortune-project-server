@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Prisma, JobStatus, ApplicationStatus, AssessmentStatus, CandidateClassification, JobRole, DocumentType } from '@prisma/client';
+import { UpdateHrDecisionDto } from '../dto/application.dto';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 import { applicationInclude, applicationIncludeDetails } from '../constants/application.constants';
 import { ICreateCandidate } from '../../candidates/interfaces/candidate.interface';
@@ -474,6 +475,59 @@ export class ApplicationRepository {
         rejected,
         passing,
       };
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  async updateHrDecision(
+    applicationId: string,
+    dto: UpdateHrDecisionDto,
+  ) {
+    try {
+      return await this.prisma.$transaction(
+        async (tx) => {
+          const application =
+            await tx.application.update({
+              where: {
+                id: applicationId,
+              },
+
+              data: {
+                status: dto.status,
+                classification:
+                  dto.classification,
+                hrNotes: dto.hrNotes,
+              },
+
+              include: applicationInclude,
+            });
+
+            const existing =
+              await tx.application.findUnique({
+                  where:{
+                      id:applicationId
+                  },
+                  select:{
+                      status:true
+                  }
+              });
+
+              if (!existing) throw new NotFoundException('Application not found');
+
+              if(existing.status !== dto.status){
+
+                  await tx.applicationStatusHistory.create({
+                      data:{
+                          applicationId,
+                          status:dto.status,
+                      },
+                  });
+
+              }
+          return application;
+        },
+      );
     } catch (error) {
       handleDatabaseError(error);
     }
