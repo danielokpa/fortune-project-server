@@ -328,6 +328,8 @@ model Application {
 
   assessmentAttempt AssessmentAttempt?
 
+  hrNotes String?
+
   interviews Interview[]
 
   statusHistory ApplicationStatusHistory[]

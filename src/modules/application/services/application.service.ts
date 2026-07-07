@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, JobRole } from '@prisma/client';
 import { ApplicationRepository } from '../repositories/application.repository';
-import { GetApplicationsDto } from '../dto/application.dto';
+import { GetApplicationsDto, UpdateHrDecisionDto } from '../dto/application.dto';
 import { ApplicationFilters } from '../interfaces/application.interface';
 import { CursorUtil } from '../../../utils/cursor.util';
 
@@ -130,5 +130,26 @@ export class ApplicationService {
 
   async getDashboardSummary() {
     return await this.applicationRepository.getDashboardSummary();
+  }
+
+  async updateHrDecision(
+    id: string,
+    dto: UpdateHrDecisionDto,
+  ) {
+    const application =
+      await this.applicationRepository.findApplicationById(
+        id,
+      );
+
+    if (!application) {
+      throw new NotFoundException(
+        'Application not found.',
+      );
+    }
+
+    return this.applicationRepository.updateHrDecision(
+      id,
+      dto,
+    );
   }
 }

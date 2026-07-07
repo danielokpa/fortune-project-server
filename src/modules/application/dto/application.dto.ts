@@ -6,7 +6,8 @@ import {
   IsString, 
   IsUUID,
   Min,
-  Max 
+  Max,
+  MaxLength,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { JobRole, AssessmentStatus, ApplicationStatus, CandidateClassification } from '@prisma/client';
@@ -68,4 +69,25 @@ export class GetApplicationsDto {
   })
   @IsOptional()
   sortOrder: 'asc' | 'desc' = 'desc';
+}
+
+export class UpdateHrDecisionDto {
+  @ApiProperty({
+    enum: ApplicationStatus,
+  })
+  @IsEnum(ApplicationStatus)
+  status: ApplicationStatus;
+
+  @ApiPropertyOptional({
+    enum: CandidateClassification,
+  })
+  @IsOptional()
+  @IsEnum(CandidateClassification)
+  classification?: CandidateClassification;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  hrNotes?: string;
 }
