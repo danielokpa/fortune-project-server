@@ -25,6 +25,7 @@ import { R2_CLIENT } from './cloudflare.constants';
             accessKeyId: config.get<string>('app.r2AccessKey')!,
             secretAccessKey: config.get<string>('app.r2SecretKey')!,
           },
+          requestChecksumCalculation: 'WHEN_SUPPORTED',
         });
       },
     },
