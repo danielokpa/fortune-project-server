@@ -17,7 +17,6 @@ export class GetApplicationsDto {
     description: 'Cursor for pagination',
   })
   @IsOptional()
-  @IsUUID()
   cursor?: string;
 
   @ApiPropertyOptional({
