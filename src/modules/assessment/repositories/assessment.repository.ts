@@ -161,6 +161,7 @@ export class AssessmentRepository {
 
     let roleplays;
 
+      console.log('Job role: ', assessment.jobRole);
     if (assessment.jobRole === JobRole.DRIVER) {
       // ---------------------------------------------------
       // DRIVER:
@@ -195,6 +196,7 @@ export class AssessmentRepository {
         ...mandatoryRoleplays,
         ...randomRoleplays,
       ];
+      console.log('Roleplays: ', roleplays);
     } else {
       // ---------------------------------------------------
       // OTHER JOB ROLES:
