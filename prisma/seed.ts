@@ -45,9 +45,9 @@ async function main() {
   //   prisma,
   // );
 
-  // await seedQuestionBank(prisma);
+  await seedQuestionBank(prisma);
   // await seedAssessments(prisma);
-  await seedCandidateDocuments(prisma);
+  // await seedCandidateDocuments(prisma);
 
   // console.log('\n');
 

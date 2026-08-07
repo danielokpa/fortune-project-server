@@ -167,6 +167,13 @@ enum RolePlayCategory {
   PROBLEM_SOLVING
   CONFLICT_RESOLUTION
 }
+
+enum RolePlayAnswerType {
+  TEXT
+  FILE_UPLOAD
+  TEXT_AND_FILE
+}
+
 model Organization {
   id String @id @default(uuid())
 
@@ -455,6 +462,8 @@ model RolePlayAnswer {
 
   question RolePlayBank @relation(fields: [questionId], references: [id])
 
+  files      RolePlayAnswerFile[]
+
   @@unique([attemptId, questionId])
 }
 
@@ -503,6 +512,10 @@ model RolePlayBank {
   jobRole JobRole
 
   prompt String
+  isMandatory Boolean      @default(false) // added
+  answerType   RolePlayAnswerType  @default(TEXT)
+  minFiles     Int?
+  maxFiles     Int?
 
   answers RolePlayAnswer[]
 
@@ -510,6 +523,15 @@ model RolePlayBank {
   assessmentAttemptRolePlays AssessmentAttemptRolePlay[]
 
   @@unique([category, prompt])
+}
+
+model RolePlayAnswerFile {
+  id              String @id @default(uuid())
+
+  rolePlayAnswerId String
+  objectKey       String
+
+  rolePlayAnswer   RolePlayAnswer @relation(fields: [rolePlayAnswerId], references: [id], onDelete: Cascade)
 }
 
 model AssessmentAttemptQuestion {

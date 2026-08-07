@@ -206,21 +206,48 @@ export class AssessmentService {
               ),
           });
 
-          await tx.rolePlayAnswer.createMany({
-            data:
-              dto.rolePlayAnswers.map(
-                (answer) => ({
-                  attemptId:
-                    attempt.id,
+          // await tx.rolePlayAnswer.createMany({
+          //   data:
+          //     dto.rolePlayAnswers.map(
+          //       (answer) => ({
+          //         attemptId:
+          //           attempt.id,
 
-                  questionId:
-                    answer.questionId,
+          //         questionId:
+          //           answer.questionId,
 
-                  answer:
-                    answer.answer,
-                }),
-              ),
-          });
+          //         answer:
+          //           answer.answer,
+          //       }),
+          //     ),
+          // });
+
+          // save object keys for proof of experience
+          for (const rolePlayAnswer of dto.rolePlayAnswers) {
+            const createdAnswer =
+              await tx.rolePlayAnswer.create({
+                data: {
+                  attemptId: attempt.id,
+                  questionId: rolePlayAnswer.questionId,
+                  answer: rolePlayAnswer.answer ?? null,
+                },
+              });
+
+            if (
+              rolePlayAnswer.objectKeys &&
+              rolePlayAnswer.objectKeys.length > 0
+            ) {
+              await tx.rolePlayAnswerFile.createMany({
+                data: rolePlayAnswer.objectKeys.map(
+                  (objectKey) => ({
+                    rolePlayAnswerId:
+                      createdAnswer.id,
+                    objectKey,
+                  }),
+                ),
+              });
+            }
+          }
 
           const updatedApplication = 
             await tx.application.update({

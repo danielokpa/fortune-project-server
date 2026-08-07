@@ -85,17 +85,29 @@ export class AssessmentRepository {
     return arr;
   }
 
-  async generateAttempt(assessmentId: string, applicationId: string) {
-    const assessment = await this.prisma.assessment.findUnique({
-      where: { id: assessmentId },
-      select: {
-        id: true,
-        jobRole: true,
-      },
-    });
-    if (!assessment) return null;
+  async generateAttempt(
+    assessmentId: string,
+    applicationId: string,
+  ) {
+    const assessment =
+      await this.prisma.assessment.findUnique({
+        where: {
+          id: assessmentId,
+        },
+        select: {
+          id: true,
+          jobRole: true,
+        },
+      });
 
-    // Tune these per your real spec — they currently sum to 20.
+    if (!assessment) {
+      return null;
+    }
+
+    // =====================================================
+    // MCQ CONFIGURATION
+    // =====================================================
+
     const MCQ_COUNTS: Record<QuestionCategory, number> = {
       [QuestionCategory.PROFESSIONAL_ATTITUDE]: 4,
       [QuestionCategory.EMOTIONAL_INTELLIGENCE]: 4,
@@ -103,57 +115,187 @@ export class AssessmentRepository {
       [QuestionCategory.SAFETY]: 4,
       [QuestionCategory.AVAILABILITY]: 4,
     };
-    const ROLEPLAY_COUNT = 7;
+
+    const RANDOM_ROLEPLAY_COUNT = 7;
+
+    // =====================================================
+    // GENERATE MCQs
+    // =====================================================
 
     const mcqs: any[] = [];
-    for (const [category, count] of Object.entries(MCQ_COUNTS)) {
-      if (count <= 0) continue;
-      const pool = await this.prisma.questionBank.findMany({
-        where: { category: category as QuestionCategory, OR: [
-            { jobRole: assessment.jobRole },
-            { jobRole: JobRole.GENERAL },
-          ],
-        },
-      });
-      mcqs.push(...this.shuffle(pool).slice(0, count));
+
+    for (const [category, count] of Object.entries(
+      MCQ_COUNTS,
+    )) {
+      if (count <= 0) {
+        continue;
+      }
+
+      const pool =
+        await this.prisma.questionBank.findMany({
+          where: {
+            category:
+              category as QuestionCategory,
+
+            OR: [
+              {
+                jobRole:
+                  assessment.jobRole,
+              },
+              {
+                jobRole: JobRole.GENERAL,
+              },
+            ],
+          },
+        });
+
+      const selectedQuestions =
+        this.shuffle(pool).slice(0, count);
+
+      mcqs.push(...selectedQuestions);
     }
 
-    const roleplayPool = await this.prisma.rolePlayBank.findMany({
-      where: { 
-        OR: [
-          { jobRole: assessment.jobRole },
-          { jobRole: JobRole.GENERAL },
-        ],
-      }
-    });
-    const roleplays = this.shuffle(roleplayPool).slice(0, ROLEPLAY_COUNT);
+    // =====================================================
+    // GENERATE ROLEPLAY QUESTIONS
+    // =====================================================
 
-    const attempt = await this.prisma.assessmentAttempt.create({
-      data: { assessmentId, status: AssessmentStatus.NOT_STARTED },
-    });
+    let roleplays;
+
+    if (assessment.jobRole === JobRole.DRIVER) {
+      // ---------------------------------------------------
+      // DRIVER:
+      // 2 mandatory + 7 random = 9 total
+      // ---------------------------------------------------
+
+      const mandatoryRoleplays =
+        await this.prisma.rolePlayBank.findMany({
+          where: {
+            jobRole: JobRole.DRIVER,
+            isMandatory: true,
+          },
+        });
+
+      const randomRoleplayPool =
+        await this.prisma.rolePlayBank.findMany({
+          where: {
+            jobRole: JobRole.DRIVER,
+            isMandatory: false,
+          },
+        });
+
+      const randomRoleplays =
+        this.shuffle(
+          randomRoleplayPool,
+        ).slice(
+          0,
+          RANDOM_ROLEPLAY_COUNT,
+        );
+
+      roleplays = [
+        ...mandatoryRoleplays,
+        ...randomRoleplays,
+      ];
+    } else {
+      // ---------------------------------------------------
+      // OTHER JOB ROLES:
+      // 7 random roleplay questions
+      // ---------------------------------------------------
+
+      const roleplayPool =
+        await this.prisma.rolePlayBank.findMany({
+          where: {
+            OR: [
+              {
+                jobRole:
+                  assessment.jobRole,
+              },
+              {
+                jobRole:
+                  JobRole.GENERAL,
+              },
+            ],
+
+            isMandatory: false,
+          },
+        });
+
+      roleplays =
+        this.shuffle(
+          roleplayPool,
+        ).slice(
+          0,
+          RANDOM_ROLEPLAY_COUNT,
+        );
+    }
+
+    // =====================================================
+    // CREATE ASSESSMENT ATTEMPT
+    // =====================================================
+
+    const attempt =
+      await this.prisma.assessmentAttempt.create({
+        data: {
+          assessmentId,
+          status:
+            AssessmentStatus.NOT_STARTED,
+        },
+      });
+
+    // =====================================================
+    // SAVE MCQs TO ATTEMPT
+    // =====================================================
 
     await this.prisma.assessmentAttemptQuestion.createMany({
-      data: mcqs.map((q, i) => ({
-        attemptId: attempt.id,
-        questionId: q.id,
-        displayOrder: i + 1,
-      })),
+      data: mcqs.map(
+        (question, index) => ({
+          attemptId:
+            attempt.id,
+
+          questionId:
+            question.id,
+
+          displayOrder:
+            index + 1,
+        }),
+      ),
     });
+
+    // =====================================================
+    // SAVE ROLEPLAY QUESTIONS TO ATTEMPT
+    // =====================================================
 
     await this.prisma.assessmentAttemptRolePlay.createMany({
-      data: roleplays.map((q, i) => ({
-        attemptId: attempt.id,
-        questionId: q.id,
-        displayOrder: i + 1,
-      })),
+      data: roleplays.map(
+        (question, index) => ({
+          attemptId:
+            attempt.id,
+
+          questionId:
+            question.id,
+
+          displayOrder:
+            index + 1,
+        }),
+      ),
     });
+
+    // =====================================================
+    // LINK ATTEMPT TO APPLICATION
+    // =====================================================
 
     await this.prisma.assessmentAttempt.update({
-      where: { id: attempt.id },
-      data: { applicationId },
+      where: {
+        id: attempt.id,
+      },
+
+      data: {
+        applicationId,
+      },
     });
 
-    return { attemptId: attempt.id };
+    return {
+      attemptId: attempt.id,
+    };
   }
 
   /*

@@ -160,6 +160,8 @@ export class RolePlayAnswerDto {
 
   @IsString()
   answer: string;
+
+  objectKeys?: string[];
 }
 
 export class SubmitAssessmentDto {
