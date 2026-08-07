@@ -4,3 +4,4 @@ export * from './customer-service.constant';
 export * from './safety.constant';
 export * from './availability.constant';
 export * from './roleplay.constant';
+export * from './mandatory-roleplay.constant';

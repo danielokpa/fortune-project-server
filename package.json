@@ -1,7 +1,7 @@
 {
-  "name": "e-commerce-server",
+  "name": "pepp-cruise-jobs-server",
   "version": "0.0.1",
-  "description": "E-Commerce Server - Professional NestJS Application",
+  "description": "PeppCruise Jobs Server - Professional NestJS Application",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
