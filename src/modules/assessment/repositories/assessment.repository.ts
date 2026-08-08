@@ -161,7 +161,7 @@ export class AssessmentRepository {
 
     let roleplays;
 
-      console.log('Job role: ', assessment.jobRole);
+    console.log('Job role: ', assessment.jobRole);
     if (assessment.jobRole === JobRole.DRIVER) {
       // ---------------------------------------------------
       // DRIVER:

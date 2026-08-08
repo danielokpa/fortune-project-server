@@ -510,6 +510,18 @@ export class AssessmentService {
 
             prompt:
               item.question.prompt,
+            
+            isMandatory:
+              item.question.isMandatory;
+
+            answerType: 
+              item.question.answerType;
+
+            minFiles:
+              item.question.minFiles;
+
+            maxFiles: 
+              item.question.maxFiles;
           }),
         ),
     };
