@@ -161,6 +161,10 @@ export class RolePlayAnswerDto {
   @IsString()
   answer: string;
 
+  // Add decorators here so the validator recognizes the property
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   objectKeys?: string[];
 }
 
