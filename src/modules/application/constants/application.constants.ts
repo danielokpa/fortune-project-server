@@ -103,9 +103,26 @@ export const applicationIncludeDetails =
         },
         rolePlayAnswers: {
           select: {
+            id: true,
             questionId: true,
             answer: true,
-            question: { select: { prompt: true } },
+
+            question: {
+              select: {
+                id: true,
+                prompt: true,
+                answerType: true,
+                minFiles: true,
+                maxFiles: true,
+              },
+            },
+
+            files: {
+              select: {
+                id: true,
+                objectKey: true,
+              },
+            },
           },
         },
         generatedQuestions: {
