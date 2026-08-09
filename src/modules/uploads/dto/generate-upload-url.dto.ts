@@ -6,6 +6,7 @@ export enum CandidateDocumentType {
   CV = 'cv',
   DRIVERS_LICENSE = 'drivers-license',
   NYSC = 'nysc',
+  PROOF_OF_EXPERIENCE = 'proof_of_experience',
 }
 
 export class GenerateUploadUrlDto {
