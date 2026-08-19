@@ -77,6 +77,23 @@ export class ApplicationRepository {
         });
 
         /**
+         * 2.3. Early Check for Duplicate Application
+         * Prevents running heavy document ops and breaking the transaction
+         */
+        const existingApplication = await tx.application.findUnique({
+          where: {
+            jobId_candidateId: {
+              jobId: dto.jobId,
+              candidateId: candidate.id,
+            },
+          },
+        });
+
+        if (existingApplication) {
+          throw new ConflictException('Candidate has already applied for this job.');
+        }
+
+        /**
          * 2.5. Save Candidate Documents
          */
         const documents = dto.candidateDocuments;
@@ -153,20 +170,16 @@ export class ApplicationRepository {
           };
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-          const target = error.meta?.target as string[];
+      // Corrected check for driverAdapterError / PostgreSQL constraint name matches
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        const errorMessage = error.message || '';
+        const isDuplicateApp = 
+          error.code === 'P2002' && 
+          (errorMessage.includes('jobId_candidateId') || errorMessage.includes('Application_jobId_candidateId_key'));
 
-          if (
-              target?.includes('jobId') &&
-              target?.includes('candidateId')
-          ) {
-              throw new ConflictException(
-                  'Candidate has already applied for this job.',
-              );
-          }
+        if (isDuplicateApp) {
+          throw new ConflictException('Candidate has already applied for this job.');
+        }
       }
 
       handleDatabaseError(error);
