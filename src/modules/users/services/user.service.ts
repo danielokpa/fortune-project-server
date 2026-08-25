@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma, User } from '@prisma/client';
+import { UserType } from 'src/enums/user-type.enum';
 import { UserRepository } from '../repositories/user.repository';
 // import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-import { DashboardDto, UpdateUserDto } from '../dto/user.dto';
+import { DashboardDto, GetUsersDto, UpdateUserDto } from '../dto/user.dto';
+import { CursorUtil } from 'src/utils/cursor.util';
+import { UserFilters } from '../interfaces/user.interface';
 
 @Injectable()
 export class UserService {
@@ -16,7 +19,7 @@ export class UserService {
   ) {}
 
   async fetchUser(id: string): Promise<Partial<User>> {
-    const user = await this.userRepository.fetchUser(id);
+    const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -25,26 +28,38 @@ export class UserService {
     return user;
   }
 
-  // async findByIdentity(identity: string): Promise<User> {
-  //   const user = await this.userRepository.findByIdentity(identity);
-
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-
-  //   return user;
-  // }
-
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findByEmail(email);
   }
 
-//   async findByUsername(username: string): Promise<User | null> {
-//     return this.userRepository.findByUsername(username);
-//   }
+  async findAll(params: GetUsersDto) {
+    const filters: UserFilters = {
+      cursor: params.cursor,
+      limit: params.limit,
+      search: params.search,
+    }
+    const users = await this.userRepository.findAll(filters);
+    const hasNextPage = users.length > filters.limit;
 
-  async findAll(params?: Prisma.UserFindManyArgs): Promise<User[]> {
-    return this.userRepository.findAll(params);
+    if (hasNextPage) users.pop();
+    const lastItem = users[users.length - 1];
+
+    const nextCursor =
+      hasNextPage && lastItem
+        ? CursorUtil.encode({
+            createdAt: lastItem.createdAt.toISOString(),
+            id: lastItem.id,
+          })
+        : null;
+
+    return {
+      items: users,
+      pagination: {
+        limit: filters.limit,
+        hasNextPage,
+        nextCursor,
+      }
+    }
   }
 
   async updateImageUrl(userId: string, imageUrl: string): Promise<User> {
@@ -68,17 +83,12 @@ export class UserService {
     return data;
   }
 
-//   async updateUser(userId: string, userData: UpdateUserDto): Promise<User> {
-//     const updatedUser = await this.userRepository.update(userId, userData);
+  async deleteUser(userId: string, adminId: string): Promise<boolean> {
+    const admin = await this.fetchUser(adminId);
+    if (!admin || admin.role !== UserType.ADMIN) throw new NotFoundException('Admin not found');
 
-//     if (!updatedUser) {
-//       throw new NotFoundException('Failed to update user');
-//     }
-
-//     return updatedUser;
-//   }
-
-  async deleteUser(userId: string): Promise<boolean> {
-    return this.userRepository.delete(userId);
+    const deleted = await this.userRepository.delete(userId);
+    if (!deleted) return false;
+    return true;
   }
 }

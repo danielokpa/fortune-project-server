@@ -691,16 +691,16 @@ export class AuthService {
     return await this.userRepository.findByEmail(email);
   }
 
-  private getBaseUrlFromRequest(req: ExpressRequest): string {
-    const origin = req.get('origin') || req.get('referer');
+  // private getBaseUrlFromRequest(req: ExpressRequest): string {
+  //   const origin = req.get('origin') || req.get('referer');
 
-    if (origin) {
-      const url = new URL(origin);
-      return `${url.protocol}//${url.host}`;
-    }
+  //   if (origin) {
+  //     const url = new URL(origin);
+  //     return `${url.protocol}//${url.host}`;
+  //   }
 
-    return process.env.PEPP_APP_CLIENT_URL || 'https://apps.peppcruise.com';
-  }
+  //   return process.env.PEPP_APP_CLIENT_URL || 'https://apps.peppcruise.com';
+  // }
 
   async logout(userId: string) {
     const user = await this.userRepository.findById(userId);

@@ -10,12 +10,13 @@ import appConfig from './config/app.config';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { PatientsModule } from './modules/patients/patient.module';
+import { DevicesModule } from './modules/devices/device.module';
+import { HealthReadingsModule } from './modules/healthReadings/health-reading.module';
 // import { CountriesModule } from './modules/countries/countries.module';
 // import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 // import { CategoryModule } from './modules/categories/category.module';
-import { AssessmentModule } from './modules/assessment/assessment.module';
 import { ApplicationModule } from './modules/application/application.module';
-import { JobModule } from './modules/jobs/job.module';
 import { CandidateModule } from './modules/candidates/candidate.module';
 import { UploadModule } from './modules/uploads/upload.module';
 import { CloudflareModule } from './services/cloudflare/cloudflare.module';
@@ -51,11 +52,12 @@ import { PrismaModule } from './prisma/prisma.module';
 
     AuthModule,
     UsersModule,
+    PatientsModule,
+    DevicesModule,
+    HealthReadingsModule,
     // CountriesModule,
     // ClientDevicesModule,
     // CategoryModule,
-    JobModule,
-    AssessmentModule,
     ApplicationModule,
     CandidateModule,
     UploadModule,

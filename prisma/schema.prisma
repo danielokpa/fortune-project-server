@@ -16,6 +16,12 @@ enum LoginType {
   SOCIAL
 }
 
+enum Role {
+  ADMIN
+  DOCTOR
+  NURSE
+}
+
 enum TokenType {
   OTP
   JWT
@@ -28,186 +34,6 @@ enum TokenSubject {
   SIGN_UP_EMAIL
   NEW_DEVICE_LOGIN_OTP
   RESET_PASSCODE
-}
-
-// model User {
-//   id                String          @id @default(uuid())
-
-//   fullName          String
-//   username          String          @unique
-//   email             String          @unique
-//   phoneNo           String?         @unique
-//   password          String
-
-//   loginType         LoginType       @default(NORMAL)
-//   userType          Role            @default(USER)
-
-//   isEmailVerified   Boolean         @default(false)
-//   isActive          Boolean         @default(true)
-
-//   imageUrl          String?
-
-//   countryId         String?
-//   country           Country?        @relation(fields: [countryId], references: [id])
-
-//   addresses         Address[]
-//   devices           ClientDevice[]
-//   cart              Cart?
-//   orders            Order[]
-
-//   createdAt         DateTime        @default(now())
-//   updatedAt         DateTime        @updatedAt
-
-//   @@map("users")
-// }
-// model ClientDevice {
-//   id                String          @id @default(uuid())
-
-//   userId            String
-//   user              User            @relation(fields: [userId], references: [id])
-
-//   deviceName        String?
-
-//   ipAddress         String?
-
-//   deviceFCMToken       String?         @db.Text
-
-//   platform          String?
-
-//   createdAt         DateTime        @default(now())
-//   updatedAt         DateTime        @updatedAt
-
-//   @@index([userId])
-
-//   @@map("client_devices")
-// }
-
-enum Role {
-  SUPER_ADMIN
-  ORG_ADMIN
-  RECRUITER
-  HIRING_MANAGER
-  CANDIDATE
-}
-
-enum JobStatus {
-  DRAFT
-  PUBLISHED
-  CLOSED
-}
-
-enum ApplicationStatus {
-  APPLIED
-  SCREENED
-  ASSESSMENT_PENDING
-  ASSESSMENT_COMPLETED
-  INTERVIEW
-  OFFER
-  HIRED
-  REJECTED
-}
-
-enum AssessmentStatus {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETED
-  EXPIRED
-}
-
-enum CandidateClassification {
-  STRONG_FIT
-  CONDITIONAL_FIT
-  WILD_CARD
-  FIT_LATER
-  WEAK_MATCH
-}
-
-enum DocumentType {
-  PHOTO
-  CV
-  DRIVERS_LICENSE
-  NYSC
-}
-
-enum InterviewStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELLED
-}
-
-enum QuestionCategory {
-  PROFESSIONAL_ATTITUDE
-  EMOTIONAL_INTELLIGENCE
-  CUSTOMER_SERVICE
-  SAFETY
-  AVAILABILITY
-}
-
-enum JobRole {
-  DRIVER
-  CUSTOMER_SUPPORT
-  ADMIN_EXECUTIVE
-  INVENTORY
-  OPERATIONS
-  GENERAL
-}
-
-enum QuestionDifficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
-enum RolePlayCategory {
-  CUSTOMER_SERVICE
-  EMOTIONAL_INTELLIGENCE
-  PROFESSIONALISM
-  SAFETY
-  INTEGRITY
-  PROBLEM_SOLVING
-  CONFLICT_RESOLUTION
-}
-
-enum RolePlayAnswerType {
-  TEXT
-  FILE_UPLOAD
-  TEXT_AND_FILE
-}
-
-model Organization {
-  id String @id @default(uuid())
-
-  name String
-
-  users User[]
-  jobs  Job[]
-
-  createdAt DateTime @default(now())
-}
-
-model User {
-  id String @id @default(uuid())
-
-  email    String @unique
-  phone    String? @unique
-  password String
-
-  firstName String
-  lastName  String
-  imageUrl  String?
-
-  isDisabled Boolean @default(false)
-
-  role Role
-
-  organizationId String?
-
-  organization Organization? @relation(fields: [organizationId], references: [id])
-
-  createdJobs Job[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Token {
@@ -233,361 +59,100 @@ model Token {
   @@map("tokens")
 }
 
-model Candidate {
-  id String @id @default(uuid())
-  // candidateCode         String @unique
+enum AlertStatus {
+  ACTIVE
+  RESOLVED
+}
 
-  fullName String
-  email    String     
-  phone    String     
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+}
 
-  whatsapp String?
+model User {
+  id         String   @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String   @unique
+  phoneNo    String?
+  password   String
+  role       Role     @default(NURSE)
+  // isActive   Boolean  @default(true)
+  isDisabled Boolean  @default(false)
 
-  residentialAddress String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  gender String
+  @@map("users")
+}
 
+model Patient {
+  id          String    @id @default(uuid())
+  firstName   String
+  lastName    String
   dateOfBirth DateTime
+  gender      String
+  contact     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  stateOfOrigin String
+  readings    HealthReading[]
+  alerts      Alert[]
+  thresholds  Threshold[]
 
-  currentLocation String
-
-  highestQualification String
-
-  yearsOfExperience Int?
-
-  applications Application[]
-
-  documents CandidateDocument[]
-
-  createdAt DateTime @default(now())
-
-  @@unique([email])
-  @@unique([phone])
-
-  @@index([fullName])
-
-  @@index([email])
-
-  @@index([phone])
+  @@map("patients")
 }
 
-model CandidateDocument {
-  id String @id @default(uuid())
+model Device {
+  id         String       @id @default(uuid())
+  deviceName String
+  status     DeviceStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now())
 
-  candidateId String
+  readings   HealthReading[]
 
-  type DocumentType
-
-  fileUrl String
-
-  candidate Candidate @relation(fields: [candidateId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([candidateId, type])
+  @@map("devices")
 }
 
-model Job {
-  id String @id @default(uuid())
+model HealthReading {
+  id          String   @id @default(uuid())
+  patientId   String
+  deviceId    String
+  heartRate   Float
+  temperature Float
+  recordedAt  DateTime @default(now())
 
-  organizationId String
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  device      Device   @relation(fields: [deviceId], references: [id])
+  alerts      Alert[]
 
-  slug String @unique
-
-  title       String
-  description String
-
-  status JobStatus @default(DRAFT)
-
-  createdById String
-
-  organization Organization @relation(fields: [organizationId], references: [id])
-
-  createdBy User @relation(fields: [createdById], references: [id])
-
-  applications Application[]
-
-  assessment Assessment?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("health_readings")
 }
 
-model Application {
-  id String @id @default(uuid())
+model Alert {
+  id         String      @id @default(uuid())
+  patientId  String
+  readingId  String
+  parameter  String      // e.g. "heart_rate" or "temperature"
+  value      Float
+  status     AlertStatus @default(ACTIVE)
+  createdAt  DateTime    @default(now())
 
-  jobId       String
-  candidateId String
+  patient    Patient       @relation(fields: [patientId], references: [id])
+  reading    HealthReading @relation(fields: [readingId], references: [id])
 
-  source String?
-
-  status ApplicationStatus @default(APPLIED)
-
-  fitScore Float?
-
-  classification CandidateClassification?
-
-  job Job @relation(fields: [jobId], references: [id])
-
-  candidate Candidate @relation(fields: [candidateId], references: [id])
-
-  assessmentAttempt AssessmentAttempt?
-
-  hrNotes String?
-
-  interviews Interview[]
-
-  statusHistory ApplicationStatusHistory[]
-
-  createdAt DateTime @default(now())
-
-  @@unique([jobId, candidateId])
-
-  @@index([createdAt(sort: Desc), id(sort: Desc)])
-
-  @@index([status])
-
-  @@index([classification])
-
-  @@index([jobId])
-
-  @@index([candidateId])
-
-  @@index([jobId, status])
-
-  @@index([jobId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("alerts")
 }
 
-model ApplicationStatusHistory {
-  id String @id @default(uuid())
-
-  applicationId String
-
-  status ApplicationStatus
-
-  application Application @relation(fields: [applicationId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-model Assessment {
-  id String @id @default(uuid())
-
-  jobId String @unique
-
-  slug String @unique
-
-  title String
-
-  jobRole JobRole
-
-  durationMinutes Int
-
-  passingScore Int
-
-  job Job @relation(fields: [jobId], references: [id])
-
-  attempts AssessmentAttempt[]
-
-  createdAt DateTime @default(now())
-}
-
-model AssessmentAttempt {
-  id String @id @default(uuid())
-
-  assessmentId String
-
-  applicationId String? @unique
-
-  score Float?
-
-  passed Boolean?
-
-  status AssessmentStatus @default(NOT_STARTED)
-
-  assessment Assessment @relation(fields: [assessmentId], references: [id])
-
-  application Application? @relation(fields: [applicationId], references: [id])
-
-  generatedQuestions AssessmentAttemptQuestion[]
-
-  generatedRolePlays AssessmentAttemptRolePlay[]
-
-  answers AssessmentAnswer[]
-
-  rolePlayAnswers RolePlayAnswer[]
-
-  startedAt   DateTime  @default(now())
-  submittedAt DateTime?
-
-  @@index([status])
-
-  @@index([passed])
-
-  @@index([assessmentId])
-
-  @@index([applicationId])
-
-  @@index([status, passed])
-}
-
-model AssessmentAnswer {
-  id String @id @default(uuid())
-
-  attemptId        String
-  questionId       String
-  selectedOptionId String
-
-  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
-
-  question QuestionBank @relation(fields: [questionId], references: [id])
-
-  selectedOption QuestionBankOption @relation(fields: [selectedOptionId], references: [id])
-
-  @@unique([attemptId, questionId])
-}
-
-model RolePlayAnswer {
-  id String @id @default(uuid())
-
-  attemptId String
-
-  questionId String
-
-  answer String
-
-  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
-
-  question RolePlayBank @relation(fields: [questionId], references: [id])
-
-  files      RolePlayAnswerFile[]
-
-  @@unique([attemptId, questionId])
-}
-
-model QuestionBank {
-  id String @id @default(uuid())
-
-  category QuestionCategory
-
-  jobRole JobRole
-
-  difficulty QuestionDifficulty
-
-  question String   @unique
-
-  weight Int @default(5)
-
-  options QuestionBankOption[]
-
-  answers AssessmentAnswer[]
-
-  createdAt                  DateTime                    @default(now())
-  assessmentAttemptQuestions AssessmentAttemptQuestion[]
-}
-
-model QuestionBankOption {
-  id String @id @default(uuid())
-
-  questionId String
-
-  optionText String
-
-  isCorrect Boolean
-
-  question QuestionBank @relation(fields: [questionId], references: [id])
-
-  selectedAnswers AssessmentAnswer[]
-
-  @@unique([questionId, optionText])
-}
-
-model RolePlayBank {
-  id String @id @default(uuid())
-
-  category RolePlayCategory?
-  
-  jobRole JobRole
-
-  prompt String
-  isMandatory Boolean      @default(false) // added
-  answerType   RolePlayAnswerType  @default(TEXT)
-  minFiles     Int?
-  maxFiles     Int?
-
-  answers RolePlayAnswer[]
-
-  createdAt                  DateTime                    @default(now())
-  assessmentAttemptRolePlays AssessmentAttemptRolePlay[]
-
-  @@unique([category, prompt])
-}
-
-model RolePlayAnswerFile {
-  id              String @id @default(uuid())
-
-  rolePlayAnswerId String
-  objectKey       String
-
-  rolePlayAnswer   RolePlayAnswer @relation(fields: [rolePlayAnswerId], references: [id], onDelete: Cascade)
-}
-
-model AssessmentAttemptQuestion {
-  id String @id @default(uuid())
-
-  attemptId String
-
-  questionId String
-
-  displayOrder Int
-
-  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
-
-  question QuestionBank @relation(fields: [questionId], references: [id])
-
-  @@index([attemptId])
-  @@index([questionId])
-
-  @@unique([attemptId, questionId])
-}
-
-model AssessmentAttemptRolePlay {
-  id String @id @default(uuid())
-
-  attemptId String
-
-  questionId String
-
-  displayOrder Int
-
-  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id])
-
-  question RolePlayBank @relation(fields: [questionId], references: [id])
-  
-  @@index([attemptId])
-  @@index([questionId])
-
-  @@unique([attemptId, questionId])
-}
-
-model Interview {
-  id String @id @default(uuid())
-
-  applicationId String
-
-  scheduledAt DateTime
-
-  meetingLink String?
-
-  notes String?
-
-  score Float?
-
-  status InterviewStatus @default(SCHEDULED)
-
-  application Application @relation(fields: [applicationId], references: [id])
-
-  createdAt DateTime @default(now())
+model Threshold {
+  id          String  @id @default(uuid())
+  patientId   String  @unique
+  minHeartRate   Float @default(60)
+  maxHeartRate   Float @default(100)
+  minTemperature Float @default(36.1)
+  maxTemperature Float @default(37.5)
+
+  patient     Patient @relation(fields: [patientId], references: [id])
+
+  @@map("thresholds")
 }
