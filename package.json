@@ -1,7 +1,7 @@
 {
-  "name": "pepp-cruise-jobs-server",
+  "name": "remote-care-server",
   "version": "0.0.1",
-  "description": "PeppCruise Jobs Server - Professional NestJS Application",
+  "description": "Remote Care Server - Professional NestJS Application",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
