@@ -5,7 +5,7 @@ import { Prisma, Patient } from '@prisma/client';
 import { PatientRepository } from '../repositories/patient.repository';
 import { CursorUtil } from 'src/utils/cursor.util';
 import { PatientFilters } from '../interfaces/patient.interface';
-import { GetPatientsDto, UpdatePatientDto } from '../dto/patient.dto';
+import { GetPatientsDto, UpdatePatientDto, CreatePatientDto } from '../dto/patient.dto';
 
 @Injectable()
 export class PatientService {
@@ -14,11 +14,17 @@ export class PatientService {
     private readonly configService: ConfigService,
   ) {}
 
-  async create(patientData: Prisma.PatientUncheckedCreateInput): Promise<Patient> {
-    const patient = await this.patientRepository.create(patientData);
-    if (!patient) throw new NotFoundException('Failed to create patient');
+  async create(dto: CreatePatientDto): Promise<Patient> {
+    const patient = await this.patientRepository.create({
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      dateOfBirth: new Date(dto.dateOfBirth), // convert string → Date
+      gender: dto.gender,
+      contact: dto.contact,
+    });
     return patient;
   }
+
 
 
   async fetchPatient(id: string): Promise<Partial<Patient>> {
