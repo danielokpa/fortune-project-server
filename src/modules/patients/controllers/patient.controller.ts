@@ -50,7 +50,7 @@ export class PatientController {
   @ApiResponse({ status: 201, description: 'Patient registered successfully' })
   @ApiResponse({ status: 500, description: 'Failed to create patient' })
   async createPatient(@Body() createPatientDto: CreatePatientDto) {
-    const data = await this.patientService.patientRepository.create(createPatientDto);
+    const data = await this.patientService.create(createPatientDto);
     return ResponseUtil.handleResponse(
       data,
       'Patient registered successfully',

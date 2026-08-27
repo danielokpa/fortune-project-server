@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Prisma, Device } from '@prisma/client';
 import { DeviceRepository } from '../repositories/device.repository';
 import { CursorUtil } from 'src/utils/cursor.util';
-import { DeviceFilters } from '../interfaces/device-filters.interface';
+import { DeviceFilters } from '../interfaces/device.interface';
 import { GetDevicesDto, UpdateDeviceDto, CreateDeviceDto } from '../dto/device.dto';
 
 @Injectable()

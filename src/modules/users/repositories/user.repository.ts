@@ -14,7 +14,7 @@ import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<Partial<User> | null> {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id },
@@ -198,7 +198,7 @@ export class UserRepository {
 
   private buildWhereClause(
     filters: UserFilters,
-  ): Prisma.ApplicationWhereInput {
+  ): Prisma.UserWhereInput {
     const andConditions: Prisma.UserWhereInput[] = [];
 
     /**
@@ -213,35 +213,28 @@ export class UserRepository {
       andConditions.push({
         OR: [
           {
-            user: {
-              firstName: {
-                contains: keyword,
-                mode: 'insensitive',
-              },
+            firstName: {
+              contains: keyword,
+              mode: 'insensitive',
+            },
+
+          },
+          {
+            lastName: {
+              contains: keyword,
+              mode: 'insensitive',
             },
           },
           {
-            user: {
-              lastName: {
-                contains: keyword,
-                mode: 'insensitive',
-              },
+            email: {
+              contains: keyword,
+              mode: 'insensitive',
             },
           },
           {
-            user: {
-              email: {
-                contains: keyword,
-                mode: 'insensitive',
-              },
-            },
-          },
-          {
-            user: {
-              phoneNo: {
-                contains: keyword,
-                mode: 'insensitive',
-              },
+            phoneNo: {
+              contains: keyword,
+              mode: 'insensitive',
             },
           },
         ],
@@ -282,4 +275,6 @@ export class UserRepository {
       });
     }
 
+    return andConditions.length > 0 ? { AND: andConditions } : {};
+  }
 }

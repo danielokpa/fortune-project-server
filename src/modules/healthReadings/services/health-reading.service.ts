@@ -3,8 +3,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, HealthReading, AlertStatus } from '@prisma/client';
 import { HealthReadingRepository } from '../repositories/health-reading.repository';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { CreateReadingDto, GetReadingsDto  } from '../dto/health-reading.dto';
+import { CreateReadingDto, GetReadingsDto } from '../dto/health-reading.dto';
 import { ReadingFilters } from '../interfaces/health-reading.interface';
+import { CursorUtil } from 'src/utils/cursor.util';
 
 @Injectable()
 export class HealthReadingService {
@@ -43,14 +44,24 @@ export class HealthReadingService {
     });
 
     // 3. Check thresholds (patient-specific or defaults)
-    const threshold = patient.thresholds
-      ? patient.thresholds
-      : {
-          minHeartRate: 60,
-          maxHeartRate: 100,
-          minTemperature: 36.1,
-          maxTemperature: 37.5,
-        };
+    // const threshold = patient.thresholds
+    //   ? patient.thresholds
+    //   : {
+    //       minHeartRate: 60,
+    //       maxHeartRate: 100,
+    //       minTemperature: 36.1,
+    //       maxTemperature: 37.5,
+    //     };
+    const threshold =
+      patient.thresholds?.[0] // if thresholds is an array
+        ? patient.thresholds[0]
+        : {
+            minHeartRate: 60,
+            maxHeartRate: 100,
+            minTemperature: 36.1,
+            maxTemperature: 37.5,
+          };
+
 
     const alertsToCreate: Prisma.AlertUncheckedCreateInput[] = [];
 
@@ -106,7 +117,7 @@ export class HealthReadingService {
     const nextCursor =
       hasNextPage && lastItem
         ? CursorUtil.encode({
-            recordedAt: lastItem.recordedAt.toISOString(),
+            createdAt: lastItem.recordedAt.toISOString(),
             id: lastItem.id,
           })
         : null;

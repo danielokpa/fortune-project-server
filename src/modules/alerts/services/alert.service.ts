@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Alert } from '@prisma/client';
 import { AlertRepository } from '../repositories/alert.repository';
 import { CursorUtil } from 'src/utils/cursor.util';
-import { AlertFilters } from '../interfaces/alert-filters.interface';
-import { GetAlertsDto } from '../dto/get-alerts.dto';
+import { AlertFilters } from '../interfaces/alert.interface';
+import { GetAlertsDto } from '../dto/alert.dto';
 
 @Injectable()
 export class AlertService {

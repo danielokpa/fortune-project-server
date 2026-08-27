@@ -62,17 +62,17 @@ export class UserService {
     }
   }
 
-  async updateImageUrl(userId: string, imageUrl: string): Promise<User> {
-    const updatedUser = await this.userRepository.update(userId, {
-      imageUrl,
-    });
+  // async updateImageUrl(userId: string, imageUrl: string): Promise<User> {
+  //   const updatedUser = await this.userRepository.update(userId, {
+  //     imageUrl,
+  //   });
 
-    if (!updatedUser) {
-      throw new NotFoundException('Failed to update image URL');
-    }
+  //   if (!updatedUser) {
+  //     throw new NotFoundException('Failed to update image URL');
+  //   }
 
-    return updatedUser;
-  }
+  //   return updatedUser;
+  // }
 
   async update(
     id: string,

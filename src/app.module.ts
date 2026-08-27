@@ -13,11 +13,11 @@ import { UsersModule } from './modules/users/users.module';
 import { PatientsModule } from './modules/patients/patient.module';
 import { DevicesModule } from './modules/devices/device.module';
 import { HealthReadingsModule } from './modules/healthReadings/health-reading.module';
+import { AlertsModule } from './modules/alerts/alert.module';
+import { ThresholdsModule } from './modules/thresholds/threshold.module';
 // import { CountriesModule } from './modules/countries/countries.module';
 // import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 // import { CategoryModule } from './modules/categories/category.module';
-import { ApplicationModule } from './modules/application/application.module';
-import { CandidateModule } from './modules/candidates/candidate.module';
 import { UploadModule } from './modules/uploads/upload.module';
 import { CloudflareModule } from './services/cloudflare/cloudflare.module';
 import { TokenModule } from './services/token/token.module';
@@ -55,11 +55,11 @@ import { PrismaModule } from './prisma/prisma.module';
     PatientsModule,
     DevicesModule,
     HealthReadingsModule,
+    AlertsModule,
+    ThresholdsModule,
     // CountriesModule,
     // ClientDevicesModule,
     // CategoryModule,
-    ApplicationModule,
-    CandidateModule,
     UploadModule,
     CloudflareModule,
     TokenModule,

@@ -14,6 +14,13 @@ export class PatientService {
     private readonly configService: ConfigService,
   ) {}
 
+  async create(patientData: Prisma.PatientUncheckedCreateInput): Promise<Patient> {
+    const patient = await this.patientRepository.create(patientData);
+    if (!patient) throw new NotFoundException('Failed to create patient');
+    return patient;
+  }
+
+
   async fetchPatient(id: string): Promise<Partial<Patient>> {
     const patient = await this.patientRepository.findById(id);
 

@@ -126,7 +126,7 @@ export class HealthReadingRepository {
     // Cursor pagination
     if (filters.cursor) {
       const cursor = CursorUtil.decode(filters.cursor);
-      const cursorDate = cursor?.recordedAt ? new Date(cursor.recordedAt) : undefined;
+      const cursorDate = cursor?.createdAt ? new Date(cursor.createdAt) : undefined;
 
       andConditions.push({
         OR: [

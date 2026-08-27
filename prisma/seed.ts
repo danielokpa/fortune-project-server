@@ -2,19 +2,11 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-import { seedCountries } from './seeds/countries.seed';
-import { seedStates } from './seeds/states.seed';
-import {
-  seedOrganization,
-} from './seeds/organisation.seed';
+// import { seedCountries } from './seeds/countries.seed';
+// import { seedStates } from './seeds/states.seed';
 import {
   seedAdminUser,
 } from './seeds/user.seed';
-import { seedJobs } from './seeds/jobs.seed';
-import { seedQuestionBank } from './seeds/questions.seed';
-import { seedAssessments } from './seeds/assessment.seed';
-import { seedCandidateDocuments } from './seeds/candidate-documents.seed';
-
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
 });
@@ -30,36 +22,17 @@ async function main() {
   // await seedCountries(prisma);
   // await seedStates(prisma);
 
-  // const organization =
-  //   await seedOrganization(
-  //     prisma,
-  //   );
+  const admin =
+    await seedAdminUser(
+      prisma,
+    );
 
-  // const admin =
-  //   await seedAdminUser(
-  //     prisma,
-  //     organization.id,
-  //   );
+  console.log('\n');
 
-  // await seedJobs(
-  //   prisma,
-  // );
-
-  await seedQuestionBank(prisma);
-  // await seedAssessments(prisma);
-  // await seedCandidateDocuments(prisma);
-
-  // console.log('\n');
-
-  // console.log(
-  //   'Organization ID:',
-  //   organization.id,
-  // );
-
-  // console.log(
-  //   'Admin User ID:',
-  //   admin.id,
-  // );
+  console.log(
+    'Admin User ID:',
+    admin.id,
+  );
 
   console.log(
     '\n✅ Base seed complete\n',

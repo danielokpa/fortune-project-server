@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsOptional,
   IsString,
+  IsPhoneNumber,
   Max,
   Min,
   IsInt,
@@ -29,8 +30,17 @@ export class UpdateImageUrlDto {
 }
 
 export class UpdateUserDto {
+  @ApiPropertyOptional()
   @IsString()
-  fullName: string;
+  firstName?: string;
+  
+  @ApiPropertyOptional()
+  @IsString()
+  lastName?: string;
+
+  @ApiPropertyOptional()
+  @IsPhoneNumber()
+  phoneNo?: string
 }
 
 export class GetUsersDto {

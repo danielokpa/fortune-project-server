@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-// import { UserController } from './controllers/user.controller';
+import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
 import { UserRepository } from './repositories/user.repository';
 // import { UserEventService } from './services/user-event.service';
@@ -9,7 +9,7 @@ import { UserRepository } from './repositories/user.repository';
 
 @Module({
   imports: [EventEmitterModule/*, ClientDevicesModule*/],
-  controllers: [/*UserController*/],
+  controllers: [UserController],
   providers: [UserService, UserRepository, /*UserEventListener*/],
   exports: [UserService, UserRepository],
 })
