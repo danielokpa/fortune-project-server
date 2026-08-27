@@ -1,3 +1,5 @@
+import { User } from '@prisma/client';
+
 export interface UserFilters {
   cursor?: string;
 
@@ -5,3 +7,6 @@ export interface UserFilters {
 
   search?: string;
 }
+
+// Omit only the password field
+export type SafeUser = Omit<User, 'password'>;

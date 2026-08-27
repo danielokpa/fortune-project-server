@@ -7,7 +7,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { CursorUtil } from 'src/utils/cursor.util';
 import { UserType } from 'src/enums';
-import { UserFilters } from '../interfaces/user.interface';
+import { UserFilters, SafeUser } from '../interfaces/user.interface';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 
 @Injectable()
@@ -168,11 +168,14 @@ export class UserRepository {
     }
   }
 
-  async findAll(filters: UserFilters): Promise<User[]> {
+  async findAll(filters: UserFilters): Promise<SafeUser[]> {
     try {
       const where = this.buildWhereClause(filters)
       const users = await this.prisma.user.findMany({
         where,
+        omit: {
+          password: true,
+        },
 
         take: filters.limit + 1,
 
