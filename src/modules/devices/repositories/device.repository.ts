@@ -120,22 +120,28 @@ export class DeviceRepository {
      */
     if (filters.search?.trim()) {
       const keyword = filters.search.trim();
+      
+      // 1. Define standard text search conditions
+      const orConditions: Prisma.DeviceWhereInput[] = [
+        {
+          deviceName: {
+            contains: keyword,
+            mode: 'insensitive',
+          },
+        },
+      ];
 
-      andConditions.push({
-        OR: [
-          {
-            deviceName: {
-              contains: keyword,
-              mode: 'insensitive',
-            },
+      // 2. Safely check if the keyword is a valid DeviceStatus enum value
+      const searchStatus = keyword.toUpperCase();
+      if (Object.values(DeviceStatus).includes(searchStatus as DeviceStatus)) {
+        orConditions.push({
+          status: {
+            equals: searchStatus as DeviceStatus,
           },
-          {
-            status: {
-              equals: keyword.toUpperCase() as any, // allow searching by status
-            },
-          },
-        ],
-      });
+        });
+      }
+
+      andConditions.push({ OR: orConditions });
     }
 
     /**

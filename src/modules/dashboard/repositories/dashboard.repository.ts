@@ -10,7 +10,7 @@ export class DashboardRepository {
       await Promise.all([
         this.prisma.patient.count(),
         this.prisma.alert.count({ where: { status: 'ACTIVE' } }),
-        this.prisma.device.count(),
+        this.prisma.device.count({ where: { status: 'ACTIVE' } }),
         this.prisma.healthReading.count(),
       ]);
 
