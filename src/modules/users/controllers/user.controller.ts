@@ -99,7 +99,7 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const userId = Validators.validateUuid(req.user.userId);
-    const data = await this.userService.update(userId, updateUserDto);
+    const data = await this.userService.update(id, updateUserDto);
     return ResponseUtil.handleResponse(
       data,
       'User updated successfully',
