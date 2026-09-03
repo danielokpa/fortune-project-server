@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Device, Prisma } from '@prisma/client';
+import { Device, DeviceStatus, Prisma } from '@prisma/client';
 import { CursorUtil } from 'src/utils/cursor.util';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
 import { DeviceFilters } from '../interfaces/device.interface';
