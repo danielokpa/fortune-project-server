@@ -154,7 +154,7 @@ export class AuthService {
     }
 
     // Verify contact as password
-    const isValid = await PasswordUtil.verifyPassword(contact, patient.contact);
+    const isValid = contact === patient.contact;
     if (!isValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
