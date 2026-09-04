@@ -109,6 +109,13 @@ export class AuthController {
     return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
   }
 
+  @Post('patient')
+  @HttpCode(HttpStatus.OK)
+  async loginPatient(@Body() body: { email: string; contact: string }) {
+    const data = await this.authService.loginPatient(body.email, body.contact);
+    return ResponseUtil.handleResponse(data, 'Patient login successful', HttpStatus.OK);
+  }
+
 //   @Post('login-with-otp')
 //   @HttpCode(HttpStatus.OK)
 //   async loginOtp(@Body() input: LoginOtpDto) {

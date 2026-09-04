@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User, Role } from '@prisma/client';
 import { Request as ExpressRequest, request } from 'express';
 import { add } from 'date-fns';
 import { UserLoginIdentityType, UserType } from '../../enums/user-type.enum';
@@ -17,6 +17,7 @@ import { TOKEN_SUBJECT } from 'src/services/token/token.constants';
 import { TokenService } from 'src/services/token/token.service';
 import { PasswordUtil } from 'src/utils/password.util';
 import { UserRepository } from '../users/repositories/user.repository';
+import { PatientRepository } from '../patients/repositories/patient.repository';
 import { JwtAuthPayload } from './auth.interface';
 import {
   ChangePasswordDto,
@@ -44,6 +45,7 @@ import { IUserLoginData } from 'src/shared/interfaces/auth.interface';
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly patientRepository: PatientRepository,
     private mailService: MailService,
     private tokenService: TokenService,
     private emailEventService: EmailEventService,
@@ -53,158 +55,6 @@ export class AuthService {
     // private clientDeviceService: ClientDeviceService,
     // private userEventService: UserEventService,
   ) {}
-
-//   async signUpPhoneNo(input: SignupPhone) {
-//     try {
-//       const { country, phoneNo } = input;
-
-//       const existingCountry = await this.countryService.findById(country);
-//       if (!existingCountry) {
-//         throw new ConflictException('Country code not found!');
-//       }
-
-//       const phone = Utils.normalizeCountryPhone(
-//         existingCountry.phoneCode,
-//         phoneNo,
-//         existingCountry.phoneLength,
-//       );
-
-//       const existingUser = await this.userRepository.findByPhone(phone);
-//       if (existingUser) {
-//         throw new ConflictException('User with this phoneNo already exist');
-//       }
-
-//       const otpToken = await this.tokenService.generateOTPtoken({
-//         phoneNo: phone,
-//         expiry: moment().add(10, 'minutes').toDate(),
-//         subject: TokenSubject.SIGN_UP_PHONE,
-//       });
-
-//       // Send SMS with OTP
-//       await this.smsEventService.emitSignUpOtpSms(
-//         Utils.phoneSMSFormat(phone),
-//         otpToken.token,
-//       );
-
-//       return {};
-//     } catch (error) {
-//       throw new BadRequestException(error);
-//     }
-//   }
-
-  // async deleteUserAccount(identity: string, password: string): Promise<null> {
-  //   try {
-  //     // Step 1: Find user
-  //     const user = await this.userService.findByIdentity(identity);
-  //     if (!user) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     // Step 2: Verify password
-  //     const verifyPassword = await PasswordUtil.verifyPassword(
-  //       password,
-  //       user.password,
-  //     );
-  //     if (!verifyPassword) {
-  //       throw new UnauthorizedException('Invalid credentials');
-  //     }
-
-  //     // Step 4: Update email to email-uuid
-  //     const newEmail = `${user.email}-${user.id}`;
-  //     const newPhoneNo = `${user.phoneNo}-${user.id}`;
-
-  //     const updatedDriver = await this.userRepository.update(user.id, {
-  //       email: newEmail,
-  //       phoneNo: newPhoneNo,
-  //     });
-  //     if (!updatedDriver) {
-  //       throw new NotFoundException('User not found after deletion');
-  //     }
-
-  //     await this.userRepository.delete(user.id);
-
-  //     return null;
-  //   } catch (error: unknown) {
-  //     if (
-  //       error instanceof NotFoundException ||
-  //       error instanceof UnauthorizedException
-  //     ) {
-  //       throw error;
-  //     }
-  //     throw new NotFoundException('Failed to delete driver account');
-  //   }
-  // }
-
-  // async signUpEmail(input: SignupEmail) {
-  //   try {
-  //     input.email = Validators.validateEmail(input.email);
-  //     const existingUser = await this.userRepository.findByEmail(input.email);
-
-  //     if (existingUser) {
-  //       throw new ConflictException('User with this email already exist');
-  //     }
-  //     const expiryDate = moment().add(10, 'minutes').toDate();
-  //     const otpToken = await this.tokenService.generateOTPtoken({
-  //       email: input.email,
-  //       expiry: expiryDate,
-  //       subject: TokenSubject.SIGN_UP_EMAIL,
-  //     });
-
-  //     // Send forget password email
-  //     await this.emailEventService.emitSignUpOtpEmail(
-  //       input.email,
-  //       otpToken.token,
-  //       expiryDate.toISOString(),
-  //     );
-
-  //     return null;
-  //   } catch (error) {
-  //     throw new BadRequestException(error);
-  //   }
-  // }
-
-  // async verifyOtp(input: VerifyOtpDto) {
-  //   const { token, subject, email, phoneNo, country } = input;
-
-  //   let data;
-
-  //   if (subject === TokenSubject.SIGN_UP_EMAIL) {
-  //     input.email = Validators.validateEmail(input.email);
-  //     data = await this.tokenService.validateOtp({
-  //       token,
-  //       subject,
-  //       email,
-  //       phoneNo,
-  //     });
-  //   } else {
-  //     if (!country) {
-  //       throw new BadRequestException('Must provide a valid country!');
-  //     }
-
-  //     const existingCountry = await this.countryService.findById(country);
-  //     if (!existingCountry) {
-  //       throw new ConflictException('Country code not found!');
-  //     }
-
-  //     const phone = Utils.normalizeCountryPhone(
-  //       existingCountry.phoneCode,
-  //       phoneNo,
-  //       existingCountry.phoneLength,
-  //     );
-
-  //     data = await this.tokenService.validateOtp({
-  //       token,
-  //       subject,
-  //       phoneNo: phone,
-  //     });
-  //   }
-
-  //   if (!data) {
-  //     throw new BadRequestException('Invalid OTP');
-  //   }
-
-  //   return input;
-  // }
 
   async verifyPasswordResetOtp(input: VerifyOtpDto) {
     const { token, subject, email } = input;
@@ -222,194 +72,6 @@ export class AuthService {
 
     return input;
   }
-
-  // async signUp(input: SignUpUserDto) {
-  //   const country = await this.countryService.findById(input.country);
-  //   if (!country) {
-  //     throw new NotFoundException('Country not found');
-  //   }
-
-  //   input.email = Validators.validateEmail(input.email);
-
-  //   const emailUser = await this.checkEmailExist(input.email);
-  //   if (emailUser) {
-  //     throw new ConflictException('User with email already exist');
-  //   }
-
-  //   if (!input.country) {
-  //     throw new BadRequestException('Must provide a valid country!');
-  //   }
-
-  //   const existingCountry = await this.countryService.findById(input.country);
-  //   if (!existingCountry) {
-  //     throw new ConflictException('Country code not found!');
-  //   }
-
-  //   const phone = Utils.normalizeCountryPhone(
-  //     existingCountry.phoneCode,
-  //     input.phoneNo,
-  //     existingCountry.phoneLength,
-  //   );
-
-  //   // const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-  //   //   phoneNo: phone,
-  //   //   token: input.otpPhone,
-  //   //   subject: TokenSubject.SIGN_UP_PHONE,
-  //   // });
-
-  //   // if (!verifyPhoneOtp) {
-  //   //   throw new BadRequestException('Invalid OTP');
-  //   // }
-
-  //   const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
-  //     email: input.email,
-  //     token: input.otpEmail,
-  //     subject: TokenSubject.SIGN_UP_EMAIL,
-  //   });
-
-  //   if (!verifyEmailOtp) {
-  //     throw new BadRequestException('Invalid OTP');
-  //   }
-
-  //   const password = await PasswordUtil.hashPassword(input.password);
-
-  //   const user = await this.userRepository.create({
-  //     email: input.email,
-  //     phoneNo: phone,
-  //     fullName: input.fullName,
-  //     username: input.username,
-  //     password: password,
-  //     countryId: existingCountry.id,
-  //     userType: UserType.USER,
-  //     loginType: LoginType.NORMAL,
-  //     isEmailVerified: true,
-  //     isActive: true,
-  //   });
-
-  //   const payload = {
-  //     sub: user.id,
-  //     userType: UserType.USER,
-  //     userId: user!.id,
-  //     email: input.email,
-  //   };
-
-  //   const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //   // Send welcome email
-  //   await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-
-  //   // Find referrer user if referral code is provided
-  //   // let referalUserId: string | undefined;
-  //   // if (input.referralCode) {
-  //   //   const referrerUser = await this.userRepository.findByReferalCode(
-  //   //     input.referralCode,
-  //   //   );
-  //   //   referalUserId = referrerUser?.id;
-  //   // }
-
-  //   // Emit event to generate referral code and handle referral tracking
-  //   // await this.userEventService.emitGenerateReferalCode(
-  //   //   user.id,
-  //   //   input.referralCode,
-  //   //   referalUserId,
-  //   // );
-
-  //   return {
-  //     email: input.email,
-  //     userType: UserType.USER,
-  //     id: user.id,
-  //     token: token,
-  //   };
-  // }
-
-  // async signUpSocial(input: SignUpSocialUserDto) {
-  //   const country = await this.countryService.findById(input.country);
-  //   if (!country) {
-  //     throw new NotFoundException('Country not found');
-  //   }
-
-  //   input.email = Validators.validateEmail(input.email);
-
-  //   const emailUser = await this.checkEmailExist(input.email);
-  //   if (emailUser) {
-  //     throw new ConflictException('User with email already exist');
-  //   }
-
-  //   if (!input.country) {
-  //     throw new BadRequestException('Must provide a valid country!');
-  //   }
-
-  //   const existingCountry = await this.countryService.findById(input.country);
-  //   if (!existingCountry) {
-  //     throw new ConflictException('Country code not found!');
-  //   }
-
-  //   const phone = Utils.normalizeCountryPhone(
-  //     existingCountry.phoneCode,
-  //     input.phoneNo,
-  //     existingCountry.phoneLength,
-  //   );
-
-  //   const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-  //     phoneNo: phone,
-  //     token: input.otpPhone,
-  //     subject: TokenSubject.SIGN_UP_PHONE,
-  //   });
-
-  //   if (!verifyPhoneOtp) {
-  //     throw new BadRequestException('Invalid OTP');
-  //   }
-
-  //   const password = await PasswordUtil.hashPassword(input.password);
-
-  //   const user = await this.userRepository.create({
-  //     email: input.email,
-  //     phoneNo: phone,
-  //     fullName: input.fullName,
-  //     password: password,
-  //     countryId: country.id,
-  //     userType: UserType.USER,
-  //     loginType: input.loginType,
-  //     isEmailVerified: true,
-  //     isPhoneVerified: true,
-  //     isActive: true,
-  //   });
-
-  //   const payload = {
-  //     sub: user.id,
-  //     userType: UserType.USER,
-  //     userId: user!.id,
-  //     email: input.email,
-  //   };
-
-  //   const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //   // Send welcome email
-  //   await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-
-  //   // Find referrer user if referral code is provided
-  //   let referalUserId: string | undefined;
-  //   if (input.referalCode) {
-  //     const referrerUser = await this.userRepository.findByReferalCode(
-  //       input.referalCode,
-  //     );
-  //     referalUserId = referrerUser?.id;
-  //   }
-
-  //   // Emit event to generate referral code and handle referral tracking
-  //   // await this.userEventService.emitGenerateReferalCode(
-  //   //   user.id,
-  //   //   input.referalCode,
-  //   //   referalUserId,
-  //   // );
-
-  //   return {
-  //     email: input.email,
-  //     userType: UserType.USER,
-  //     id: user.id,
-  //     token: token,
-  //   };
-  // }
 
   async login(input: LoginUserDto) {
     
@@ -482,6 +144,40 @@ export class AuthService {
     };
 
     return data;
+  }
+
+  async loginPatient(email: string, contact: string) {
+    const patient = await this.patientRepository.findByEmail(email);
+
+    if (!patient) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Verify contact as password
+    const isValid = await PasswordUtil.verifyPassword(contact, patient.contact);
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload: JwtAuthPayload = {
+      sub: patient.id,
+      userType: Role.PATIENT,
+      userId: patient.id,
+      email: patient.email,
+    };
+
+    const token = await this.tokenService.generateJWTtoken(payload);
+
+    return {
+      id: patient.id,
+      token,
+      userType: Role.PATIENT,
+      patient: {
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        email: patient.email,
+      },
+    };
   }
 
   // async loginOtp(input: LoginOtpDto) {

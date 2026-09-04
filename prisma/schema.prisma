@@ -20,6 +20,7 @@ enum Role {
   ADMIN
   DOCTOR
   NURSE
+  PATIENT
 }
 
 enum TokenType {
@@ -90,6 +91,7 @@ model Patient {
   id          String    @id @default(uuid())
   firstName   String
   lastName    String
+  email       String    @unique
   dateOfBirth DateTime
   gender      String
   contact     String

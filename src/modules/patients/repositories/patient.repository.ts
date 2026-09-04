@@ -29,6 +29,17 @@ export class PatientRepository {
     }
   }
 
+  async findByEmail(email: string): Promise<Patient | null> {
+    try {
+      const patient = await this.prisma.patient.findUnique({ where: { email } });
+  
+      if (!patient) throw new NotFoundException('Patient not found');
+      return patient;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
   async findById(id: string): Promise<Patient | null> {
     try {
       const patient = await this.prisma.patient.findUnique({

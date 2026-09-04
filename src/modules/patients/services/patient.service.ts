@@ -18,6 +18,7 @@ export class PatientService {
     const patient = await this.patientRepository.create({
       firstName: dto.firstName,
       lastName: dto.lastName,
+      email: dto.email,
       dateOfBirth: new Date(dto.dateOfBirth), // convert string → Date
       gender: dto.gender,
       contact: dto.contact,

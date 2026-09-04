@@ -3,6 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
+  IsEmail,
   IsInt,
   Min,
   Max,
@@ -18,6 +19,10 @@ export class CreatePatientDto {
   @ApiProperty()
   @IsString()
   lastName: string;
+
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
   @ApiProperty()
   @IsDateString()

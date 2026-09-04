@@ -21,18 +21,28 @@ async function main() {
   );
   // await seedCountries(prisma);
   // await seedStates(prisma);
+  // const patients = await prisma.patient.findMany({ where: { email: null } });
 
-  const admin =
-    await seedAdminUser(
-      prisma,
-    );
+  //   for (const p of patients) {
+  //     const syntheticEmail = `${p.firstName}.${p.lastName}.${p.id}@patients.local`.toLowerCase();
+  //     await prisma.patient.update({
+  //       where: { id: p.id },
+  //       data: { email: syntheticEmail },
+  //     });
+  //     console.log(`✅ Backfilled email for patient ${p.id}: ${syntheticEmail}`);
+  //   }
+  
+  // const admin =
+  //   await seedAdminUser(
+  //     prisma,
+  //   );
 
-  console.log('\n');
+  // console.log('\n');
 
-  console.log(
-    'Admin User ID:',
-    admin.id,
-  );
+  // console.log(
+  //   'Admin User ID:',
+  //   admin.id,
+  // );
 
   console.log(
     '\n✅ Base seed complete\n',
