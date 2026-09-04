@@ -5,6 +5,7 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './auth.service';
 // import { CountriesModule } from '../countries/countries.module';
 import { UsersModule } from '../users/users.module';
+import { PatientsModule } from '../patients/patient.module';
 // import { ClientDevicesModule } from '../client-devices/client-devices.module';
 
 @Module({
@@ -13,6 +14,7 @@ import { UsersModule } from '../users/users.module';
     MailModule,
     // CountriesModule,
     UsersModule,
+    PatientsModule,
     // ClientDevicesModule,
   ],
   providers: [AuthService],
