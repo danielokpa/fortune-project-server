@@ -14,7 +14,6 @@ import {
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
-import type { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -26,6 +25,7 @@ import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
+import type { Request as ExpressRequest } from 'express';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { JwtAuthPayload } from '../../auth/auth.interface';
 import { Validators } from 'src/utils/validators.utils';
@@ -72,6 +72,25 @@ export class PatientController {
     );
   }
 
+  @Roles(UserType.PATIENT)
+  @Get('summary')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get patient summary (latest reading + active alerts)' })
+  @ApiResponse({ status: 200, description: 'Patient summary retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Patient not found' })
+  async getMySummary(
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  ) {
+    const userId = Validators.validateUuid(req.user.userId);
+    const data = await this.patientService.getSummary(userId);
+    return ResponseUtil.handleResponse(
+      data,
+      'Patient summary retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Roles(UserType.ADMIN, UserType.DOCTOR, UserType.NURSE)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get patient profile' })
@@ -119,6 +138,7 @@ export class PatientController {
     );
   }
 
+  @Roles(UserType.ADMIN, UserType.DOCTOR)
   @Get(':id/summary')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get patient summary (latest reading + active alerts)' })
