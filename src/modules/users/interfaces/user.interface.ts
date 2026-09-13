@@ -1,12 +1,16 @@
-import { User } from '@prisma/client';
+import { Role } from '@prisma/client';
 
 export interface UserFilters {
   cursor?: string;
-
   limit: number;
-
   search?: string;
+  role?: Role;
 }
 
-// Omit only the password field
-export type SafeUser = Omit<User, 'password'>;
+export type SafeUser = {
+  id: number;
+  fullName: string;
+  email: string;
+  role: Role;
+  createdAt: Date;
+};

@@ -1,283 +1,137 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Prisma, Role, User } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { User, Prisma } from '@prisma/client';
-import { CursorUtil } from 'src/utils/cursor.util';
-import { UserType } from 'src/enums';
-import { UserFilters, SafeUser } from '../interfaces/user.interface';
 import { handleDatabaseError } from 'src/utils/db-error-handler.util';
+import { UserFilters } from '../interfaces/user.interface';
+
+const safeUserSelect = {
+  id: true,
+  fullName: true,
+  email: true,
+  role: true,
+  createdAt: true,
+  student: true,
+} satisfies Prisma.UserSelect;
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<Partial<User> | null> {
+  async findById(id: number) {
     try {
-      const user = await this.prisma.user.findUnique({
+      return await this.prisma.user.findUnique({
         where: { id },
-        omit: {
-          password: true
-        },
+        select: safeUserSelect,
       });
-
-      return user;
     } catch (error) {
       handleDatabaseError(error);
     }
   }
-
-  // async fetchUser(id: string): Promise<Partial<User> | null> {
-  //   try {
-  //     const user = await this.prisma.user.findUnique({
-  //       where: { id },
-
-  //       omit: {
-  //         password: true,
-  //       },
-  //     });
-
-  //     return user;
-  //   } catch (error) {
-  //     handleDatabaseError(error);
-  //   }
-  // }
-
-  // async fetchAndUpdateUser(
-  //   id: string,
-  //   data: Prisma.UserUpdateInput,
-  // ): Promise<User> {
-  //   try {
-  //     const existingUser = await this.prisma.user.findUnique({
-  //       where: { id },
-  //     });
-
-  //     if (!existingUser) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     const updatedUser = await this.prisma.user.update({
-  //       where: { id },
-  //       data,
-  //     });
-
-  //     return updatedUser;
-  //   } catch (error) {
-  //     handleDatabaseError(error);
-  //   }
-  // }
 
   async findByEmail(email: string): Promise<User | null> {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: { email },
+      return await this.prisma.user.findUnique({
+        where: { email: email.toLowerCase() },
+        include: { student: true },
       });
-
-      return user;
     } catch (error) {
       handleDatabaseError(error);
     }
   }
 
-  // async findByPhone(phoneNo: string): Promise<User | null> {
-  //   try {
-  //     const user = await this.prisma.user.findFirst({
-  //       where: { phone: phoneNo },
-  //     });
+  async findAll(filters: UserFilters) {
+    const take = (filters.limit || 20) + 1;
+    const cursorId = filters.cursor ? parseInt(filters.cursor, 10) : undefined;
 
-  //     return user;
-  //   } catch (error) {
-  //     handleDatabaseError(error);
-  //   }
-  // }
-
-  // async findByEmailAndRole(
-  //   email: string,
-  //   userType: UserType,
-  // ): Promise<User | null> {
-  //   try {
-  //     const user = await this.prisma.user.findFirst({
-  //       where: {
-  //         email,
-  //         role: userType,
-  //       },
-  //     });
-
-  //     return user;
-  //   } catch (error) {
-  //     handleDatabaseError(error);
-  //   }
-  // }
-
-  async create(userData: Prisma.UserUncheckedCreateInput): Promise<User> {
     try {
-      const user = await this.prisma.user.create({
-        data: userData,
-      });
-
-      if (!user) {
-        throw new InternalServerErrorException('Failed to create user');
-      }
-
-      return user;
-    } catch (error) {
-      handleDatabaseError(error);
-    }
-  }
-
-  async update(id: string, userData: Prisma.UserUpdateInput): Promise<User> {
-    try {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { id },
-      });
-
-      if (!existingUser) {
-        throw new NotFoundException('User not found');
-      }
-
-      const updatedUser = await this.prisma.user.update({
-        where: { id },
-        data: userData,
-      });
-
-      return updatedUser;
-    } catch (error) {
-      handleDatabaseError(error);
-    }
-  }
-
-  async delete(id: string): Promise<boolean> {
-    try {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { id },
-      });
-
-      if (!existingUser) {
-        throw new NotFoundException('User not found');
-      }
-
-      await this.prisma.user.delete({
-        where: { id },
-      });
-
-      return true;
-    } catch (error) {
-      handleDatabaseError(error);
-    }
-  }
-
-  async findAll(filters: UserFilters): Promise<SafeUser[]> {
-    try {
-      const where = this.buildWhereClause(filters)
-      const users = await this.prisma.user.findMany({
-        where,
-        omit: {
-          password: true,
-        },
-
-        take: filters.limit + 1,
-
-        orderBy: [
-          {
-            createdAt: 'desc',
-          },
-          {
-            id: 'desc',
-          },
-        ]
-      });
-
-      if (!users) {
-        throw new NotFoundException('Users not found');
-      }
-
-      return users;
-    } catch (error) {
-      handleDatabaseError(error);
-    }
-  }
-
-  private buildWhereClause(
-    filters: UserFilters,
-  ): Prisma.UserWhereInput {
-    const andConditions: Prisma.UserWhereInput[] = [];
-
-    /**
-     * ---------------------------------------------------------
-     * Search
-     * ---------------------------------------------------------
-     */
-
-    if (filters.search?.trim()) {
-      const keyword = filters.search.trim();
-
-      andConditions.push({
-        OR: [
-          {
-            firstName: {
-              contains: keyword,
-              mode: 'insensitive',
-            },
-
-          },
-          {
-            lastName: {
-              contains: keyword,
-              mode: 'insensitive',
-            },
-          },
-          {
-            email: {
-              contains: keyword,
-              mode: 'insensitive',
-            },
-          },
-          {
-            phoneNo: {
-              contains: keyword,
-              mode: 'insensitive',
-            },
-          },
-        ],
-      });
-    }
-
-    /**
-     * ---------------------------------------------------------
-     * Cursor Pagination (Keyset Pagination)
-     * ---------------------------------------------------------
-     */
-
-    if (filters.cursor) {
-      const cursor = CursorUtil.decode(filters.cursor);
-
-      const cursorDate = cursor?.createdAt ? new Date(cursor.createdAt) : undefined;
-
-      andConditions.push({
-        OR: [
-          {
-            createdAt: {
-              lt: cursorDate,
-            },
-          },
-          {
-            AND: [
-              {
-                createdAt: cursorDate,
-              },
-              {
-                id: {
-                  lt: cursor?.id,
+      return await this.prisma.user.findMany({
+        where: {
+          role: filters.role,
+          OR: filters.search
+            ? [
+                {
+                  fullName: {
+                    contains: filters.search,
+                  },
                 },
-              },
-            ],
-          },
-        ],
+                {
+                  email: {
+                    contains: filters.search,
+                  },
+                },
+              ]
+            : undefined,
+        },
+        select: safeUserSelect,
+        orderBy: { id: 'desc' },
+        take,
+        skip: cursorId ? 1 : 0,
+        cursor: cursorId ? { id: cursorId } : undefined,
       });
+    } catch (error) {
+      handleDatabaseError(error);
     }
+  }
 
-    return andConditions.length > 0 ? { AND: andConditions } : {};
+  async createLecturer(data: {
+    fullName: string;
+    email: string;
+    passwordHash: string;
+  }) {
+    try {
+      return await this.prisma.user.create({
+        data: {
+          fullName: data.fullName,
+          email: data.email.toLowerCase(),
+          passwordHash: data.passwordHash,
+          role: Role.LECTURER,
+        },
+        select: safeUserSelect,
+      });
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  async createStudent(data: {
+    fullName: string;
+    email: string;
+    passwordHash: string;
+    matricNumber: string;
+    department: string;
+    pinHash?: string;
+  }) {
+    try {
+      return await this.prisma.user.create({
+        data: {
+          fullName: data.fullName,
+          email: data.email.toLowerCase(),
+          passwordHash: data.passwordHash,
+          role: Role.STUDENT,
+          student: {
+            create: {
+              matricNumber: data.matricNumber,
+              department: data.department,
+              pinHash: data.pinHash,
+            },
+          },
+        },
+        select: safeUserSelect,
+      });
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  async update(id: number, data: Prisma.UserUpdateInput) {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data,
+        select: safeUserSelect,
+      });
+    } catch (error) {
+      handleDatabaseError(error);
+    }
   }
 }

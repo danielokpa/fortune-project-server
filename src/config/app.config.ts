@@ -5,33 +5,18 @@ export default registerAs('app', () => ({
   apiPrefix: process.env.API_PREFIX || 'api',
   corsOrigin: process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
-    : ['https://www.dev.peppcruise.com', 'https://www.admin.peppcruise.com'],
-  jwtSecret: process.env.JWT_SECRET || '',
+    : ['http://localhost:3000', 'http://localhost:5173'],
+  jwtSecret: process.env.JWT_SECRET || 'attendance-dev-jwt-secret-change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
-  jwtTokenExpiry: process.env.JWT_TOKEN_EXPIRY || '1h',
-  apiKey: process.env.PEPPCRUISE_API_KEY || '',
+  qrTokenSecret:
+    process.env.QR_TOKEN_SECRET ||
+    process.env.JWT_SECRET ||
+    'attendance-dev-qr-secret-change-me',
+  attendanceThreshold: parseInt(process.env.ATTENDANCE_THRESHOLD || '75', 10),
+  webauthnRpId: process.env.WEBAUTHN_RP_ID || 'localhost',
+  webauthnOrigin: process.env.WEBAUTHN_ORIGIN || 'http://localhost:3000',
+  webauthnRpName:
+    process.env.WEBAUTHN_RP_NAME || 'UNICAL QR Attendance',
   rateLimitTtl: parseInt(process.env.RATE_LIMIT_TTL || '60000', 10),
-  rateLimitLimit: parseInt(process.env.RATE_LIMIT_LIMIT || '10', 10),
-  emailHost: process.env.EMAIL_HOST || '',
-  emailPort: parseInt(process.env.EMAIL_PORT || '587', 10),
-  emailId: process.env.EMAIL_ID || '',
-  emailPass: process.env.EMAIL_PASS || '',
-  emailFrom: process.env.EMAIL_FROM || '',
-  twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || '',
-  twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
-  twilioFromNumber: process.env.TWILIO_FROM_NUMBER || '',
-  imageBaseUrl: process.env.IMAGE_BASE_URL || '',
-  r2EndPoint: process.env.R2_ENDPOINT || '',
-  r2Bucket: process.env.R2_BUCKET || 'candidates',
-  r2AccessKey: process.env.R2_ACCESS_KEY! || 'null',
-  r2SecretKey: process.env.R2_SECRET_KEY! || 'null',
-  database: {
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: parseInt(process.env.DATABASE_PORT || '3306', 10),
-    username: process.env.DATABASE_USERNAME || 'root',
-    password: process.env.DATABASE_PASSWORD || 'password',
-    name: process.env.DATABASE_NAME || 'peppcruise',
-    synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
-    logging: process.env.DATABASE_LOGGING === 'true',
-  },
+  rateLimitLimit: parseInt(process.env.RATE_LIMIT_LIMIT || '60', 10),
 }));

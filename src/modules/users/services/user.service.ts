@@ -1,94 +1,79 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Prisma, User } from '@prisma/client';
-import { UserType } from 'src/enums/user-type.enum';
+import { PasswordUtil } from 'src/utils/password.util';
 import { UserRepository } from '../repositories/user.repository';
-// import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-import { DashboardDto, GetUsersDto, UpdateUserDto } from '../dto/user.dto';
-import { CursorUtil } from 'src/utils/cursor.util';
+import {
+  CreateLecturerDto,
+  CreateStudentDto,
+  GetUsersDto,
+  UpdateUserDto,
+} from '../dto/user.dto';
 import { UserFilters } from '../interfaces/user.interface';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly userRepository: UserRepository,
+  constructor(private readonly userRepository: UserRepository) {}
 
-    // private readonly clientDeviceService: ClientDeviceService,
-
-    private readonly configService: ConfigService,
-  ) {}
-
-  async fetchUser(id: string): Promise<Partial<User>> {
+  async fetchUser(id: number) {
     const user = await this.userRepository.findById(id);
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
     return user;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string) {
     return this.userRepository.findByEmail(email);
   }
 
   async findAll(params: GetUsersDto) {
     const filters: UserFilters = {
       cursor: params.cursor,
-      limit: params.limit,
+      limit: params.limit || 20,
       search: params.search,
-    }
-    const users = await this.userRepository.findAll(filters);
+      role: params.role,
+    };
+    const users = (await this.userRepository.findAll(filters)) || [];
     const hasNextPage = users.length > filters.limit;
-
     if (hasNextPage) users.pop();
     const lastItem = users[users.length - 1];
-
-    const nextCursor =
-      hasNextPage && lastItem
-        ? CursorUtil.encode({
-            createdAt: lastItem.createdAt.toISOString(),
-            id: lastItem.id,
-          })
-        : null;
 
     return {
       items: users,
       pagination: {
         limit: filters.limit,
         hasNextPage,
-        nextCursor,
-      }
-    }
+        nextCursor: hasNextPage && lastItem ? String(lastItem.id) : null,
+      },
+    };
   }
 
-  // async updateImageUrl(userId: string, imageUrl: string): Promise<User> {
-  //   const updatedUser = await this.userRepository.update(userId, {
-  //     imageUrl,
-  //   });
-
-  //   if (!updatedUser) {
-  //     throw new NotFoundException('Failed to update image URL');
-  //   }
-
-  //   return updatedUser;
-  // }
-
-  async update(
-    id: string,
-    userData: Prisma.UserUncheckedUpdateInput,
-  ): Promise<User> {
-    const data = await this.userRepository.update(id, userData);
-    if (!data) throw new NotFoundException('Failed to update user');
-    return data;
+  async createLecturer(dto: CreateLecturerDto) {
+    return this.userRepository.createLecturer({
+      fullName: dto.fullName,
+      email: dto.email,
+      passwordHash: await PasswordUtil.hashPassword(dto.password),
+    });
   }
 
-  async deleteUser(userId: string, adminId: string): Promise<boolean> {
-    const admin = await this.fetchUser(adminId);
-    if (!admin || admin.role !== UserType.ADMIN) throw new NotFoundException('Admin not found');
+  async createStudent(dto: CreateStudentDto) {
+    return this.userRepository.createStudent({
+      fullName: dto.fullName,
+      email: dto.email,
+      passwordHash: await PasswordUtil.hashPassword(dto.password),
+      matricNumber: dto.matricNumber,
+      department: dto.department,
+      pinHash: dto.pin
+        ? await PasswordUtil.hashPassword(dto.pin)
+        : undefined,
+    });
+  }
 
-    const deleted = await this.userRepository.delete(userId);
-    if (!deleted) return false;
-    return true;
+  async update(id: number, dto: UpdateUserDto) {
+    await this.fetchUser(id);
+    return this.userRepository.update(id, dto);
+  }
+
+  async updatePassword(id: number, passwordHash: string) {
+    return this.userRepository.update(id, { passwordHash });
   }
 }

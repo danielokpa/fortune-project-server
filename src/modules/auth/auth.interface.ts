@@ -1,18 +1,10 @@
-import { UserType } from 'src/enums';
+import { Role } from '@prisma/client';
 
 export interface JwtAuthPayload {
-  sub: string;
+  sub: number;
   email: string;
-  userType: UserType;
-  userId: string;
+  userType: Role;
+  userId: number;
   iat?: number;
   exp?: number;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  password: string;
-  isActive: boolean;
-  userType: UserType;
 }

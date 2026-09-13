@@ -22,7 +22,7 @@ export class AppController {
     return {
       success: true,
       status: 'OK',
-      service: 'PePP Cruise Server API',
+      service: 'UNICAL QR Attendance API',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',

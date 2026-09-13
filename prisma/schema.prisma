@@ -1,160 +1,173 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-}
-
-enum LoginType {
-  NORMAL
-  SOCIAL
+  provider = "sqlite"
 }
 
 enum Role {
   ADMIN
-  DOCTOR
-  NURSE
-  PATIENT
+  LECTURER
+  STUDENT
 }
 
-enum TokenType {
-  OTP
-  JWT
-  REFRESH
+enum SessionStatus {
+  OPEN
+  CLOSED
 }
 
-enum TokenSubject {
-  FORGOT_PASSWORD
-  SIGN_UP_PHONE
-  SIGN_UP_EMAIL
-  NEW_DEVICE_LOGIN_OTP
-  RESET_PASSCODE
+enum VerificationMethod {
+  QR_FINGERPRINT
+  QR_PIN
 }
 
-model Token {
-  id String @id @default(uuid())
-
-  subject TokenSubject
-  token   String
-
-  email   String?
-  phoneNo String?
-
-  tokenType TokenType
-
-  expiry DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([email])
-  @@index([phoneNo])
-  @@index([token])
-  @@index([expiry])
-  @@map("tokens")
-}
-
-enum AlertStatus {
-  ACTIVE
-  RESOLVED
-}
-
-enum DeviceStatus {
-  ACTIVE
-  INACTIVE
+enum AttendanceStatus {
+  PRESENT
 }
 
 model User {
-  id         String   @id @default(uuid())
-  firstName  String
-  lastName   String
-  email      String   @unique
-  phoneNo    String?
-  password   String
-  role       Role     @default(NURSE)
-  // isActive   Boolean  @default(true)
-  isDisabled Boolean  @default(false)
+  id           Int      @id @default(autoincrement())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  student              Student?
+  courses              Course[]            @relation("CourseLecturer")
+  sessions             AttendanceSession[] @relation("SessionLecturer")
+  auditLogs            AuditLog[]
+  webauthnChallenges   WebAuthnChallenge[]
 
   @@map("users")
 }
 
-model Patient {
-  id          String    @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String    @unique
-  dateOfBirth DateTime
-  gender      String
-  contact     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model Student {
+  id           Int     @id @default(autoincrement())
+  userId       Int     @unique
+  matricNumber String  @unique
+  department   String
+  pinHash      String?
 
-  readings    HealthReading[]
-  alerts      Alert[]
-  thresholds  Threshold[]
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrollments   Enrollment[]
+  records       AttendanceRecord[]
+  credentials   WebAuthnCredential[]
+  authAttempts  BiometricAttempt[]
 
-  @@map("patients")
+  @@map("students")
 }
 
-model Device {
-  id         String       @id @default(uuid())
-  deviceName String
-  status     DeviceStatus @default(ACTIVE)
-  createdAt  DateTime     @default(now())
+model Course {
+  id         Int    @id @default(autoincrement())
+  courseCode String @unique
+  title      String
+  unitLoad   Int
+  lecturerId Int
 
-  readings   HealthReading[]
+  lecturer    User                 @relation("CourseLecturer", fields: [lecturerId], references: [id])
+  enrollments Enrollment[]
+  sessions    AttendanceSession[]
 
-  @@map("devices")
+  @@map("courses")
 }
 
-model HealthReading {
-  id          String   @id @default(uuid())
-  patientId   String
-  deviceId    String
-  heartRate   Float
-  temperature Float
-  recordedAt  DateTime @default(now())
+model Enrollment {
+  id               Int    @id @default(autoincrement())
+  studentId        Int
+  courseId         Int
+  academicSession  String
 
-  patient     Patient  @relation(fields: [patientId], references: [id])
-  device      Device   @relation(fields: [deviceId], references: [id])
-  alerts      Alert[]
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  @@map("health_readings")
+  @@unique([studentId, courseId, academicSession])
+  @@map("enrollments")
 }
 
-model Alert {
-  id         String      @id @default(uuid())
-  patientId  String
-  readingId  String
-  parameter  String      // e.g. "heart_rate" or "temperature"
-  value      Float
-  status     AlertStatus @default(ACTIVE)
-  createdAt  DateTime    @default(now())
+model AttendanceSession {
+  id          Int           @id @default(autoincrement())
+  courseId    Int
+  lecturerId  Int
+  qrToken     String        @unique
+  tokenExpiry DateTime
+  status      SessionStatus @default(OPEN)
+  createdAt   DateTime      @default(now())
 
-  patient    Patient       @relation(fields: [patientId], references: [id])
-  reading    HealthReading @relation(fields: [readingId], references: [id])
+  course   Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lecturer User                @relation("SessionLecturer", fields: [lecturerId], references: [id])
+  records  AttendanceRecord[]
+  attempts BiometricAttempt[]
 
-  @@map("alerts")
+  @@map("attendance_sessions")
 }
 
-model Threshold {
-  id          String  @id @default(uuid())
-  patientId   String  @unique
-  minHeartRate   Float @default(60)
-  maxHeartRate   Float @default(100)
-  minTemperature Float @default(36.1)
-  maxTemperature Float @default(37.5)
+model AttendanceRecord {
+  id                 Int                 @id @default(autoincrement())
+  sessionId          Int
+  studentId          Int
+  timestamp          DateTime            @default(now())
+  verificationMethod VerificationMethod
+  status             AttendanceStatus    @default(PRESENT)
 
-  patient     Patient @relation(fields: [patientId], references: [id])
+  session AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  @@map("thresholds")
+  @@unique([sessionId, studentId])
+  @@map("attendance_records")
+}
+
+model WebAuthnCredential {
+  credentialId String   @id
+  studentId    Int
+  publicKey    String
+  signCount    Int      @default(0)
+  deviceInfo   String?
+  createdAt    DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("webauthn_credentials")
+}
+
+model WebAuthnChallenge {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  challenge String
+  sessionId Int?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@map("webauthn_challenges")
+}
+
+model BiometricAttempt {
+  id        Int @id @default(autoincrement())
+  sessionId Int
+  studentId Int
+  failCount Int @default(0)
+
+  session AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, studentId])
+  @@map("biometric_attempts")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  actorId   Int?
+  action    String
+  entity    String
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
 }

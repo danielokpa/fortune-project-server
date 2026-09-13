@@ -1,24 +1,28 @@
 import { Module } from '@nestjs/common';
-import { MailModule } from 'src/services/mail/mail.module';
-import { TokenModule } from 'src/services/token/token.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './auth.service';
-// import { CountriesModule } from '../countries/countries.module';
 import { UsersModule } from '../users/users.module';
-import { PatientsModule } from '../patients/patient.module';
-// import { ClientDevicesModule } from '../client-devices/client-devices.module';
+import { AuthGuard } from './guards/auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
-    TokenModule,
-    MailModule,
-    // CountriesModule,
     UsersModule,
-    PatientsModule,
-    // ClientDevicesModule,
+    JwtModule.registerAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('app.jwtSecret'),
+        signOptions: {
+          expiresIn: config.get<string>('app.jwtExpiresIn') || '1d',
+        },
+      }),
+    }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, AuthGuard, RolesGuard],
   controllers: [AuthController],
-  exports: [],
+  exports: [AuthService, AuthGuard, RolesGuard, JwtModule],
 })
 export class AuthModule {}

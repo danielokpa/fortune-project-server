@@ -1,57 +1,102 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient, Role } from '@prisma/client';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
+import { createClient } from '@libsql/client';
+import * as argon2 from 'argon2';
 
-// import { seedCountries } from './seeds/countries.seed';
-// import { seedStates } from './seeds/states.seed';
-import {
-  seedAdminUser,
-} from './seeds/user.seed';
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
-
+const url = process.env.DATABASE_URL || 'file:./prisma/dev.db';
 const prisma = new PrismaClient({
-  adapter,
+  adapter: new PrismaLibSql(createClient({ url })),
 });
 
 async function main() {
-  console.log(
-    '\n🚀 Starting seed...\n',
-  );
-  // await seedCountries(prisma);
-  // await seedStates(prisma);
-  // const patients = await prisma.patient.findMany({ where: { email: null } });
+  const adminHash = await argon2.hash('Admin123!');
+  const lecturerHash = await argon2.hash('Lecturer123!');
+  const studentHash = await argon2.hash('Student123!');
+  const pinHash = await argon2.hash('1234');
 
-  //   for (const p of patients) {
-  //     const syntheticEmail = `${p.firstName}.${p.lastName}.${p.id}@patients.local`.toLowerCase();
-  //     await prisma.patient.update({
-  //       where: { id: p.id },
-  //       data: { email: syntheticEmail },
-  //     });
-  //     console.log(`✅ Backfilled email for patient ${p.id}: ${syntheticEmail}`);
-  //   }
-  
-  // const admin =
-  //   await seedAdminUser(
-  //     prisma,
-  //   );
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@unical.edu.ng' },
+    update: {},
+    create: {
+      fullName: 'System Admin',
+      email: 'admin@unical.edu.ng',
+      passwordHash: adminHash,
+      role: Role.ADMIN,
+    },
+  });
 
-  // console.log('\n');
+  const lecturer = await prisma.user.upsert({
+    where: { email: 'jane.lecturer@unical.edu.ng' },
+    update: {},
+    create: {
+      fullName: 'Dr Jane Lecturer',
+      email: 'jane.lecturer@unical.edu.ng',
+      passwordHash: lecturerHash,
+      role: Role.LECTURER,
+    },
+  });
 
-  // console.log(
-  //   'Admin User ID:',
-  //   admin.id,
-  // );
+  const studentUser = await prisma.user.upsert({
+    where: { email: 'john.student@unical.edu.ng' },
+    update: {},
+    create: {
+      fullName: 'John Student',
+      email: 'john.student@unical.edu.ng',
+      passwordHash: studentHash,
+      role: Role.STUDENT,
+      student: {
+        create: {
+          matricNumber: 'CS/2021/001',
+          department: 'Computer Science',
+          pinHash,
+        },
+      },
+    },
+    include: { student: true },
+  });
 
-  console.log(
-    '\n✅ Base seed complete\n',
-  );
+  const course = await prisma.course.upsert({
+    where: { courseCode: 'CSC 401' },
+    update: {},
+    create: {
+      courseCode: 'CSC 401',
+      title: 'Software Engineering',
+      unitLoad: 3,
+      lecturerId: lecturer.id,
+    },
+  });
+
+  if (studentUser.student) {
+    await prisma.enrollment.upsert({
+      where: {
+        studentId_courseId_academicSession: {
+          studentId: studentUser.student.id,
+          courseId: course.id,
+          academicSession: '2024/2025',
+        },
+      },
+      update: {},
+      create: {
+        studentId: studentUser.student.id,
+        courseId: course.id,
+        academicSession: '2024/2025',
+      },
+    });
+  }
+
+  console.log('Seeded users:', {
+    admin: admin.email,
+    lecturer: lecturer.email,
+    student: studentUser.email,
+  });
 }
 
 main()
-  .catch(console.error)
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
   .finally(async () => {
     await prisma.$disconnect();
   });
-
