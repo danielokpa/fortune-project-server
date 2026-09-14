@@ -1,12 +1,16 @@
 import 'dotenv/config';
 import { PrismaClient, Role } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
-import { createClient } from '@libsql/client';
 import * as argon2 from 'argon2';
 
-const url = process.env.DATABASE_URL || 'file:./prisma/dev.db';
+// Use the TURSO_DATABASE_URL if available, otherwise fall back to local
+const url = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL || 'file:./prisma/dev.db';
+
 const prisma = new PrismaClient({
-  adapter: new PrismaLibSql(createClient({ url })),
+  adapter: new PrismaLibSql({ 
+    url,
+    authToken: process.env.TURSO_AUTH_TOKEN 
+  }),
 });
 
 async function main() {
