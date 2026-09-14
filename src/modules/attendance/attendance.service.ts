@@ -386,14 +386,29 @@ export class AttendanceService {
   }
 
   private async takeChallenge(userId: number, type: string) {
+    // 1. Fetch the latest challenge for this user regardless of its time status
     const challenge = await this.prisma.webAuthnChallenge.findFirst({
-      where: { userId, type, expiresAt: { gt: new Date() } },
-      orderBy: { createdAt: 'desc' },
+      where: { userId, type },
+      orderBy: { id: 'desc' }, // Order by id or createdAt (whichever is your primary identifier)
     });
+
+    // 2. If no challenge exists at all in the database
     if (!challenge) {
+      throw new BadRequestException('WebAuthn challenge not found. Please retry.');
+    }
+
+    // 3. Add a 60-second clock-drift grace period to handle server-database time differences
+    const now = new Date();
+    const gracePeriodMs = 60 * 1000; // 1 minute grace period
+    const absoluteExpiry = new Date(challenge.expiresAt.getTime() + gracePeriodMs);
+
+    if (absoluteExpiry < now) {
       throw new BadRequestException('WebAuthn challenge expired');
     }
+
+    // 4. Delete the challenge right after validation to prevent replay attacks
     await this.prisma.webAuthnChallenge.delete({ where: { id: challenge.id } });
+    
     return challenge;
   }
 
