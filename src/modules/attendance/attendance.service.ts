@@ -389,7 +389,7 @@ export class AttendanceService {
     // 1. Fetch the latest challenge for this user regardless of its time status
     const challenge = await this.prisma.webAuthnChallenge.findFirst({
       where: { userId, type },
-      orderBy: { id: 'desc' }, // Order by id or createdAt (whichever is your primary identifier)
+      orderBy: { createdAt: 'desc' }, // Order by id or createdAt (whichever is your primary identifier)
     });
 
     // 2. If no challenge exists at all in the database
